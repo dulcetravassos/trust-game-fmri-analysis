@@ -1,0 +1,22 @@
+# 1. Ignore raw files (PROTECTED FOR NOW)
+/data/raw/
+
+# 2. Ignore derivatives and outputs from previous analysis
+/data/derivatives/
+/data/spm-data/readme_old.txt
+/data/NOTESnCAVEATS.txt
+
+# 3. Block all .nii and .nii.gz files for security/privacy reasons
+*.nii
+*.nii.gz
+
+# 4. Exceptions to the previous point (Whitelist) -> However, cannot bypass the /data/raw/ blockage (as expected)
+# NOTE: THESE EXCEPTIONS ARE BLOCKED FOR NOW. CURRENTLY NOT SHARING ANY DATA.
+#!*defaced.nii
+#!*defaced.nii.gz
+
+#!*phasediff.nii
+#!*phasediff.nii.gz
+
+#!*magnitude*.nii     # magnitude1, magnitude2
+#!*magnitude*.nii.gz
