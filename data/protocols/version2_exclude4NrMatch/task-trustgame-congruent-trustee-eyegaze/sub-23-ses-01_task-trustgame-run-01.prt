@@ -1,0 +1,222 @@
+
+FileVersion:        1
+
+ResolutionOfTime:   msec
+
+Experiment:         trustgame_run1
+
+BackgroundColor:    0 0 0
+TextColor:          255 255 255
+TimeCourseColor:    0 170 0
+TimeCourseThick:    3
+ReferenceFuncColor: 113 113 255
+ReferenceFuncThick: 3
+
+NrOfConditions:     30
+
+
+
+congruent_VIDEO_TTrust_directed
+2
+170079	174640
+418080	422638
+
+Color: 255 255 255
+
+congruent_VIDEO_TTrust_directed_excluded
+2
+8077	12643
+194079	198639
+
+Color: 100 100 100
+
+congruent_VIDEO_TTrust_averted
+2
+336079	340782
+362080	366735
+
+Color: 155 155 155
+
+congruent_VIDEO_TUntrust_directed
+2
+34077	38640
+114078	118640
+
+Color: 255 0 255
+
+congruent_VIDEO_TUntrust_averted
+2
+58077	62640
+312079	316638
+
+Color: 155 0 155
+
+congruent_VIDEO_TUntrust_averted_excluded
+2
+142078	146640
+388080	392639
+
+Color: 100 100 100
+
+congruent_VIDEO_PC
+2
+86078	90205
+224079	228154
+
+Color: 255 255 0
+
+congruent_VIDEO_PC_excluded
+2
+256079	260154
+282079	286154
+
+Color: 100 100 100
+
+congruent_EVALUATION_TTrust_directed
+1
+422652	426758
+
+Color: 0 255 255
+
+congruent_EVALUATION_TTrust_averted
+0
+
+Color: 228 228 228
+
+congruent_EVALUATION_TUntrust_directed
+1
+118655	122762
+
+Color: 0 155 155
+
+congruent_EVALUATION_TUntrust_averted
+1
+392653	396757
+
+Color: 128 128 128
+
+congruent_EVALUATION_PC
+1
+228170	232276
+
+Color: 238 238 238
+
+congruent_DECISION_TTrust_directed
+2
+176671	180776
+428786	432887
+
+Color: 10 40 40
+
+congruent_DECISION_TTrust_directed_excluded
+2
+14739	18825
+204787	208893
+
+Color: 100 100 100
+
+congruent_DECISION_TTrust_averted
+2
+342803	346904
+368769	372875
+
+Color: 140 50 0
+
+congruent_DECISION_TUntrust_directed
+2
+40672	44757
+124788	128894
+
+Color: 0 30 40
+
+congruent_DECISION_TUntrust_averted
+2
+64671	68772
+318670	322775
+
+Color: 240 30 0
+
+congruent_DECISION_TUntrust_averted_excluded
+2
+148671	152777
+398786	402892
+
+Color: 100 100 100
+
+congruent_DECISION_PC
+2
+92238	96344
+234304	238409
+
+Color: 0 50 70
+
+congruent_DECISION_PC_excluded
+2
+262187	266288
+292303	296409
+
+Color: 100 100 100
+
+congruent_FEEDBACK_TTrust_directed
+2
+184788	186804
+436903	438918
+
+Color: 90 10 70
+
+congruent_FEEDBACK_TTrust_directed_excluded
+2
+24863	26872
+214905	216920
+
+Color: 100 100 100
+
+congruent_FEEDBACK_TTrust_averted
+2
+350921	352936
+376887	378902
+
+Color: 60 20 50
+
+congruent_FEEDBACK_TUntrust_directed
+2
+48774	50788
+132905	134921
+
+Color: 80 30 60
+
+congruent_FEEDBACK_TUntrust_averted
+2
+74789	76804
+326787	328803
+
+Color: 40 50 20
+
+congruent_FEEDBACK_TUntrust_averted_excluded
+2
+158789	160804
+406903	408919
+
+Color: 100 100 100
+
+congruent_FEEDBACK_PC
+2
+102356	104371
+244421	246437
+
+Color: 200 200 70
+
+congruent_FEEDBACK_PC_excluded
+2
+272305	274320
+302421	304436
+
+Color: 100 100 100
+
+No_Response
+2
+198654	202759
+286170	290275
+
+Color: 90 90 90
+

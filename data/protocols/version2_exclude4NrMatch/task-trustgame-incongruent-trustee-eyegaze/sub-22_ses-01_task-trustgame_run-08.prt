@@ -1,0 +1,281 @@
+FileVersion: 1
+
+ResolutionOfTime: msec
+
+Experiment: trustgame_tg22_run8
+
+BackgroundColor: 0 0 0
+TextColor: 255 255 255
+TimeCourseColor: 0 170 0
+TimeCourseThick: 3
+ReferenceFuncColor: 113 113 255
+ReferenceFuncThick: 3
+
+NrOfConditions: 53
+
+congruent_VIDEO_TTrust_directed
+0
+Color: 255 255 255
+
+congruent_VIDEO_TTrust_averted
+0
+Color: 155 155 155
+
+congruent_VIDEO_TUntrust_directed
+0
+Color: 255 0 255
+
+congruent_VIDEO_TUntrust_averted
+0
+Color: 155 0 155
+
+congruent_VIDEO_PC
+0
+Color: 255 255 0
+
+congruent_EVALUATION_TTrust_directed
+0
+Color: 0 255 255
+
+congruent_EVALUATION_TTrust_averted
+0
+Color: 228 228 228
+
+congruent_EVALUATION_TUntrust_directed
+0
+Color: 0 155 155
+
+congruent_EVALUATION_TUntrust_averted
+0
+Color: 128 128 128
+
+congruent_EVALUATION_PC
+0
+Color: 238 238 238
+
+congruent_DECISION_TTrust_directed
+0
+Color: 10 40 40
+
+congruent_DECISION_TTrust_averted
+0
+Color: 140 50 0
+
+congruent_DECISION_TUntrust_directed
+0
+Color: 0 30 40
+
+congruent_DECISION_TUntrust_averted
+0
+Color: 240 30 0
+
+congruent_DECISION_PC
+0
+Color: 0 50 70
+
+congruent_FEEDBACK_TTrust_directed
+0
+Color: 90 10 70
+
+congruent_FEEDBACK_TTrust_averted
+0
+Color: 60 20 50
+
+congruent_FEEDBACK_TUntrust_directed
+0
+Color: 80 30 60
+
+congruent_FEEDBACK_TUntrust_averted
+0
+Color: 40 50 20
+
+congruent_FEEDBACK_PC
+0
+Color: 200 200 70
+
+incongruent_VIDEO_TTrust_directed
+2
+8003 12574
+280004 284568
+Color: 255 255 255
+
+incongruent_VIDEO_TTrust_averted
+2
+224004 228661
+332004 336660
+Color: 155 155 155
+
+incongruent_VIDEO_TTrust_averted_excluded
+2
+84003 88676
+306004 310661
+Color: 100 100 100
+
+incongruent_VIDEO_TUntrust_directed
+2
+34003 38570
+392004 396565
+Color: 255 0 255
+
+incongruent_VIDEO_TUntrust_directed_excluded
+2
+194003 198568
+418004 422565
+Color: 100 100 100
+
+incongruent_VIDEO_TUntrust_averted
+2
+58003 62570
+254004 258570
+Color: 155 0 155
+
+incongruent_VIDEO_PC
+2
+166003 170083
+360004 364080
+Color: 255 255 0
+
+incongruent_VIDEO_PC_excluded
+2
+110003 114084
+136003 140084
+Color: 100 100 100
+
+incongruent_EVALUATION_TTrust_directed
+0
+Color: 0 255 255
+
+incongruent_EVALUATION_TTrust_averted
+2
+228682 232721
+336681 340720
+Color: 228 228 228
+
+incongruent_EVALUATION_TUntrust_directed
+2
+198582 202622
+422579 426620
+Color: 0 155 155
+
+incongruent_EVALUATION_TUntrust_averted
+0
+Color: 128 128 128
+
+incongruent_EVALUATION_PC
+2
+140101 144141
+364097 368137
+Color: 238 238 238
+
+incongruent_DECISION_TTrust_directed
+2
+14653 18693
+286598 290637
+Color: 10 40 40
+
+incongruent_DECISION_TTrust_averted
+2
+234748 238788
+342747 346788
+Color: 140 50 0
+
+incongruent_DECISION_TTrust_averted_excluded
+2
+90701 94741
+312697 316737
+Color: 100 100 100
+
+incongruent_DECISION_TUntrust_directed
+2
+40601 44642
+398596 402636
+Color: 0 30 40
+
+incongruent_DECISION_TUntrust_directed_excluded
+2
+204649 208689
+428646 432681
+Color: 100 100 100
+
+incongruent_DECISION_TUntrust_averted
+2
+64601 68641
+260598 264637
+Color: 240 30 0
+
+incongruent_DECISION_PC
+2
+172116 176157
+370163 374203
+Color: 0 50 70
+
+incongruent_DECISION_PC_excluded
+2
+116117 120157
+146166 150206
+Color: 100 100 100
+
+incongruent_FEEDBACK_TTrust_directed
+2
+24726 26735
+294649 296664
+Color: 90 10 70
+
+incongruent_FEEDBACK_TTrust_averted
+2
+244799 246815
+350798 352813
+Color: 60 20 50
+
+incongruent_FEEDBACK_TTrust_averted_excluded
+2
+98752 100767
+322748 324763
+Color: 100 100 100
+
+incongruent_FEEDBACK_TUntrust_directed
+2
+48654 50668
+408647 410662
+Color: 80 30 60
+
+incongruent_FEEDBACK_TUntrust_directed_excluded
+2
+212700 214715
+436697 438712
+Color: 100 100 100
+
+incongruent_FEEDBACK_TUntrust_averted
+2
+72652 74667
+268649 270664
+Color: 40 50 20
+
+incongruent_FEEDBACK_PC
+2
+182167 184182
+380214 382229
+Color: 200 200 70
+
+incongruent_FEEDBACK_PC_excluded
+2
+126168 128183
+156217 158233
+Color: 100 100 100
+
+Video_NO_RESPONSE
+0
+Color: 80 80 80
+
+Evaluation_NO_RESPONSE
+1
+114084 114084
+Color: 0 90 90
+
+Decision_NO_RESPONSE
+0
+Color: 90 0 90
+
+Feedback_NO_RESPONSE
+0
+Color: 90 90 0
