@@ -20,8 +20,8 @@ clear; clc;
 spm_path = 'C:\Users\User\Desktop\Tese\spm12';
 
 % Input and output directories
-raw_base_dir = 'C:\Users\User\Desktop\Tese\DATA\raw';
-output_base_dir = 'C:\Users\User\Desktop\Tese\DATA\spm-data\rawdata';
+raw_base_dir = 'C:\Users\User\Desktop\Tese\github\data\raw';
+output_base_dir = 'C:\Users\User\Desktop\Tese\github\data\spm-data\rawdata';
 
 % What is going to be converted (1 for yes, 0 for no)
 convert_anat_defaced = 0; % Defaced Anatomical
