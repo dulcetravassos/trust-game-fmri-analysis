@@ -21,13 +21,13 @@ clear all; clc;
 % NOTE - some configurations may have to be changed in the read_prt function (for example, the conversion factor, currently for msec -> sec)
 
 % Input folder - congruent trials
-folder_prt_congruent = 'C:\Users\User\Desktop\Tese\github\data\protocols\version2_exclude4NrMatch\task-trustgame-congruent-trustee-eyegaze';
+folder_prt_congruent = 'C:\Users\User\Desktop\Tese\data\protocols\version2_exclude4NrMatch\task-trustgame-congruent-trustee-eyegaze';
 
 % Input folder - incongruent trials
-folder_prt_incongruent = 'C:\Users\User\Desktop\Tese\github\data\protocols\version2_exclude4NrMatch\task-trustgame-incongruent-trustee-eyegaze';
+folder_prt_incongruent = 'C:\Users\User\Desktop\Tese\data\protocols\version2_exclude4NrMatch\task-trustgame-incongruent-trustee-eyegaze';
 
 % Output folder: /derivatives (BIDS)
-folder_out = 'C:\Users\User\Desktop\Tese\github\data\spm-data\derivatives\spm-events';
+folder_out = 'C:\Users\User\Desktop\Tese\data\spm-data\derivatives\spm-events';
 
 % What is going to be converted (1 for yes, 0 for no)
 do_congruent = 1;
