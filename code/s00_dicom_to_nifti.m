@@ -39,7 +39,7 @@ runs_fmap = [1:8]; % Fieldmaps
 % may vary between the input and output. This correspondence table follows
 % the format {raw, BIDS}.
 subject_map = {
-    'sub-tg02',  'sub-002';
+    % 'sub-tg02',  'sub-002';
     'sub-tg03',  'sub-003';
     'sub-tg04',  'sub-004';
     'sub-tg06',  'sub-006';
