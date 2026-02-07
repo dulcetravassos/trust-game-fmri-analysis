@@ -314,6 +314,12 @@ if strcmp(info.type,'func')
     json.RepetitionTime = tr;
     json.EchoTime = te;
 
+    % Sub-017 acquired with inverse slice order!
+    is_inverted = contains(info.bids_subj,'sub-017');
+    if is_inverted
+        fprintf('[INFO] Applying DESCENDING slice timing for sub-017!\n')
+    end
+
     if strcmp(info.task,'main')
 
         % Since we know that the protocol is Siemens Interleaved with 34 slices, we
@@ -323,19 +329,32 @@ if strcmp(info.type,'func')
         nslices = 34;
         time_per_slice = tr/nslices;
         slice_times = zeros(1, nslices);
-        
-        % Even slices
-        % Slice 2 at t=0, slice 2*n at t=(n-1)*time_per_slice
-        counter = 0;
-        for s = 2:2:nslices
-            slice_times(s) = counter * time_per_slice;
-            counter = counter+1;
-        end
-        
-        % Odd slices
-        for s = 1:2:nslices
-            slice_times(s) = counter * time_per_slice;
-            counter = counter+1;
+
+        if ~is_inverted
+            % Even slices
+            % Slice 2 at t=0, slice 2*n at t=(n-1)*time_per_slice
+            counter = 0;
+            for s = 2:2:nslices
+                slice_times(s) = counter * time_per_slice;
+                counter = counter+1;
+            end
+            
+            % Odd slices
+            for s = 1:2:nslices
+                slice_times(s) = counter * time_per_slice;
+                counter = counter+1;
+            end
+        else
+            % Even slices
+            counter=0;
+            for s = nslices:-2:2
+                slice_times(s) = counter * time_per_slice; counter = counter+1;
+            end
+
+            % Odd slices
+            for s=(nslices-1):-2:1
+                slice_times(s) = counter * time_per_slice; counter = counter+1;
+            end
         end
         
         json.SliceTiming = slice_times;
@@ -346,17 +365,30 @@ if strcmp(info.type,'func')
         time_per_slice = tr/nslices;
         slice_times = zeros(1, nslices);
         
-        % Odd slices
-        counter = 0;
-        for s = 1:2:nslices
-            slice_times(s) = counter * time_per_slice;
-            counter = counter+1;
-        end
-        
-        % Even slices
-        for s = 2:2:nslices
-            slice_times(s) = counter * time_per_slice;
-            counter = counter+1;
+        if ~is_inverted
+            % Odd slices
+            counter = 0;
+            for s = 1:2:nslices
+                slice_times(s) = counter * time_per_slice;
+                counter = counter+1;
+            end
+            
+            % Even slices
+            for s = 2:2:nslices
+                slice_times(s) = counter * time_per_slice;
+                counter = counter+1;
+            end
+        else
+            % Odd slices
+            counter=0;
+            for s = nslices:-2:1
+                slice_times(s) = counter * time_per_slice; counter = counter+1;
+            end
+
+            % Even slices
+            for s= (nslices-1):-2:2
+                slice_times(s) = counter * time_per_slice; counter = counter+1;
+            end
         end
         
         json.SliceTiming = slice_times;
