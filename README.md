@@ -1,4 +1,4 @@
-# Short Title: Trust Game fMRI Analysis
+# Short Title: Social Reversal Learning
 ## Title: Learning and relearning to trust in different social contexts: an fMRI study
 
 **Contributors:** Dulce Travassos
