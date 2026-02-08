@@ -3,7 +3,8 @@
 %   Slice Timing Correction (BIDS ready)                                 %
 %                                                                        %
 %   Adapted to deal with subjects with reverse slice order and variable  %
-%   volumes. Saves output in derivatives folder (BIDS friendly).         %
+%   volumes. Saves output in derivatives folder with a JSON file (BIDS   %
+%   friendly).                                                           %
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 06/02/2026                                                  %
@@ -114,7 +115,9 @@ for s = 1:length(subjects)
         % Get functional files ('sub-002_task-main_run-01_bold.nii' format-like)
         subj_func_dir = fullfile(raw_dir,subj,'func');
         file_pattern = sprintf('*%s*_bold.nii',current_task);
-        run_files = dir(fullfile(subj_func_dir,file_pattern));
+        run_struct = dir(fullfile(subj_func_dir,file_pattern));
+        [~,idx] = sort({run_struct.name});
+        run_files = run_struct(idx);
         if isempty(run_files)
             fprintf('[WARNING] No functional files found for %s. Skipping.\n', subj);
             continue;
@@ -173,15 +176,19 @@ for s = 1:length(subjects)
             continue;
         end
         
-        % To comply with BIDS, we need to move the new files to the derivatives folder...   
+        % To comply with BIDS, we need to move the new files to the derivatives folder... 
+        % Also, creates JSON file for this operation
         for k = 1:length(files_to_move)
             orig_name = files_to_move{k};
             out_name = ['a' orig_name];
             src = fullfile(subj_func_dir,out_name);
             dest = fullfile(subj_out_dir,out_name);
     
-            if exist(src,'file'); 
+            if exist(src,'file') 
                 movefile(src,dest);
+                init_json_path = fullfile(subj_func_dir,replace(orig_name,'.nii','.json'));
+                out_json_path = replace(dest,'.nii','.json');  
+                create_derivative_json(init_json_path, out_json_path, ref_slice);
             else
                 fprintf('[WARNING] Could not find generated file: %s\n',out_name);
             end
@@ -197,3 +204,25 @@ for s = 1:length(subjects)
 end
 
 fprintf('\nFinished!\n')
+
+%% Helper Functions
+
+function create_derivative_json(source_json_path,target_json_path,ref_slice)
+
+if exist(source_json_path,'file')
+    content = fileread(source_json_path);
+    json_data = jsondecode(content);
+else
+    json_data = struct(); % start new one
+end
+
+json_data.SliceTimingCorrected = true;
+json_data.ReferenceSliceIndex = ref_slice;
+json_data.Sources = {source_json_path};
+
+% Save .json file
+fid = fopen(target_json_path,'w');
+if fid==-1; warning('Could not save JSON file.'); return; end
+fprintf(fid,'%s',jsonencode(json_data,'PrettyPrint',true));
+fclose(fid);
+end
