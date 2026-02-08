@@ -21,7 +21,7 @@ clear; clc;
 spm_path = 'C:\Users\User\Desktop\Tese\spm12';
 
 % Input and output directories
-base_dir = 'C:\Users\User\Desktop\Tese\github\data\spm-data';
+base_dir = 'C:\Users\User\Desktop\Tese\data\spm-data';
 raw_dir  = fullfile(base_dir,'rawdata');
 deriv_dir = fullfile(base_dir,'derivatives','spm-preprocessing');
 
