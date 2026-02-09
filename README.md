@@ -5,6 +5,8 @@
 
 **Date created:** January 2026
 
+**Last updated:** February 2026
+
 **Identifer:** DOI (xxxxx)
 
 **Category:** Project
@@ -12,8 +14,6 @@
 **Code License:** MIT
 
 **Description:** This repository contains the complete pipeline for fMRI data preprocessing and analysis on SPM for the (xxxx) study.
-
-**IMPORTANT: NOTE THAT DATA IS CURRENTLY NOT AVAILABLE.**
 
 This repository consists of a SPM project ran on MatLab, with (xxx) scripts and (xxx) folders containing the data either needed to run these scripts or created by these scripts. All outputs follow the BIDS naming convention. For a detailed description of all folders and files, please see below. To run this repository, first download MatLab and SPM (versions provided below). The scripts are named in the order that they should be run. For any further information about this repository, please contact: Dulce Travassos, email: uc2021216844 [at] student [dot] uc [dot] pt.
 
@@ -32,7 +32,7 @@ This repository consists of a SPM project ran on MatLab, with (xxx) scripts and 
 
 **SPM12:** Release 7771
 
-### Hardware
+### Hardware:
 
 **OS:** Microsoft Windows 10 (64-bit)
 
