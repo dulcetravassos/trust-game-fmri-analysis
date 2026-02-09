@@ -1,0 +1,25 @@
+##################################################################################
+#									         #
+#  The code was developed and tested on a PC with the following specifications:  #
+#									         #
+#  Software: MATLAB R2024b (Update 4 - 24.2.0.2833386)			         #
+#  	     SPM12 (7771)						         #
+#  OS: Microsoft Windows 10 (64-bit)					         #
+#  CPU: Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz			         #
+#  RAM: 16GB								         #
+#  GPU: NVIDIA GeForce RTX 2060 with Max-Q Design			         #
+#									         #
+##################################################################################
+
+--------------------------------------------- s00_dicom_to_nifti --------------------------------------------- 
+
+Converts raw DICOM MRI data (anatomical, functional, fieldmaps) into NIfTI files suitable for preprocessing and analysis in SPM12. Saves a JSON file with metadata. Output filenames follow BIDS conventions, when applicable.
+
+--------------------------------------------- s00_convert_prt_to_spm ---------------------------------------------
+
+The function prt_to_spm(), using the function read_prt(), reads multiple .prt files from a selected folder; confirms the resolution of time (converting msec to sec); skips empty conditions (meaning 0 trials); detects start time of an event and calculates its duration; and saves a .mat file with a BIDS compliant name. 
+
+--------------------------------------------- s01_slice_timing --------------------------------------------- 
+
+Slice Timing Correction script adapted to deal with subjects with reverse slice order and variable volumes. Saves output in derivatives folder with a JSON file (BIDS friendly). 
+Takes ~20 minutes to process a single subject (main task + face localizer).
