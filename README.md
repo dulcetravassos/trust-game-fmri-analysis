@@ -24,7 +24,20 @@ This repository consists of a SPM project ran on MatLab, with (xxx) scripts and 
   - file2: xxx
 - folder2: xxx)
 
-## Software Used
-MatLab R2024b (24.2)
+## Environment 
 
-SPM12
+### Software:
+
+**MatLab**: R2024b (Update 4 - 24.2.0.2833386)
+
+**SPM12:** Release 7771
+
+### Hardware
+
+**OS:** Microsoft Windows 10 (64-bit)
+
+**CPU:** Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz
+
+**RAM:** 16GB
+
+**GPU:** NVIDIA GeForce RTX 2060 with Max-Q Design
