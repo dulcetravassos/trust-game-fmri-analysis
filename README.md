@@ -28,16 +28,24 @@ This repository consists of a SPM project ran on MatLab, with (xxx) scripts and 
 
 ### Software:
 
-**MatLab**: R2024b (Update 4 - 24.2.0.2833386)
+**Windows Environment:**
 
-**SPM12:** Release 7771
+* **MatLab**: R2024b (Update 4 - 24.2.0.2833386)
+
+* **SPM12:** Release 7771
+
+**WSL (Linux) Environment:**
+
+* **OS**: Ubuntu v24.04.5 LTS
+
+* **FSL:** vX.X.X *(specifically `fugue` for fieldmap unwarping)*
 
 ### Hardware:
 
-**OS:** Microsoft Windows 10 (64-bit)
+* **OS:** Microsoft Windows 10 (64-bit)
 
-**CPU:** Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz
+* **CPU:** Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz
 
-**RAM:** 16GB
+* **RAM:** 16GB
 
-**GPU:** NVIDIA GeForce RTX 2060 with Max-Q Design
+* **GPU:** NVIDIA GeForce RTX 2060 with Max-Q Design
