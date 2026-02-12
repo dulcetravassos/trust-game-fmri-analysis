@@ -70,6 +70,7 @@ volumes_main = [
 %% Slice Timing
 
 % Initialize SPM
+if isempty(which('spm')); addpath(spm_path); end
 spm('defaults', 'FMRI');
 spm_jobman('initcfg');
 
