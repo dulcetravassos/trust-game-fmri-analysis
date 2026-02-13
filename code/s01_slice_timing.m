@@ -83,7 +83,7 @@ for s = 1:length(subjects)
     fprintf('\n==================================================\n');
     fprintf('Processing Slice Timing for: %s\n', subj);
     
-    % Create output filder
+    % Create output folder
     subj_out_dir = fullfile(deriv_dir,subj,'func');
     if ~exist(subj_out_dir,'dir'); mkdir(subj_out_dir); end
     
