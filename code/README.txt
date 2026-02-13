@@ -3,7 +3,9 @@
 #  The code was developed and tested on a PC with the following specifications:  #
 #									         #
 #  Software: MATLAB R2024b (Update 4 - 24.2.0.2833386)			         #
-#  	     SPM12 (7771)						         #
+#  	     SPM12 (7771)							 #
+#	     Ubuntu v24.04.5 LTS						 #
+#	     FSL vXX.XX.XX (FUGUS)						 #
 #  OS: Microsoft Windows 10 (64-bit)					         #
 #  CPU: Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz			         #
 #  RAM: 16GB								         #
@@ -23,3 +25,7 @@ The function prt_to_spm(), using the function read_prt(), reads multiple .prt fi
 
 Slice Timing Correction script adapted to deal with subjects with reverse slice order and variable volumes. Saves output in derivatives folder with a JSON file (BIDS friendly). 
 Takes ~20 minutes to process a single subject (main task + face localizer).
+
+--------------------------------------------- s02_set_the_origin --------------------------------------------- 
+
+Makes a copy of the original/raw anatomic images to the correct BIDS derivative folder and opens that copy on the SPM display, to allow the user to set the origin (AC-PC).
