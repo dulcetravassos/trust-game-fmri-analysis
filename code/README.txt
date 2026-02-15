@@ -24,8 +24,15 @@ The function prt_to_spm(), using the function read_prt(), reads multiple .prt fi
 --------------------------------------------- s01_slice_timing --------------------------------------------- 
 
 Slice Timing Correction script adapted to deal with subjects with reverse slice order and variable volumes. Saves output in derivatives folder with a JSON file (BIDS friendly). 
-Takes ~20 minutes to process a single subject (main task + face localizer).
+Time: ~20 minutes per subject (Main Task + Face Localizer).
 
 --------------------------------------------- s02_set_the_origin --------------------------------------------- 
 
 Makes a copy of the original/raw anatomic images to the correct BIDS derivative folder and opens that copy on the SPM display, to allow the user to set the origin (AC-PC).
+
+--------------------------------------- s03_motion_correction_realignment ---------------------------------------
+
+Performs the SPM12 operation "Realign: Estimate & Reslice" on slice-timed data ('a...' files). The "Estimate" calculates the motion parameters (rp_*.txt) and the "Reslice" applies these parameters and writes new 'r...' files and generates a mean image (mean*.nii).
+Time: ~25 minutes per subject (Main Task + Face Localizer).
+
+Note: Reslicing is performed at this stage to provide physical aligned files required for Distortion Correction in FSL.
