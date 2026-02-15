@@ -24,7 +24,7 @@ The function prt_to_spm(), using the function read_prt(), reads multiple .prt fi
 --------------------------------------------- s01_slice_timing --------------------------------------------- 
 
 Slice Timing Correction script adapted to deal with subjects with reverse slice order and variable volumes. Saves output in derivatives folder with a JSON file (BIDS friendly). 
-Time: ~20 minutes per subject (Main Task + Face Localizer).
+Time: ~15 minutes per subject (Main Task + Face Localizer).
 
 --------------------------------------------- s02_set_the_origin --------------------------------------------- 
 
