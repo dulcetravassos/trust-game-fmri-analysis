@@ -47,5 +47,10 @@ Note: Reslicing is performed at this stage to provide physical aligned files req
 Creates a 'fake magnitude' (surrogate) by skull-stripping the T1w image and coregistering it to the Mean Functional image (Segmentation -> ImCalc -> Coregister). This script is necessary for subjects missing magnitude files, since performing Distortion Correction in FSL requires complete fieldmaps (magnitude + phasediff). 
 Segmentation generates tissue probability maps for grey matter, white matter and CSF; ImCalc applies the expression "i1.*((i2+i3+i4)>0.5)" to keep only voxels with >50% probability of actually being brain tisse; and Coregistration (Est & Res) aligns and reslices the brain-extracted T1w to the functional space.
 This script automatically cleans up the intermediate files generated mid-operation (e.g., c1, c2, m_*) from the 'anat' folder. This ensures that further preprocessing steps (e.g., the main Segmentation step) run smoothly without file overwriting conflicts.
-Time: 
+
+
+---------------------------------------------- s05_align_fieldmaps ----------------------------------------------
+
+Aligns the fieldmaps for posterior Distortion Correction on FSL FUGUE. This script can deal with the 'fake magnitudes' created in the step before (they are already aligned to the mean functional image) and with runs with more than one magnitude file.
+
 
