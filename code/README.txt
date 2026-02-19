@@ -17,18 +17,22 @@
 
 Converts raw DICOM MRI data (anatomical, functional, fieldmaps) into NIfTI files suitable for preprocessing and analysis in SPM12. Saves a JSON file with metadata. Output filenames follow BIDS conventions, when applicable.
 
+
 --------------------------------------------- s00_convert_prt_to_spm ---------------------------------------------
 
 The function prt_to_spm(), using the function read_prt(), reads multiple .prt files from a selected folder; confirms the resolution of time (converting msec to sec); skips empty conditions (meaning 0 trials); detects start time of an event and calculates its duration; and saves a .mat file with a BIDS compliant name. 
+
 
 --------------------------------------------- s01_slice_timing --------------------------------------------- 
 
 Slice Timing Correction script adapted to deal with subjects with reverse slice order and variable volumes. Saves output in derivatives folder with a JSON file (BIDS friendly). 
 Time: ~15 minutes per subject (Main Task + Face Localizer).
 
+
 --------------------------------------------- s02_set_the_origin --------------------------------------------- 
 
 Makes a copy of the original/raw anatomic images to the correct BIDS derivative folder and opens that copy on the SPM display, to allow the user to set the origin (AC-PC).
+
 
 --------------------------------------- s03_motion_correction_realignment ---------------------------------------
 
@@ -36,3 +40,12 @@ Performs the SPM12 operation "Realign: Estimate & Reslice" on slice-timed data (
 Time: ~25 minutes per subject (Main Task + Face Localizer).
 
 Note: Reslicing is performed at this stage to provide physical aligned files required for Distortion Correction in FSL.
+
+
+------------------------------------------ s04_get_magnitude_substitute ------------------------------------------
+
+Creates a 'fake magnitude' (surrogate) by skull-stripping the T1w image and coregistering it to the Mean Functional image (Segmentation -> ImCalc -> Coregister). This script is necessary for subjects missing magnitude files, since performing Distortion Correction in FSL requires complete fieldmaps (magnitude + phasediff). 
+Segmentation generates tissue probability maps for grey matter, white matter and CSF; ImCalc applies the expression "i1.*((i2+i3+i4)>0.5)" to keep only voxels with >50% probability of actually being brain tisse; and Coregistration (Est & Res) aligns and reslices the brain-extracted T1w to the functional space.
+This script automatically cleans up the intermediate files generated mid-operation (e.g., c1, c2, m_*) from the 'anat' folder. This ensures that further preprocessing steps (e.g., the main Segmentation step) run smoothly without file overwriting conflicts.
+Time: 
+
