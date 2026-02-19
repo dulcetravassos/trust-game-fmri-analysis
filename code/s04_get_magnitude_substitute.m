@@ -51,6 +51,8 @@ for s = 1:length(subjects)
     func_dir = fullfile(deriv_dir,subj,'func');
     fmap_dir = fullfile(deriv_dir,subj,'fmap'); % Output folder
 
+    if ~exist(fmap_dir,'dir'); mkdir(fmap_dir); end
+
     % High-Res anatomical image, with origin set
     t1_file = fullfile(anat_dir,[subj '_desc-defaced_T1w.nii']);
     if ~exist(t1_file,'file')
@@ -79,30 +81,30 @@ for s = 1:length(subjects)
     matlabbatch{1}.spm.spatial.preproc.channel.biasfwhm = 60;
     matlabbatch{1}.spm.spatial.preproc.channel.write = [0 1]; % save bias-field corrected structural image (prefix m)
     % Grey Matter
-    matlabbatch{1}.spm.spatial.preproc.tissue(1).tpm = {[tpm_path ' ,1']};
+    matlabbatch{1}.spm.spatial.preproc.tissue(1).tpm = {[tpm_path ',1']};
     matlabbatch{1}.spm.spatial.preproc.tissue(1).ngaus = 1;
     matlabbatch{1}.spm.spatial.preproc.tissue(1).native = [1 0];
     matlabbatch{1}.spm.spatial.preproc.tissue(1).warped = [0 0];
     % White Matter
-    matlabbatch{1}.spm.spatial.preproc.tissue(2).tpm = {[tpm_path ' ,2']};
+    matlabbatch{1}.spm.spatial.preproc.tissue(2).tpm = {[tpm_path ',2']};
     matlabbatch{1}.spm.spatial.preproc.tissue(2).ngaus = 1;
     matlabbatch{1}.spm.spatial.preproc.tissue(2).native = [1 0];
     matlabbatch{1}.spm.spatial.preproc.tissue(2).warped = [0 0];
     % CSF
-    matlabbatch{1}.spm.spatial.preproc.tissue(3).tpm = {[tpm_path ' ,3']};
+    matlabbatch{1}.spm.spatial.preproc.tissue(3).tpm = {[tpm_path ',3']};
     matlabbatch{1}.spm.spatial.preproc.tissue(3).ngaus = 2;
     matlabbatch{1}.spm.spatial.preproc.tissue(3).native = [1 0];
     matlabbatch{1}.spm.spatial.preproc.tissue(3).warped = [0 0];
     % Other tissues (which we don't need native images)
-    matlabbatch{1}.spm.spatial.preproc.tissue(4).tpm = {[tpm_path ' ,4']};
+    matlabbatch{1}.spm.spatial.preproc.tissue(4).tpm = {[tpm_path ',4']};
     matlabbatch{1}.spm.spatial.preproc.tissue(4).ngaus = 3;
     matlabbatch{1}.spm.spatial.preproc.tissue(4).native = [0 0];
     matlabbatch{1}.spm.spatial.preproc.tissue(4).warped = [0 0];
-    matlabbatch{1}.spm.spatial.preproc.tissue(5).tpm = {[tpm_path ' ,5']};
+    matlabbatch{1}.spm.spatial.preproc.tissue(5).tpm = {[tpm_path ',5']};
     matlabbatch{1}.spm.spatial.preproc.tissue(5).ngaus = 4;
     matlabbatch{1}.spm.spatial.preproc.tissue(5).native = [0 0];
     matlabbatch{1}.spm.spatial.preproc.tissue(5).warped = [0 0];
-    matlabbatch{1}.spm.spatial.preproc.tissue(6).tpm = {[tpm_path ' ,6']};
+    matlabbatch{1}.spm.spatial.preproc.tissue(6).tpm = {[tpm_path ',6']};
     matlabbatch{1}.spm.spatial.preproc.tissue(6).ngaus = 2;
     matlabbatch{1}.spm.spatial.preproc.tissue(6).native = [0 0];
     matlabbatch{1}.spm.spatial.preproc.tissue(6).warped = [0 0];
@@ -149,7 +151,7 @@ for s = 1:length(subjects)
     % -------- Coregister and Reslice to Functional space --------
     fprintf('>>>>> Step 3: Coregistration to Functional...\n')
 
-    final_mag_file = fullfile(fmap_dir,[subj '_magnitude1.nii']); % following BIDS standard
+    final_mag_file = fullfile(fmap_dir,[subj '_run-01_magnitude.nii']); % following BIDS standard and matching the existing dataset pattern
 
     clear matlabbatch;
     matlabbatch{1}.spm.spatial.coreg.estwrite.ref = {mean_func};
@@ -185,7 +187,7 @@ for s = 1:length(subjects)
                 delete(files_to_delete{f});
             end
         end
-        mat_file = fullfile(filepath, [name '.mat']); % if there are any
+        mat_file = fullfile(filepath, [name '_seg8.mat']); % if there are any
         if exist(mat_file,'file'); delete(mat_file); end;
     else
         fprintf('[ERROR] Coregistration output not found...\n');
