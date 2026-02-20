@@ -44,13 +44,32 @@ Note: Reslicing is performed at this stage to provide physical aligned files req
 
 ------------------------------------------ s04_get_magnitude_substitute ------------------------------------------
 
-Creates a 'fake magnitude' (surrogate) by skull-stripping the T1w image and coregistering it to the Mean Functional image (Segmentation -> ImCalc -> Coregister). This script is necessary for subjects missing magnitude files, since performing Distortion Correction in FSL requires complete fieldmaps (magnitude + phasediff). 
-Segmentation generates tissue probability maps for grey matter, white matter and CSF; ImCalc applies the expression "i1.*((i2+i3+i4)>0.5)" to keep only voxels with >50% probability of actually being brain tisse; and Coregistration (Est & Res) aligns and reslices the brain-extracted T1w to the functional space.
-This script automatically cleans up the intermediate files generated mid-operation (e.g., c1, c2, m_*) from the 'anat' folder. This ensures that further preprocessing steps (e.g., the main Segmentation step) run smoothly without file overwriting conflicts.
+Creates a 'fake magnitude' (surrogate) by skull-stripping the T1w image for subjects missing magnitude files, since performing Distortion Correction in FSL requires complete fieldmaps (magnitude + phasediff).
+The process involves Segmentation (generates tissue probability maps for grey matter, white matter and CSF) and ImCalc (applies the expression "i1.*((i2+i3+i4)>0.5)" to keep only voxels with >50% probability of actually being brain tisse).
+Finally, the alignment to the phasediff space is done in a 2-step coregistration process to avoid SPM crashes:
+1) Estimate & Reslice to the Mean Functional image (aligns the structural mask to the subject's functional head position using mutual information);
+2) Write (Reslice ONLY) to the Native Phasediff (forcing the functional-aligned T1w into the exact spatial grid and voxel dimensions of the raw phasediff without attempting mutual information estimation).
+This script automatically cleans up the intermediate files generated mid-operation (e.g., c1, c2, m_*) to prevent overwriting conflicts in later pipeline stages.
 
 
----------------------------------------------- s05_align_fieldmaps ----------------------------------------------
+---------------------------------------------- s05_01_prepare_native_fmap_fsl ----------------------------------------------
 
-Aligns the fieldmaps for posterior Distortion Correction on FSL FUGUE. This script can deal with the 'fake magnitudes' created in the step before (they are already aligned to the mean functional image) and with runs with more than one magnitude file.
+Processes the raw phasediff and magnitude files to generate a continuous, unwrapped fieldmap (in rad/s) strictly within the Native space.
+Methodological note: Phasediff images are never resampled/resliced while wrapped (-pi to +pi) to avoid severe boundary overshoots caused by spatial interpolation.
+This script performs three key corrections:
+1) SIEMENS Scaling Bug: Divides the raw Siemens phasediff by 2 using 'fslmaths' to correct the amplitude scale back to the standard 4096 expected by FSL;
+2) Skull-stripping: Applies FSL 'bet' to extract the brain from real magnitude files;
+3) SIEMENS Slice Dimension Bug: Uses FSL 'flirt' to truncate the magnitude image when the scanner reconstructs it with +1 slice compared to the phasediff (cases where magnitude1 or magnitude2 instead of regular magnitude).
+Finally, it runs 'fsl_prepare_fieldmap' to output 'fmap_rads_*.nii.gz'.
+Being a .m file with bash code, you are supposed to copy-paste the code lines for each subject to a WSL interpreter (Linux) instead of running the script itself on Matlab.
 
 
+---------------------------------------------- s05_02_align_fmap_to_func_spm ----------------------------------------------
+
+Bridges the continuous Native Space fieldmaps back to the Functional Space. It automatically unzips the *.nii.gz files and performs Coregistration (Estimate & Reslice) to align them with the Mean Functional image.
+This returns an image geometrically matched to the functional data and ready for Unwarping via FSL FUGUE.
+
+
+---------------------------------------------- s05_03_distortion_correction_fsl ----------------------------------------------
+
+Applies the calculated and functionally-aligned fieldmaps ('rfmap_rads') to the previously realigned BOLD images ('ra*_bold.nii') using FSL FUGUE. This step unwarps the EPI distortions caused by B0 magnetic field inhomogeneities, outputting the final 'ura*_bold.nii' images.
