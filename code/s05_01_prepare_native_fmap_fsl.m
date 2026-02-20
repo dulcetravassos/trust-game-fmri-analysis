@@ -7,6 +7,8 @@
 %   fieldmaps are prepared using fsl_prepare_fieldmaps.                  %
 %   To install FSL, follow the guide:                                    %
 %   https://fsl.fmrib.ox.ac.uk/fsl/docs/install/windows.html             %
+%   This script takes into consideration special cases where there are   %
+%   multiple magnitudes (magnitude1, magnitude2).                        %
 %                                                                        %
 %   THIS SCRIPT SHOULD NOT BE RUN ON MATLAB. IT IS INTENDED TO COPY      %
 %   AND PASTE DIRECTLY ON THE WSL INTERPRETER. The code is separated by  %
@@ -27,6 +29,7 @@
 % https://web.mit.edu/fsl_v5.0.10/fsl/doc/wiki/FUGUE(2f)Guide.html
 % https://fsl.fmrib.ox.ac.uk/fsl/docs/structural/bet.html
 % https://web.mit.edu/fsl_v5.0.10/fsl/doc/wiki/BET(2f)UserGuide.html
+% https://web.mit.edu/fsl_v5.0.10/fsl/doc/wiki/FLIRT(2f)UserGuide.html
 
 % IMPORTANT: THE FOLLOWING CODE IS BASH AND THEREFORE CANNOT BE RUN ON
 % MATLAB. YOU SHOULD COPY THE CODE AND RUN IT ON A WSL LINUX INTERPRETER.
@@ -127,6 +130,15 @@ fugue -i rasub-002_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap_rad
 % Sub-019: Runs – 3, 4, 5, 7, 8 
 % MAGNITUDE 2:
 % Sub-009: Runs – 6, 8
+%
+% Additionally, while developing this script, I noticed that thosemagnitude1 and magnitude2 files had +1 voxel than the phasediff, 
+% blocking the fsl_prepare_fieldmap. Those runs have an additional line (flirt), to cut the magnitude to the exact size of phasediff.
+%
+% flirt -in fmap/sub-006_run-02_magnitude_brain.nii -ref ../../../rawdata/sub-006/fmap/sub-006_run-02_phasediff.nii -applyxfm -usesqform -out fmap/sub-006_run-02_magnitude_brain_matched.nii
+% flirt: the main options are an input (-in), a reference (-ref) volume, and output volume (-out) where the transform is applied to the 
+% input volume to align it with the reference volume. To apply a transform that aligns the NIFTI mm coordinates: -applyxfm, -usesqform 
+% and -out; but not -init). For these usage the reference volume must still be specified as this sets the voxel and image dimensions of 
+% the resulting volume.
 
 %% SUB-002
 
@@ -240,6 +252,8 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-004_run-08_phasediff_half.nii fmap/sub-004
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-006
 
+mkdir -p fmap
+
 # RUN-01
 bet ../../../rawdata/sub-006/fmap/sub-006_run-01_magnitude.nii fmap/sub-006_run-01_magnitude_brain.nii -f 0.5 -m
 fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-01_phasediff.nii -div 2 fmap/sub-006_run-01_phasediff_half.nii
@@ -247,13 +261,15 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-01_phasediff_half.nii fmap/sub-006
 
 # RUN-02
 bet ../../../rawdata/sub-006/fmap/sub-006_run-02_magnitude1.nii fmap/sub-006_run-02_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-006_run-02_magnitude_brain.nii -ref ../../../rawdata/sub-006/fmap/sub-006_run-02_phasediff.nii -applyxfm -usesqform -out fmap/sub-006_run-02_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-02_phasediff.nii -div 2 fmap/sub-006_run-02_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-02_phasediff_half.nii fmap/sub-006_run-02_magnitude_brain.nii fmap/fmap_rads_sub-006_run-02.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-02_phasediff_half.nii fmap/sub-006_run-02_magnitude_brain_matched.nii fmap/fmap_rads_sub-006_run-02.nii.gz 2.46 --nocheck
 
 # RUN-03
 bet ../../../rawdata/sub-006/fmap/sub-006_run-03_magnitude1.nii fmap/sub-006_run-03_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-006_run-03_magnitude_brain.nii -ref ../../../rawdata/sub-006/fmap/sub-006_run-03_phasediff.nii -applyxfm -usesqform -out fmap/sub-006_run-03_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-03_phasediff.nii -div 2 fmap/sub-006_run-03_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-03_phasediff_half.nii fmap/sub-006_run-03_magnitude_brain.nii fmap/fmap_rads_sub-006_run-03.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-03_phasediff_half.nii fmap/sub-006_run-03_magnitude_brain_matched.nii fmap/fmap_rads_sub-006_run-03.nii.gz 2.46 --nocheck
 
 # RUN-04
 bet ../../../rawdata/sub-006/fmap/sub-006_run-04_magnitude.nii fmap/sub-006_run-04_magnitude_brain.nii -f 0.5 -m
@@ -267,13 +283,15 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-05_phasediff_half.nii fmap/sub-006
 
 # RUN-06
 bet ../../../rawdata/sub-006/fmap/sub-006_run-06_magnitude1.nii fmap/sub-006_run-06_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-006_run-06_magnitude_brain.nii -ref ../../../rawdata/sub-006/fmap/sub-006_run-06_phasediff.nii -applyxfm -usesqform -out fmap/sub-006_run-06_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-06_phasediff.nii -div 2 fmap/sub-006_run-06_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-06_phasediff_half.nii fmap/sub-006_run-06_magnitude_brain.nii fmap/fmap_rads_sub-006_run-06.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-06_phasediff_half.nii fmap/sub-006_run-06_magnitude_brain_matched.nii fmap/fmap_rads_sub-006_run-06.nii.gz 2.46 --nocheck
 
 # RUN-07
 bet ../../../rawdata/sub-006/fmap/sub-006_run-07_magnitude1.nii fmap/sub-006_run-07_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-006_run-07_magnitude_brain.nii -ref ../../../rawdata/sub-006/fmap/sub-006_run-07_phasediff.nii -applyxfm -usesqform -out fmap/sub-006_run-07_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-07_phasediff.nii -div 2 fmap/sub-006_run-07_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-07_phasediff_half.nii fmap/sub-006_run-07_magnitude_brain.nii fmap/fmap_rads_sub-006_run-07.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-07_phasediff_half.nii fmap/sub-006_run-07_magnitude_brain_matched.nii fmap/fmap_rads_sub-006_run-07.nii.gz 2.46 --nocheck
 
 # RUN-08
 bet ../../../rawdata/sub-006/fmap/sub-006_run-08_magnitude.nii fmap/sub-006_run-08_magnitude_brain.nii -f 0.5 -m
@@ -283,6 +301,8 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-08_phasediff_half.nii fmap/sub-006
 %% SUB-007
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-007
+
+mkdir -p fmap
 
 # RUN-01
 bet ../../../rawdata/sub-007/fmap/sub-007_run-01_magnitude.nii fmap/sub-007_run-01_magnitude_brain.nii -f 0.5 -m
@@ -328,6 +348,8 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-007_run-08_phasediff_half.nii fmap/sub-007
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-008
 
+mkdir -p fmap
+
 # RUN-01
 bet ../../../rawdata/sub-008/fmap/sub-008_run-01_magnitude.nii fmap/sub-008_run-01_magnitude_brain.nii -f 0.5 -m
 fslmaths ../../../rawdata/sub-008/fmap/sub-008_run-01_phasediff.nii -div 2 fmap/sub-008_run-01_phasediff_half.nii
@@ -372,25 +394,31 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-008_run-08_phasediff_half.nii fmap/sub-008
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-009
 
+mkdir -p fmap
+
 # RUN-01
 bet ../../../rawdata/sub-009/fmap/sub-009_run-01_magnitude1.nii fmap/sub-009_run-01_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-009_run-01_magnitude_brain.nii -ref ../../../rawdata/sub-009/fmap/sub-009_run-01_phasediff.nii -applyxfm -usesqform -out fmap/sub-009_run-01_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-009/fmap/sub-009_run-01_phasediff.nii -div 2 fmap/sub-009_run-01_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-01_phasediff_half.nii fmap/sub-009_run-01_magnitude_brain.nii fmap/fmap_rads_sub-009_run-01.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-01_phasediff_half.nii fmap/sub-009_run-01_magnitude_brain_matched.nii fmap/fmap_rads_sub-009_run-01.nii.gz 2.46 --nocheck
 
 # RUN-02
 bet ../../../rawdata/sub-009/fmap/sub-009_run-02_magnitude1.nii fmap/sub-009_run-02_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-009_run-02_magnitude_brain.nii -ref ../../../rawdata/sub-009/fmap/sub-009_run-02_phasediff.nii -applyxfm -usesqform -out fmap/sub-009_run-02_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-009/fmap/sub-009_run-02_phasediff.nii -div 2 fmap/sub-009_run-02_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-02_phasediff_half.nii fmap/sub-009_run-02_magnitude_brain.nii fmap/fmap_rads_sub-009_run-02.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-02_phasediff_half.nii fmap/sub-009_run-02_magnitude_brain_matched.nii fmap/fmap_rads_sub-009_run-02.nii.gz 2.46 --nocheck
 
 # RUN-03
 bet ../../../rawdata/sub-009/fmap/sub-009_run-03_magnitude1.nii fmap/sub-009_run-03_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-009_run-03_magnitude_brain.nii -ref ../../../rawdata/sub-009/fmap/sub-009_run-03_phasediff.nii -applyxfm -usesqform -out fmap/sub-009_run-03_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-009/fmap/sub-009_run-03_phasediff.nii -div 2 fmap/sub-009_run-03_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-03_phasediff_half.nii fmap/sub-009_run-03_magnitude_brain.nii fmap/fmap_rads_sub-009_run-03.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-03_phasediff_half.nii fmap/sub-009_run-03_magnitude_brain_matched.nii fmap/fmap_rads_sub-009_run-03.nii.gz 2.46 --nocheck
 
 # RUN-04
 bet ../../../rawdata/sub-009/fmap/sub-009_run-04_magnitude1.nii fmap/sub-009_run-04_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-009_run-04_magnitude_brain.nii -ref ../../../rawdata/sub-009/fmap/sub-009_run-04_phasediff.nii -applyxfm -usesqform -out fmap/sub-009_run-04_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-009/fmap/sub-009_run-04_phasediff.nii -div 2 fmap/sub-009_run-04_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-04_phasediff_half.nii fmap/sub-009_run-04_magnitude_brain.nii fmap/fmap_rads_sub-009_run-04.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-04_phasediff_half.nii fmap/sub-009_run-04_magnitude_brain_matched.nii fmap/fmap_rads_sub-009_run-04.nii.gz 2.46 --nocheck
 
 # RUN-05
 bet ../../../rawdata/sub-009/fmap/sub-009_run-05_magnitude.nii fmap/sub-009_run-05_magnitude_brain.nii -f 0.5 -m
@@ -399,8 +427,9 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-05_phasediff_half.nii fmap/sub-009
 
 # RUN-06
 bet ../../../rawdata/sub-009/fmap/sub-009_run-06_magnitude2.nii fmap/sub-009_run-06_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-009_run-06_magnitude_brain.nii -ref ../../../rawdata/sub-009/fmap/sub-009_run-06_phasediff.nii -applyxfm -usesqform -out fmap/sub-009_run-06_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-009/fmap/sub-009_run-06_phasediff.nii -div 2 fmap/sub-009_run-06_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-06_phasediff_half.nii fmap/sub-009_run-06_magnitude_brain.nii fmap/fmap_rads_sub-009_run-06.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-06_phasediff_half.nii fmap/sub-009_run-06_magnitude_brain_matched.nii fmap/fmap_rads_sub-009_run-06.nii.gz 2.46 --nocheck
 
 # RUN-07
 bet ../../../rawdata/sub-009/fmap/sub-009_run-07_magnitude.nii fmap/sub-009_run-07_magnitude_brain.nii -f 0.5 -m
@@ -409,12 +438,15 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-07_phasediff_half.nii fmap/sub-009
 
 # RUN-08
 bet ../../../rawdata/sub-009/fmap/sub-009_run-08_magnitude2.nii fmap/sub-009_run-08_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-009_run-08_magnitude_brain.nii -ref ../../../rawdata/sub-009/fmap/sub-009_run-08_phasediff.nii -applyxfm -usesqform -out fmap/sub-009_run-08_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-009/fmap/sub-009_run-08_phasediff.nii -div 2 fmap/sub-009_run-08_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-08_phasediff_half.nii fmap/sub-009_run-08_magnitude_brain.nii fmap/fmap_rads_sub-009_run-08.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-08_phasediff_half.nii fmap/sub-009_run-08_magnitude_brain_matched.nii fmap/fmap_rads_sub-009_run-08.nii.gz 2.46 --nocheck
 
 %% SUB-011
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-011
+
+mkdir -p fmap
 
 # RUN-01
 bet ../../../rawdata/sub-011/fmap/sub-011_run-01_magnitude.nii fmap/sub-011_run-01_magnitude_brain.nii -f 0.5 -m
@@ -460,6 +492,8 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-011_run-08_phasediff_half.nii fmap/sub-011
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-012
 
+mkdir -p fmap
+
 # RUN-01
 bet ../../../rawdata/sub-012/fmap/sub-012_run-01_magnitude.nii fmap/sub-012_run-01_magnitude_brain.nii -f 0.5 -m
 fslmaths ../../../rawdata/sub-012/fmap/sub-012_run-01_phasediff.nii -div 2 fmap/sub-012_run-01_phasediff_half.nii
@@ -503,6 +537,8 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-012_run-08_phasediff_half.nii fmap/sub-012
 %% SUB-013
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-013
+
+mkdir -p fmap
 
 # RUN-01
 bet ../../../rawdata/sub-013/fmap/sub-013_run-01_magnitude.nii fmap/sub-013_run-01_magnitude_brain.nii -f 0.5 -m
@@ -548,6 +584,8 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-013_run-08_phasediff_half.nii fmap/sub-013
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-014
 
+mkdir -p fmap
+
 # RUN-01
 bet ../../../rawdata/sub-014/fmap/sub-014_run-01_magnitude.nii fmap/sub-014_run-01_magnitude_brain.nii -f 0.5 -m
 fslmaths ../../../rawdata/sub-014/fmap/sub-014_run-01_phasediff.nii -div 2 fmap/sub-014_run-01_phasediff_half.nii
@@ -592,6 +630,8 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-014_run-08_phasediff_half.nii fmap/sub-014
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-015
 
+mkdir -p fmap
+
 # RUN-01
 bet ../../../rawdata/sub-015/fmap/sub-015_run-01_magnitude.nii fmap/sub-015_run-01_magnitude_brain.nii -f 0.5 -m
 fslmaths ../../../rawdata/sub-015/fmap/sub-015_run-01_phasediff.nii -div 2 fmap/sub-015_run-01_phasediff_half.nii
@@ -599,8 +639,9 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-01_phasediff_half.nii fmap/sub-015
 
 # RUN-02
 bet ../../../rawdata/sub-015/fmap/sub-015_run-02_magnitude1.nii fmap/sub-015_run-02_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-015_run-02_magnitude_brain.nii -ref ../../../rawdata/sub-015/fmap/sub-015_run-02_phasediff.nii -applyxfm -usesqform -out fmap/sub-015_run-02_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-015/fmap/sub-015_run-02_phasediff.nii -div 2 fmap/sub-015_run-02_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-02_phasediff_half.nii fmap/sub-015_run-02_magnitude_brain.nii fmap/fmap_rads_sub-015_run-02.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-02_phasediff_half.nii fmap/sub-015_run-02_magnitude_brain_matched.nii fmap/fmap_rads_sub-015_run-02.nii.gz 2.46 --nocheck
 
 # RUN-03
 bet ../../../rawdata/sub-015/fmap/sub-015_run-03_magnitude.nii fmap/sub-015_run-03_magnitude_brain.nii -f 0.5 -m
@@ -609,13 +650,15 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-03_phasediff_half.nii fmap/sub-015
 
 # RUN-04
 bet ../../../rawdata/sub-015/fmap/sub-015_run-04_magnitude1.nii fmap/sub-015_run-04_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-015_run-04_magnitude_brain.nii -ref ../../../rawdata/sub-015/fmap/sub-015_run-04_phasediff.nii -applyxfm -usesqform -out fmap/sub-015_run-04_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-015/fmap/sub-015_run-04_phasediff.nii -div 2 fmap/sub-015_run-04_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-04_phasediff_half.nii fmap/sub-015_run-04_magnitude_brain.nii fmap/fmap_rads_sub-015_run-04.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-04_phasediff_half.nii fmap/sub-015_run-04_magnitude_brain_matched.nii fmap/fmap_rads_sub-015_run-04.nii.gz 2.46 --nocheck
 
 # RUN-05
 bet ../../../rawdata/sub-015/fmap/sub-015_run-05_magnitude1.nii fmap/sub-015_run-05_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-015_run-05_magnitude_brain.nii -ref ../../../rawdata/sub-015/fmap/sub-015_run-05_phasediff.nii -applyxfm -usesqform -out fmap/sub-015_run-05_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-015/fmap/sub-015_run-05_phasediff.nii -div 2 fmap/sub-015_run-05_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-05_phasediff_half.nii fmap/sub-015_run-05_magnitude_brain.nii fmap/fmap_rads_sub-015_run-05.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-05_phasediff_half.nii fmap/sub-015_run-05_magnitude_brain_matched.nii fmap/fmap_rads_sub-015_run-05.nii.gz 2.46 --nocheck
 
 # RUN-06
 bet ../../../rawdata/sub-015/fmap/sub-015_run-06_magnitude.nii fmap/sub-015_run-06_magnitude_brain.nii -f 0.5 -m
@@ -629,12 +672,15 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-07_phasediff_half.nii fmap/sub-015
 
 # RUN-08
 bet ../../../rawdata/sub-015/fmap/sub-015_run-08_magnitude1.nii fmap/sub-015_run-08_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-015_run-08_magnitude_brain.nii -ref ../../../rawdata/sub-015/fmap/sub-015_run-08_phasediff.nii -applyxfm -usesqform -out fmap/sub-015_run-08_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-015/fmap/sub-015_run-08_phasediff.nii -div 2 fmap/sub-015_run-08_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-08_phasediff_half.nii fmap/sub-015_run-08_magnitude_brain.nii fmap/fmap_rads_sub-015_run-08.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-08_phasediff_half.nii fmap/sub-015_run-08_magnitude_brain_matched.nii fmap/fmap_rads_sub-015_run-08.nii.gz 2.46 --nocheck
 
 %% SUB-016
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-016
+
+mkdir -p fmap
 
 # RUN-01
 bet ../../../rawdata/sub-016/fmap/sub-016_run-01_magnitude.nii fmap/sub-016_run-01_magnitude_brain.nii -f 0.5 -m
@@ -680,6 +726,8 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-016_run-08_phasediff_half.nii fmap/sub-016
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-017
 
+mkdir -p fmap
+
 # RUN-01
 bet ../../../rawdata/sub-017/fmap/sub-017_run-01_magnitude.nii fmap/sub-017_run-01_magnitude_brain.nii -f 0.5 -m
 fslmaths ../../../rawdata/sub-017/fmap/sub-017_run-01_phasediff.nii -div 2 fmap/sub-017_run-01_phasediff_half.nii
@@ -723,6 +771,8 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-017_run-08_phasediff_half.nii fmap/sub-017
 %% SUB-018
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-018
+
+mkdir -p fmap
 
 # RUN-01
 bet ../../../rawdata/sub-018/fmap/sub-018_run-01_magnitude.nii fmap/sub-018_run-01_magnitude_brain.nii -f 0.5 -m
@@ -768,6 +818,8 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-018_run-08_phasediff_half.nii fmap/sub-018
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-019
 
+mkdir -p fmap
+
 # RUN-01
 bet ../../../rawdata/sub-019/fmap/sub-019_run-01_magnitude.nii fmap/sub-019_run-01_magnitude_brain.nii -f 0.5 -m
 fslmaths ../../../rawdata/sub-019/fmap/sub-019_run-01_phasediff.nii -div 2 fmap/sub-019_run-01_phasediff_half.nii
@@ -780,18 +832,21 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-02_phasediff_half.nii fmap/sub-019
 
 # RUN-03
 bet ../../../rawdata/sub-019/fmap/sub-019_run-03_magnitude1.nii fmap/sub-019_run-03_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-019_run-03_magnitude_brain.nii -ref ../../../rawdata/sub-019/fmap/sub-019_run-03_phasediff.nii -applyxfm -usesqform -out fmap/sub-019_run-03_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-019/fmap/sub-019_run-03_phasediff.nii -div 2 fmap/sub-019_run-03_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-03_phasediff_half.nii fmap/sub-019_run-03_magnitude_brain.nii fmap/fmap_rads_sub-019_run-03.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-03_phasediff_half.nii fmap/sub-019_run-03_magnitude_brain_matched.nii fmap/fmap_rads_sub-019_run-03.nii.gz 2.46 --nocheck
 
 # RUN-04
 bet ../../../rawdata/sub-019/fmap/sub-019_run-04_magnitude1.nii fmap/sub-019_run-04_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-019_run-04_magnitude_brain.nii -ref ../../../rawdata/sub-019/fmap/sub-019_run-04_phasediff.nii -applyxfm -usesqform -out fmap/sub-019_run-04_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-019/fmap/sub-019_run-04_phasediff.nii -div 2 fmap/sub-019_run-04_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-04_phasediff_half.nii fmap/sub-019_run-04_magnitude_brain.nii fmap/fmap_rads_sub-019_run-04.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-04_phasediff_half.nii fmap/sub-019_run-04_magnitude_brain_matched.nii fmap/fmap_rads_sub-019_run-04.nii.gz 2.46 --nocheck
 
 # RUN-05
 bet ../../../rawdata/sub-019/fmap/sub-019_run-05_magnitude1.nii fmap/sub-019_run-05_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-019_run-05_magnitude_brain.nii -ref ../../../rawdata/sub-019/fmap/sub-019_run-05_phasediff.nii -applyxfm -usesqform -out fmap/sub-019_run-05_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-019/fmap/sub-019_run-05_phasediff.nii -div 2 fmap/sub-019_run-05_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-05_phasediff_half.nii fmap/sub-019_run-05_magnitude_brain.nii fmap/fmap_rads_sub-019_run-05.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-05_phasediff_half.nii fmap/sub-019_run-05_magnitude_brain_matched.nii fmap/fmap_rads_sub-019_run-05.nii.gz 2.46 --nocheck
 
 # RUN-06
 bet ../../../rawdata/sub-019/fmap/sub-019_run-06_magnitude.nii fmap/sub-019_run-06_magnitude_brain.nii -f 0.5 -m
@@ -800,17 +855,21 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-06_phasediff_half.nii fmap/sub-019
 
 # RUN-07
 bet ../../../rawdata/sub-019/fmap/sub-019_run-07_magnitude1.nii fmap/sub-019_run-07_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-019_run-07_magnitude_brain.nii -ref ../../../rawdata/sub-019/fmap/sub-019_run-07_phasediff.nii -applyxfm -usesqform -out fmap/sub-019_run-07_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-019/fmap/sub-019_run-07_phasediff.nii -div 2 fmap/sub-019_run-07_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-07_phasediff_half.nii fmap/sub-019_run-07_magnitude_brain.nii fmap/fmap_rads_sub-019_run-07.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-07_phasediff_half.nii fmap/sub-019_run-07_magnitude_brain_matched.nii fmap/fmap_rads_sub-019_run-07.nii.gz 2.46 --nocheck
 
 # RUN-08
 bet ../../../rawdata/sub-019/fmap/sub-019_run-08_magnitude1.nii fmap/sub-019_run-08_magnitude_brain.nii -f 0.5 -m
+flirt -in fmap/sub-019_run-08_magnitude_brain.nii -ref ../../../rawdata/sub-019/fmap/sub-019_run-08_phasediff.nii -applyxfm -usesqform -out fmap/sub-019_run-08_magnitude_brain_matched.nii
 fslmaths ../../../rawdata/sub-019/fmap/sub-019_run-08_phasediff.nii -div 2 fmap/sub-019_run-08_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-08_phasediff_half.nii fmap/sub-019_run-08_magnitude_brain.nii fmap/fmap_rads_sub-019_run-08.nii.gz 2.46 --nocheck
+fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-08_phasediff_half.nii fmap/sub-019_run-08_magnitude_brain_matched.nii fmap/fmap_rads_sub-019_run-08.nii.gz 2.46 --nocheck
 
 %% SUB-020
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-020
+
+mkdir -p fmap
 
 # RUN-01
 bet ../../../rawdata/sub-020/fmap/sub-020_run-01_magnitude.nii fmap/sub-020_run-01_magnitude_brain.nii -f 0.5 -m
@@ -856,6 +915,8 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-020_run-08_phasediff_half.nii fmap/sub-020
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-021
 
+mkdir -p fmap
+
 # RUN-01
 bet ../../../rawdata/sub-021/fmap/sub-021_run-01_magnitude.nii fmap/sub-021_run-01_magnitude_brain.nii -f 0.5 -m
 fslmaths ../../../rawdata/sub-021/fmap/sub-021_run-01_phasediff.nii -div 2 fmap/sub-021_run-01_phasediff_half.nii
@@ -900,6 +961,8 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-021_run-08_phasediff_half.nii fmap/sub-021
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-022
 
+mkdir -p fmap
+
 # RUN-01
 bet ../../../rawdata/sub-022/fmap/sub-022_run-01_magnitude.nii fmap/sub-022_run-01_magnitude_brain.nii -f 0.5 -m
 fslmaths ../../../rawdata/sub-022/fmap/sub-022_run-01_phasediff.nii -div 2 fmap/sub-022_run-01_phasediff_half.nii
@@ -943,6 +1006,8 @@ fsl_prepare_fieldmap SIEMENS fmap/sub-022_run-08_phasediff_half.nii fmap/sub-022
 %% SUB-023
 
 cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-023
+
+mkdir -p fmap
 
 # RUN-01
 bet ../../../rawdata/sub-023/fmap/sub-023_run-01_magnitude.nii fmap/sub-023_run-01_magnitude_brain.nii -f 0.5 -m
