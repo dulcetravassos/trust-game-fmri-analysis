@@ -5,13 +5,19 @@
 %   To perform Distortion Correction on FSL FUGUE, we need complete      %
 %   fieldmaps (magnitude + phase). For subjects missing the magnitude    %
 %   files, this script generates a "fake magnitude" by skull-stripping   %
-%   the T1w image and coregistering it to the Mean Functional image.     %
+%   the T1w image.                                                       %
+%   (1) EstWrite to Mean Functional: Aligns the T1w to the subject's     %
+%       head position during the functional runs, using mutual info      %
+%   (2) Write (Reslice ONLY) to Native Phasediff: Forces the functional- %
+%       -aligned T1w into the exact spatial grid (dimensions) of the raw %
+%       phasediff. It skips estimation to avoid SPM crashes caused by    %
+%       the lack of structural contrast in phase images.                 %
 %   This step is not necessary if all subjects have complete fieldmaps.  % 
 %   Also, creates a JSON file for this operation.                        %
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 18/02/2026                                                  %
-%   Last update: 19/02/2026                                              %
+%   Last update: 20/02/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -25,6 +31,7 @@ spm_path = 'C:\Users\User\Desktop\Tese\spm12';
 
 % Input and output directories
 base_dir = 'C:\Users\User\Desktop\Tese\data\spm-data';
+raw_dir = fullfile(base_dir,'rawdata');
 deriv_dir = fullfile(base_dir,'derivatives','spm-preprocessing');
 
 % List of Subjects WITHOUT magnitude files
@@ -48,6 +55,7 @@ for s = 1:length(subjects)
     fprintf('Creating "fake" magnitude for: %s\n', subj);
     
     anat_dir = fullfile(deriv_dir,subj,'anat');
+    raw_fmap_dir = fullfile(raw_dir,subj,'fmap');
     func_dir = fullfile(deriv_dir,subj,'func');
     fmap_dir = fullfile(deriv_dir,subj,'fmap'); % Output folder
 
@@ -60,14 +68,23 @@ for s = 1:length(subjects)
         continue;
     end
 
-    % Mean functional image from the Realignment step (Reference)
-    file_pattern = sprintf('mean*a%s_task-main_run-01_bold.nii', subj);
-    mean_struct= dir(fullfile(func_dir,file_pattern));
+    % Mean functional image from the Realignment step (Reference for visual alignment/estimate)
+    file_pattern_func = sprintf('mean*a%s_task-main_run-01_bold.nii', subj);
+    mean_struct= dir(fullfile(func_dir,file_pattern_func));
     if isempty(mean_struct)
         fprintf('[ERROR] Missing Mean Functional Image for %s.',subj);
         continue;
     end
     mean_func = fullfile(func_dir,mean_struct(1).name);
+
+    % Native phasediff (Reference for grid resizing/write ONLY) -> using run-01 as the universal reference
+    file_pattern_phase = sprintf('*run-01_phasediff.nii');
+    phase_struct= dir(fullfile(raw_fmap_dir,file_pattern_phase));
+    if isempty(phase_struct)
+        fprintf('[ERROR] Missing Native Phasediff for %s. Cannot align T1w.',subj);
+        continue;
+    end
+    native_phase_ref = fullfile(raw_fmap_dir,phase_struct(1).name);
     
     
     % ####################### SPM Batches #######################
@@ -148,10 +165,8 @@ for s = 1:length(subjects)
     spm_jobman('run',matlabbatch);
 
     
-    % -------- Coregister and Reslice to Functional space --------
-    fprintf('>>>>> Step 3: Coregistration to Functional...\n')
-
-    final_mag_file = fullfile(fmap_dir,[subj '_run-01_magnitude.nii']); % following BIDS standard and matching the existing dataset pattern
+    % -------- Coregister to Functional (Est & Res) --------
+    fprintf('>>>>> Step 3a: Coregistration to Mean Functional...\n')
 
     clear matlabbatch;
     matlabbatch{1}.spm.spatial.coreg.estwrite.ref = {mean_func};
@@ -168,12 +183,31 @@ for s = 1:length(subjects)
   
     spm_jobman('run',matlabbatch);
 
-    % Move and rename outputs
+    % get the name of the file aligned to the functional
     [filepath_ss, name_ss, ext_ss] = fileparts(skull_stripped_t1);
-    resliced_output = fullfile(filepath_ss, ['r' name_ss ext_ss]);
-    if exist(resliced_output,'file')
-        movefile(resliced_output,final_mag_file);
-        fprintf('SUCCESS: Fake magnitude created at: %s\n',final_mag_file);
+    func_aligned_mag = fullfile(filepath_ss, ['r' name_ss ext_ss]);
+    
+    % -------- Reslice ONLY to Native Phasediff space --------
+    fprintf('>>>>> Step 3b: Reslicing to Native Phasediff (no estimation)...\n')
+
+    final_mag_file = fullfile(fmap_dir,[subj '_run-01_magnitude.nii']); % following BIDS standard and matching the existing dataset pattern
+
+    clear matlabbatch;
+    matlabbatch{1}.spm.spatial.coreg.write.ref = {native_phase_ref};
+    matlabbatch{1}.spm.spatial.coreg.write.source = {func_aligned_mag};
+    matlabbatch{1}.spm.spatial.coreg.write.other = {''};
+    matlabbatch{1}.spm.spatial.coreg.write.roptions.interp = 4;
+    matlabbatch{1}.spm.spatial.coreg.write.roptions.wrap = [0 0 0];
+    matlabbatch{1}.spm.spatial.coreg.write.roptions.mask = 0;
+    matlabbatch{1}.spm.spatial.coreg.write.roptions.prefix = 'nat_';
+  
+    spm_jobman('run',matlabbatch);
+
+    % Move and rename outputs
+    native_aligned_mag = fullfile(filepath_ss, ['nat_r' name_ss ext_ss]);
+    if exist(native_aligned_mag,'file')
+        movefile(native_aligned_mag,final_mag_file);
+        fprintf('SUCCESS: Native Fake magnitude created at: %s\n',final_mag_file);
         % According to BIDS, it needs a JSON file
         t1_json = replace(t1_file,'.nii','.json');
         create_mag_json(t1_json,replace(final_mag_file,'.nii','.json'));
@@ -181,7 +215,7 @@ for s = 1:length(subjects)
         % CLEAN THE INTERMEDIATE FILES IN THE FOLDER, NOT TO MESS WITH
         % LATER PROCESSING STAGES!
         fprintf('> Cleaning up intermediate files in anat folder...\n');
-        files_to_delete = {m_t1,c1,c2,c3,skull_stripped_t1};
+        files_to_delete = {m_t1,c1,c2,c3,skull_stripped_t1,func_aligned_mag};
         for f=1:length(files_to_delete)
             if exist(files_to_delete{f},'file')
                 delete(files_to_delete{f});
@@ -212,7 +246,7 @@ end
 
 json_data.Description = 'Magnitude Substitute/Surrogate Image derived from T1w for FSL FUGUE';
 json_data.SkullStripped = true;
-json_data.CoregisteredTo = 'Mean Functional Image';
+json_data.CoregisteredTo = 'Mean Functional (Alignment) and Native Phasediff (Grid Resampling)(run-01)';
 json_data.Sources = {source_json_path};
 
 % Save .json file
