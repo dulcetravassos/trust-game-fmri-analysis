@@ -161,6 +161,33 @@ for s = 1:length(subjects)
         end
         try
             spm_jobman('run',matlabbatch);
+
+            % the 'r...' files need a JSON
+            % phasediff
+            orig_phase_json = replace(phase_deriv_path,'.nii','.json');
+            [~,phase_name_only,~] = fileparts(phase_deriv_path);
+            r_phase_json = fullfile(deriv_fmap_dir,['r' phase_name_only '.json']);
+            if exist(orig_phase_json,'file')
+                json_data = jsondecode(fileread(orig_phase_json));
+                json_data.SpatialReference = 'Coregistered and Resliced to Mean Functional Image';
+                fid = fopen(r_phase_json,'w');
+                fprintf(fid,'%s',jsonencode(json_data,'PrettyPrint',true));
+                fclose(fid);
+            end
+            % (real) magnitude
+            if ~is_fake_mag
+                orig_mag_json = replace(mag_deriv_path,'.nii','.json');
+                [~,mag_name_only,~] = fileparts(mag_deriv_path);
+                r_mag_json = fullfile(deriv_fmap_dir,['r' mag_name_only '.json']);
+                if exist(orig_mag_json,'file')
+                    json_data = jsondecode(fileread(orig_mag_json));
+                    json_data.SpatialReference = 'Coregistered and Resliced to Mean Functional Image';
+                    fid = fopen(r_mag_json,'w');
+                    fprintf(fid,'%s',jsonencode(json_data,'PrettyPrint',true));
+                    fclose(fid);
+                end
+            end
+
         catch ME
             fprintf('[ERROR] Coregistration failed for %s %s: %s\n',subj,current_run,ME.message);
         end
