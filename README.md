@@ -38,7 +38,7 @@ This repository consists of a SPM project ran on MatLab, with (xxx) scripts and 
 
 * **OS**: Ubuntu v24.04.5 LTS
 
-* **FSL:** vX.X.X *(specifically `fugue` for fieldmap unwarping)*
+* **FSL:** v6.0.7.19 *(specifically `fugue` for fieldmap unwarping and `bet` for magnitude skull-stripping)*
 
 ### Hardware:
 
