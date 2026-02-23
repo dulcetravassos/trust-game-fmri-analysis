@@ -1,15 +1,16 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                        %
-%   Distortion Correction - Align Fieldmap to Mean Functional (SPM)      %
+%   Distortion Correction - Unzip outputs and create JSONs (SPM)         %
 %                                                                        %
-%   Now that the fieldmap is a continuous rad/s map, we can safely       %
-%   reslice it into the functional sapce using SPM's Coregister tool.    %
-%   This code also creates JSON files for the FSL commands descripted    %
-%   on the previous script (BIDS).                                       %
+%   Unzips the new images (fieldmap and functional) from the previous    % 
+%   script and creates a JSON for them (for the functional, copies the   %
+%   metadata from the 'ra*.json', appends the information regarding the  %
+%   Distortion Correction performed in the previous script, and saves it %
+%   as the new 'ura*.json' sidecar.                                      %
 %                                                                        %
 %   Author: Dulce Travassos                                              %
-%   Created: 20/02/2026                                                  %
-%   Last update: 20/02/2026                                              %
+%   Created: 22/02/2026                                                  %
+%   Last update: 23/02/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -123,18 +124,21 @@
 %
 % Additionally, while developing this script, I noticed that thosemagnitude1 and magnitude2 files had +1 voxel than the phasediff, 
 % blocking the fsl_prepare_fieldmap. Those runs have an additional line (flirt), to cut the magnitude to the exact size of phasediff.
-%
+
 % flirt -in fmap/sub-006_run-02_magnitude_brain.nii -ref ../../../rawdata/sub-006/fmap/sub-006_run-02_phasediff.nii -applyxfm -usesqform -out fmap/sub-006_run-02_magnitude_brain_matched.nii
 % flirt: the main options are an input (-in), a reference (-ref) volume, and output volume (-out) where the transform is applied to the 
 % input volume to align it with the reference volume. To apply a transform that aligns the NIFTI mm coordinates: -applyxfm, -usesqform 
 % and -out; but not -init). For these usage the reference volume must still be specified as this sets the voxel and image dimensions of 
 % the resulting volume.
 
+% fslmaths fmap/rfmap_rads_sub-008_run-01.nii -nan fmap/rfmap_rads_sub-008_run-01.nii
+% replaces NaNs with 0
+
 %% Initial Configurations
 % Change according to your preferences
 % Note that some parameters may have to be changed inside the main loop
 
-spm_path = 'C:\Users\User\Desktop\Tese\spm12';
+clear all; clc;
 
 % Input and output directories
 base_dir = 'C:\Users\User\Desktop\Tese\data\spm-data';
@@ -142,80 +146,74 @@ deriv_dir = fullfile(base_dir,'derivatives','spm-preprocessing');
 
 % List of Subjects
 subjects = {
-    'sub-002', 'sub-003', 'sub-004', 'sub-006', 'sub-007', 'sub-008', ...
-    'sub-009', 'sub-011', 'sub-012', 'sub-013', 'sub-014', 'sub-015', ...
-    'sub-016', 'sub-017', 'sub-018', 'sub-019', 'sub-020', 'sub-021', ...
-    'sub-022', 'sub-023'
+    'sub-002', 
+    % 'sub-003', 'sub-004', 'sub-006', 'sub-007', 'sub-008', ...
+    % 'sub-009', 'sub-011', 'sub-012', 'sub-013', 'sub-014', 'sub-015', ...
+    % 'sub-016', 'sub-017', 'sub-018', 'sub-019', 'sub-020', 'sub-021', ...
+    % 'sub-022', 'sub-023'
 };
 
-%% Align Fieldmaps
-
-% Initialize SPM
-if isempty(which('spm')); addpath(spm_path); end
-spm('defaults', 'FMRI');
-spm_jobman('initcfg');
+%% Unzip and Generate JSONs
 
 for s = 1:length(subjects)
     subj = subjects{s};
     fprintf('\n==================================================\n');
-    fprintf('Aligning rad/s fieldmaps for: %s\n', subj);
+    fprintf('Processing: %s\n', subj);
     
-    fmap_dir = fullfile(deriv_dir,subj,'fmap');
     func_dir = fullfile(deriv_dir,subj,'func');
+    fmap_dir = fullfile(deriv_dir,subj,'fmap');
 
-    % Find Mean Functional image (Reference)
-    file_pattern = sprintf('mean*a%s_task-main_run-01_bold.nii', subj);
-    mean_struct= dir(fullfile(func_dir,file_pattern));
-    if isempty(mean_struct)
-        fprintf('[ERROR] Missing Mean Functional Image for %s.\n',subj);
-        continue;
-    end
-    mean_func = fullfile(func_dir,mean_struct(1).name);
-    
+    % -------------------------- Fieldmaps --------------------------
+
     % Find all fmap_rads.nii.gz
     fmaps_gz = dir(fullfile(fmap_dir,'fmap_rads_*.nii.gz'));
     if isempty(fmaps_gz)
         fprintf('[Warning] No fmap_rads_*.nii.gz files found for %s.\n',subj);
-        continue;
+        %continue;
+    else
+        for p = 1:length(fmaps_gz)
+            fmap_gz_file = fullfile(fmap_dir,fmaps_gz(p).name);
+            fprintf('>> Unzipping FMAP: %s\n',fmaps_gz(p).name);
+            
+            % Unzip if the .nii doesn't exist yet
+            fmap_nii_file = replace(fmap_gz_file,'.nii.gz','.nii');
+            if ~exist(fmap_nii_file,'file')
+                gunzip(fmap_gz_file);
+            end
+        
+            % Extract basic name and create JSON
+            [~,fmap_name_only,~] = fileparts(replace(fmap_gz_file,'.nii.gz','.nii'));
+            fmap_out_json = fullfile(fmap_dir,[fmap_name_only '.json']);
+            create_fmap_json(fmap_out_json,subj);
+        end
     end
 
-    for p = 1:length(fmaps_gz)
-        gz_file = fullfile(fmap_dir,fmaps_gz(p).name);
+    % ---------------------- Functional 'ura' ----------------------
 
-        fprintf('>> Unzipping and aligning: %s\n',fmaps_gz(p).name);
+    % Find all urasub-00x_task-main_run-0y_bold.nii.gz
+    ura_files_gz = dir(fullfile(func_dir,'ura*.nii.gz'));
+    if isempty(ura_files_gz)
+        fprintf('[Warning] No ura*.nii.gz files found for %s.\n',subj);
+        %continue;
+    else
+        for p = 1:length(ura_files_gz)
+            func_gz_file = fullfile(func_dir,ura_files_gz(p).name);
+            fprintf('>> Unzipping FUNC: %s\n',ura_files_gz(p).name);
         
-        % Unzip if the .nii doesn't exist yet
-        nii_file = replace(gz_file,'.nii.gz','.nii');
-        if ~exist(nii_file,'file')
-            gunzip(gz_file);
-        end
-
-        [~,name_only,ext] = fileparts(nii_file);
-        out_rfmap = fullfile(fmap_dir,['r' name_only ext]);
-        out_json = fullfile(fmap_dir,['r' name_only '.json']);
-
-
-        % ####################### SPM Batch #######################
+            % Unzip if the .nii doesn't exist yet
+            func_nii_file = replace(func_gz_file,'.nii.gz','.nii');
+            if ~exist(func_nii_file,'file')
+                gunzip(func_gz_file);
+            end
         
-        clear matlabbatch;
-        matlabbatch{1}.spm.spatial.coreg.estwrite.ref = {mean_func};
-        matlabbatch{1}.spm.spatial.coreg.estwrite.source = {nii_file};
-        matlabbatch{1}.spm.spatial.coreg.estwrite.other = {''};
-        matlabbatch{1}.spm.spatial.coreg.estwrite.eoptions.cost_fun = 'nmi';
-        matlabbatch{1}.spm.spatial.coreg.estwrite.eoptions.sep = [4 2];
-        matlabbatch{1}.spm.spatial.coreg.estwrite.eoptions.tol = [0.02 0.02 0.02 0.001 0.001 0.001 0.01 0.01 0.01 0.001 0.001 0.001];
-        matlabbatch{1}.spm.spatial.coreg.estwrite.eoptions.fwhm = [7 7];
-        matlabbatch{1}.spm.spatial.coreg.estwrite.roptions.interp = 4;
-        matlabbatch{1}.spm.spatial.coreg.estwrite.roptions.wrap = [0 0 0];
-        matlabbatch{1}.spm.spatial.coreg.estwrite.roptions.mask = 0;
-        matlabbatch{1}.spm.spatial.coreg.estwrite.roptions.prefix = 'r';
+            [~,func_name_only,~] = fileparts(replace(func_gz_file, '.nii.gz', '.nii'));
+            func_base_name_raw = eraseBetween(func_name_only,1,3); % removes 'ura' prefix to obtain the original file name
+            func_run_str = regexp(func_name_only,'run-\d+','match','once');
         
-        try
-            spm_jobman('run',matlabbatch);
-            fprintf('Success! Creating JSON for BIDS compliance...\n');
-            create_fmap_json(out_json,subj);
-        catch ME
-            fprintf('[ERROR] Alignment failed for %s: %s\n',fmaps_gz(p).name,ME.message);
+            ra_json_path = fullfile(func_dir,['ra' func_base_name_raw '.json']);
+            ura_json_path = fullfile(func_dir,[func_name_only '.json']);
+            
+            create_ura_json(ra_json_path,ura_json_path,subj,func_run_str);
         end
     end
 end
@@ -226,11 +224,9 @@ fprintf('\nDone!\n');
 function create_fmap_json(target_json_path,subj)
 
 json_data = struct();
-json_data.Description = 'Coregistered Phase/Magnitude Fieldmap calculated in rad/s using FSL fsl_prepare_fieldmap';
+json_data.Description = 'Phase/Magnitude Fieldmap calculated in rad/s using FSL fsl_prepare_fieldmap';
 json_data.Units = 'rad/s';
-json_data.CoregisteredTo = sprintf('Mean Functional Image (mean*a%s_task-main_run-01_bold.nii)',subj);
-json_data.Software = 'SPM12 (Coregistration) & FSL (Fieldmap Prep)';
-json_data.Interpolation = '4th Degree B-Spline';
+json_data.Software = 'FSL (Fieldmap Prep)';
 
 fake_mag_subjects = {'sub-002', 'sub-003', 'sub-004'};
 if ismember(subj,fake_mag_subjects)
@@ -244,6 +240,33 @@ end
 
 % Save .json file
 fid = fopen(target_json_path,'w');
+if fid==-1; warning('Could not save JSON file.'); return; end
+fprintf(fid,'%s',jsonencode(json_data,'PrettyPrint',true));
+fclose(fid);
+end
+
+
+function create_ura_json(ra_json_path,ura_json_path,subj,run_str)
+
+if exist(ra_json_path,'file')
+    content = fileread(ra_json_path);
+    try
+        json_data = jsondecode(content);
+    catch
+        json_data = struct();
+    end
+else
+    json_data = struct();
+end
+
+json_data.DistortionCorrection = true;
+json_data.DistortionCorrectionSoftware = 'FSL FUGUE';
+json_data.DistortionCorrectionParameters = struct('dwell_time',0.00056,'unwarpdir','y-');
+json_data.B0FieldSource = sprintf('fmap_rads_%s_%s.nii',subj,run_str);
+json_data.Sources = {sprintf('func/ra%s_task-main_%s_bold.nii',subj,run_str)};
+
+% Save .json file
+fid = fopen(ura_json_path,'w');
 if fid==-1; warning('Could not save JSON file.'); return; end
 fprintf(fid,'%s',jsonencode(json_data,'PrettyPrint',true));
 fclose(fid);
