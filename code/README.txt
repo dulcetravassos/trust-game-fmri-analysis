@@ -5,7 +5,7 @@
 #  Software: MATLAB R2024b (Update 4 - 24.2.0.2833386)			         #
 #  	     SPM12 (7771)							 #
 #	     Ubuntu v24.04.5 LTS						 #
-#	     FSL vXX.XX.XX (FUGUS)						 #
+#	     FSL v6.0.7.19 (FUGUS)						 #
 #  OS: Microsoft Windows 10 (64-bit)					         #
 #  CPU: Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz			         #
 #  RAM: 16GB								         #
