@@ -94,15 +94,12 @@
 
 % Example
 % ----------- s05_01 -----------
-fslmaths ../../../rawdata/sub-002/fmap/sub-002_run-01_phasediff.nii -div 2 fmap/sub-002_run-01_phasediff_half.nii
-bet rsub-006_run-01_magnitude.nii rsub-006_run-01_magnitude_brain.nii -f 0.5 -m
-fsl_prepare_fieldmap SIEMENS rsub-006_run-01_phasediff.nii rsub-006_run-01_magnitude_brain.nii fmap_rads_sub-006_run-01.nii.gz 2.46
+bet ../../../rawdata/sub-006/fmap/sub-006_run-01_magnitude.nii fmap/sub-006_run-01_magnitude_brain.nii.gz -f 0.5 -m
+fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-01_phasediff.nii -div 2 fmap/sub-006_run-01_phasediff_half.nii.gz
+fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-01_phasediff_half.nii.gz fmap/sub-006_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-006_run-01.nii.gz 2.46 --nocheck
+fugue -i func/rasub-006_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/fmap_rads_sub-006_run-01.nii.gz --unwarpdir=y- -u func/urasub-006_task-main_run-01_bold.nii.gz -v
 % ----------- s05_02 -----------
-% Open fmap_rads_sub-002_run-01.nii.gz to .nii
-% Coregister (Estimate & Reslice) using Reference Image mean...a_sub-002...bold.nii and Source Image fmap_rads_sub-002_run-01.nii
-% Output: fmap_rads_sub-002_run-01.nii
-% ----------- s05_03 -----------
-fugue -i rasub-006_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap_rads_sub-006_run-01.nii.gz --unwarpdir=y- -u urasub-006_task-main_run-01_bold.nii
+% Unzip ura* files and create JSONs (BIDS-compliant)
 
 % Note that the -i and --loadfmap should match (e.g., functional run-02 should be paired with fmap run-02)
 
@@ -112,14 +109,11 @@ fugue -i rasub-006_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap_rad
 
 % Example
 % ----------- s05_01 -----------
-fslmaths ../../../rawdata/sub-002/fmap/sub-002_run-01_phasediff.nii -div 2 fmap/sub-002_run-01_phasediff_half.nii
-fsl_prepare_fieldmap SIEMENS rsub-002_run-01_phasediff.nii sub-002_run-01_magnitude.nii fmap_rads_sub-002_run-01.nii.gz 2.46
+fslmaths ../../../rawdata/sub-002/fmap/sub-002_run-01_phasediff.nii -div 2 fmap/sub-002_run-01_phasediff_half.nii.gz
+fsl_prepare_fieldmap SIEMENS fmap/sub-002_run-01_phasediff_half.nii.gz fmap/sub-002_run-01_magnitude.nii fmap/fmap_rads_sub-002_run-01.nii.gz 2.46
+fugue -i func/rasub-002_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/fmap_rads_sub-002_run-01.nii.gz --unwarpdir=y- -u func/urasub-002_task-main_run-01_bold.nii.gz
 % ----------- s05_02 -----------
-% Open fmap_rads_sub-002_run-01.nii.gz to .nii
-% Coregister (Estimate & Reslice) using Reference Image mean...a_sub-002...bold.nii and Source Image fmap_rads_sub-002_run-01.nii
-% Output: fmap_rads_sub-002_run-01.nii
-% ----------- s05_03 -----------
-fugue -i rasub-002_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap_rads_sub-002_run-01.nii.gz --unwarpdir=y- -u urasub-002_task-main_run-01_bold.nii
+% Unzip ura* files and create JSONs (BIDS-compliant)
 
 % Note that the -i and --loadfmap should match (e.g., functional run-02 should be paired with fmap run-02)
 
