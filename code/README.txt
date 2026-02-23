@@ -52,24 +52,20 @@ Finally, the alignment to the phasediff space is done in a 2-step coregistration
 This script automatically cleans up the intermediate files generated mid-operation (e.g., c1, c2, m_*) to prevent overwriting conflicts in later pipeline stages.
 
 
----------------------------------------------- s05_01_prepare_native_fmap_fsl ----------------------------------------------
+---------------------------------------------- s05_01_distortion_correction_fsl ----------------------------------------------
 
-Processes the raw phasediff and magnitude files to generate a continuous, unwrapped fieldmap (in rad/s) strictly within the Native space.
-Methodological note: Phasediff images are never resampled/resliced while wrapped (-pi to +pi) to avoid severe boundary overshoots caused by spatial interpolation.
-This script performs three key corrections:
+Processes the raw phasediff and magnitude files to generate a continuous fieldmap (in rad/s) and applies it directly to the functional images to correct for B0 magnetic field inhomogeneities.
+This script performs several key corrections strictly within the Native space using FSL:
 1) SIEMENS Scaling Bug: Divides the raw Siemens phasediff by 2 using 'fslmaths' to correct the amplitude scale back to the standard 4096 expected by FSL;
-2) Skull-stripping: Applies FSL 'bet' to extract the brain from real magnitude files;
-3) SIEMENS Slice Dimension Bug: Uses FSL 'flirt' to truncate the magnitude image when the scanner reconstructs it with +1 slice compared to the phasediff (cases where magnitude1 or magnitude2 instead of regular magnitude).
-Finally, it runs 'fsl_prepare_fieldmap' to output 'fmap_rads_*.nii.gz'.
-Being a .m file with bash code, you are supposed to copy-paste the code lines for each subject to a WSL interpreter (Linux) instead of running the script itself on Matlab.
+2) Skull-stripping: Applies FSL 'bet' to extract the brain from the real magnitude files to improve fieldmap estimation;
+3) SIEMENS Slice Dimension Bug: Uses FSL 'flirt' to truncate the magnitude image when the scanner reconstructs it with +1 slice compared to the phasediff (common in cases with magnitude1 or magnitude2 instead of regular magnitude);
+4) Fieldmap Preparation: Runs 'fsl_prepare_fieldmap' to compute the unwrapped fieldmap in rad/s ('fmap_rads_*.nii.gz') and cleans residual NaNs (fslmaths);
+5) Unwarping: Applies the generated fieldmap to the realigned BOLD functional images using FSL FUGUE, outputting the distortion-corrected images ('ura*.nii.gz').
+Being a .m file containing bash code, you are supposed to copy-paste the code lines for each subject to a WSL interpreter (Linux) instead of running the script itself on Matlab.
 
 
----------------------------------------------- s05_02_align_fmap_to_func_spm ----------------------------------------------
+---------------------------------------------- s05_02_unzip_create_json_spm ----------------------------------------------
 
-Bridges the continuous Native Space fieldmaps back to the Functional Space. It automatically unzips the *.nii.gz files and performs Coregistration (Estimate & Reslice) to align them with the Mean Functional image.
-This returns an image geometrically matched to the functional data and ready for Unwarping via FSL FUGUE.
+Bridges the FSL outputs back to the SPM environment. It automatically unzips the FSL-generated *.nii.gz files (fmap_rads* and ura*) into standard .nii files.
+Additionally, it generates BIDS-compliant JSON sidecars for both the fieldmaps and the new unwarped functional images. For the functional data, it reads the original 'ra*.json' metadata and appends the appropriate Distortion Correction tags.
 
-
----------------------------------------------- s05_03_distortion_correction_fsl ----------------------------------------------
-
-Applies the calculated and functionally-aligned fieldmaps ('rfmap_rads') to the previously realigned BOLD images ('ra*_bold.nii') using FSL FUGUE. This step unwarps the EPI distortions caused by B0 magnetic field inhomogeneities, outputting the final 'ura*_bold.nii' images.
