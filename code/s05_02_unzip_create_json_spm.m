@@ -10,7 +10,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 22/02/2026                                                  %
-%   Last update: 26/02/2026                                              %
+%   Last update: 27/02/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -90,7 +90,7 @@
 % fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-01_phasediff_half.nii.gz fmap/sub-006_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-006_run-01.nii.gz 2.46 --nocheck
 % fslmaths fmap/fmap_rads_sub-006_run-01.nii.gz -nan fmap/fmap_rads_sub-006_run-01.nii.gz
 % flirt -in fmap/sub-006_run-01_magnitude_brain.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-% flirt -in fmap/fmap_rads_sub-006_run-01.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-006_run-01.nii.gz
+% flirt -in fmap/fmap_rads_sub-006_run-01.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-006_run-01.nii.gz
 % fugue -i func/rasub-006_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-006_run-01.nii.gz --unwarpdir=y- -u func/urasub-006_task-main_run-01_bold.nii.gz -v
 % ----------- s05_02 -----------
 % Unzip rfmap* and ura* files and create JSONs (BIDS-compliant)
@@ -106,9 +106,8 @@
 % fslmaths ../../../rawdata/sub-002/fmap/sub-002_run-01_phasediff.nii -div 2 fmap/sub-002_run-01_phasediff_half.nii.gz
 % fsl_prepare_fieldmap SIEMENS fmap/sub-002_run-01_phasediff_half.nii.gz fmap/sub-002_run-01_magnitude.nii fmap/fmap_rads_sub-002_run-01.nii.gz 2.46 --nocheck
 % fslmaths fmap/fmap_rads_sub-002_run-01.nii.gz -nan fmap/fmap_rads_sub-002_run-01.nii.gz
-% fslmaths fmap/fmap_rads_sub-002_run-01.nii.gz -s 2 fmap/fmap_rads_sub-002_run-01.nii.gz
 % flirt -in fmap/sub-002_run-01_magnitude.nii -ref func/rasub-002_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-% flirt -in fmap/fmap_rads_sub-002_run-01.nii.gz -ref func/rasub-002_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-002_run-01.nii.gz
+% flirt -in fmap/fmap_rads_sub-002_run-01.nii.gz -ref func/rasub-002_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-002_run-01.nii.gz
 % fugue -i func/rasub-002_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-002_run-01.nii.gz --unwarpdir=y- -u func/urasub-002_task-main_run-01_bold.nii.gz -v
 % ----------- s05_02 -----------
 % Unzip rfmap* and ura* files and create JSONs (BIDS-compliant)
@@ -133,7 +132,7 @@
 % blocking the fsl_prepare_fieldmap. Those runs have an additional line (flirt), to cut the magnitude to the exact size of phasediff.
 %
 % flirt -in fmap/sub-006_run-01_magnitude_brain.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-% flirt -in fmap/fmap_rads_sub-006_run-01.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-006_run-01.nii.gz
+% flirt -in fmap/fmap_rads_sub-006_run-01.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat  -out fmap/rfmap_rads_sub-006_run-01.nii.gz
 % flirt: used for registration, the main options are an input (-in), a reference (-ref) volume, the calculated affine transformation that registers 
 % the input to the reference which is saved as a 4x4 affine matrix (-omat), and output volume (-out) where the transform  is applied to the input 
 % volume to align it with the reference volume. To apply a saved transformation to a volume: -applyxfm, -init and -out. For these usage the reference 
@@ -141,9 +140,6 @@
 
 % fslmaths fmap/fmap_rads_sub-008_run-01.nii -nan fmap/fmap_rads_sub-008_run-01.nii
 % replaces NaNs with 0
-
-% fslmaths fmap/fmap_rads_sub-002_run-01.nii.gz -s 2 fmap/fmap_rads_sub-002_run-01.nii.gz
-% for subjects with fake magnitudes, we perform smoothing to eliminate "phantom voxels" outside the brain
 
 %% Initial Configurations
 % Change according to your preferences
@@ -289,10 +285,10 @@ json_data.DistortionCorrection = true;
 json_data.DistortionCorrectionSoftware = 'FSL FUGUE';
 json_data.DistortionCorrectionParameters = struct('dwell_time',dwell_time,'unwarpdir','y-');
 
-fake_mag_subjects = {'sub-002', 'sub-003', 'sub-004'};
-if ismember(subj,fake_mag_subjects)
-    json_data.DistortionCorrectionParameters.FieldmapSmoothing = 'Gaussian (sigma=2mm)';
-end
+%fake_mag_subjects = {'sub-002', 'sub-003', 'sub-004'};
+%if ismember(subj,fake_mag_subjects)
+%    json_data.DistortionCorrectionParameters.FieldmapSmoothing = 'Gaussian (sigma=2mm)';
+%end
 
 json_data.B0FieldSource = fmap_name;
 json_data.Sources = {sprintf('func/ra%s.nii',func_base_name_raw)};
