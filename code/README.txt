@@ -54,18 +54,20 @@ This script automatically cleans up the intermediate files generated mid-operati
 
 ---------------------------------------------- s05_01_distortion_correction_fsl ----------------------------------------------
 
-Processes the raw phasediff and magnitude files to generate a continuous fieldmap (in rad/s) and applies it directly to the functional images to correct for B0 magnetic field inhomogeneities.
-This script performs several key corrections strictly within the Native space using FSL:
-1) SIEMENS Scaling Bug: Divides the raw Siemens phasediff by 2 using 'fslmaths' to correct the amplitude scale back to the standard 4096 expected by FSL;
+Processes the raw phasediff and magnitude files to generate a continuous fieldmap (in rad/s), coregisters it to the functional space, and applies it to correct for B0 magnetic field inhomogeneities.
+This script performs several key corrections strictly using FSL via a WSL interpreter:
+1) SIEMENS Scaling: Divides the raw Siemens phasediff by 2 using 'fslmaths' to correct the amplitude scale back to the standard 4096 expected by FSL;
 2) Skull-stripping: Applies FSL 'bet' to extract the brain from the real magnitude files to improve fieldmap estimation;
-3) SIEMENS Slice Dimension Bug: Uses FSL 'flirt' to truncate the magnitude image when the scanner reconstructs it with +1 slice compared to the phasediff (common in cases with magnitude1 or magnitude2 instead of regular magnitude);
+3) Slice Dimension: Uses FSL 'flirt' to truncate the magnitude image when the scanner reconstructs it with +1 slice compared to the phasediff (common in cases with magnitude1 or magnitude2 instead of regular magnitude);
 4) Fieldmap Preparation: Runs 'fsl_prepare_fieldmap' to compute the unwrapped fieldmap in rad/s ('fmap_rads_*.nii.gz') and cleans residual NaNs (fslmaths);
-5) Unwarping: Applies the generated fieldmap to the realigned BOLD functional images using FSL FUGUE, outputting the distortion-corrected images ('ura*.nii.gz').
-Being a .m file containing bash code, you are supposed to copy-paste the code lines for each subject to a WSL interpreter (Linux) instead of running the script itself on Matlab.
+5) Functional Coregistration: Uses FSL 'flirt' to calculate the transformation matrix from the magnitude image to the realigned BOLD functional image, and applies this matrix to the fieldmap to create a functionally-aligned fieldmap ('rfmap_rads_*.nii.gz');
+6) Unwarping: Applies the coregistered fieldmap to the realigned BOLD functional images using FSL FUGUE, outputting the final distortion-corrected images ('ura*.nii.gz').
+
+NOTE: Being a .m file containing bash code, you are supposed to copy-paste the code lines for each subject to a WSL interpreter (Linux) instead of running the script itself on Matlab.
 
 
 ---------------------------------------------- s05_02_unzip_create_json_spm ----------------------------------------------
 
-Bridges the FSL outputs back to the SPM environment. It automatically unzips the FSL-generated *.nii.gz files (fmap_rads* and ura*) into standard .nii files.
-Additionally, it generates BIDS-compliant JSON sidecars for both the fieldmaps and the new unwarped functional images. For the functional data, it reads the original 'ra*.json' metadata and appends the appropriate Distortion Correction tags.
+Bridges the FSL outputs back to the SPM environment. It automatically unzips the FSL-generated *.nii.gz files (rfmap_rads* and ura*) into standard .nii files.
+Additionally, it generates BIDS-compliant JSON sidecars for both the fieldmaps and the new unwarped functional images. For the functional data, it reads the original 'ra*.json' metadata and appends the appropriate Distortion Correction tags and information.
 
