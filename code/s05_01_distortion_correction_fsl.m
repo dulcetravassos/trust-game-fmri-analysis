@@ -7,12 +7,11 @@
 %   fieldmaps are prepared in native space using fsl_prepare_fieldmaps   %
 %   ('fmap_rads_*.nii.gz'). Magnitude images are coregistered to the     %
 %   functional space using FSL FLIRT. This spatial transformation is     %
-%   then applied to the fieldmaps (using spline interpolation) to create %
-%   functionally-aligned fieldmaps ('rfmap_rads_*.nii.gz'). Finally,     %
-%   FSL FUGUE applies these resliced fieldmaps to the previously         %
-%   realigned BOLD images. The output is a new set of functional images  %
-%   prefixed with 'u' (unwarped) corrected for B0 magnetic field         %
-%   inhomogeneities.                                                     %
+%   then applied to the fieldmaps to create functionally-aligned         %
+%   fieldmaps ('rfmap_rads_*.nii.gz'). Finally, FSL FUGUE applies these  %
+%   resliced fieldmaps to the previously realigned BOLD images. The      %
+%   output is a new set of functional images prefixed with 'u'           %
+%   (unwarped) corrected for B0 magnetic field inhomogeneities.          %                                               %
 %   This script handles multiple magnitudes (magnitude1, magnitude2)     %
 %   with matrix size mismatches and "fake" magnitudes derived from T1w   %
 %   (see scrip s04) by applying a Gaussian smoothing (-s 2) on the       %
@@ -27,7 +26,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 20/02/2026                                                  %
-%   Last update: 26/02/2026                                              %
+%   Last update: 27/02/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -110,7 +109,7 @@ fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-01_phasediff_half.nii.gz fmap/sub-006_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-006_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-006_run-01.nii.gz -nan fmap/fmap_rads_sub-006_run-01.nii.gz
 flirt -in fmap/sub-006_run-01_magnitude_brain.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-006_run-01.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-006_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-006_run-01.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-006_run-01.nii.gz
 fugue -i func/rasub-006_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-006_run-01.nii.gz --unwarpdir=y- -u func/urasub-006_task-main_run-01_bold.nii.gz -v
 % ----------- s05_02 -----------
 % Unzip rfmap* and ura* files and create JSONs (BIDS-compliant)
@@ -126,9 +125,8 @@ fugue -i func/rasub-006_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fma
 fslmaths ../../../rawdata/sub-002/fmap/sub-002_run-01_phasediff.nii -div 2 fmap/sub-002_run-01_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-002_run-01_phasediff_half.nii.gz fmap/sub-002_run-01_magnitude.nii fmap/fmap_rads_sub-002_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-002_run-01.nii.gz -nan fmap/fmap_rads_sub-002_run-01.nii.gz
-fslmaths fmap/fmap_rads_sub-002_run-01.nii.gz -s 2 fmap/fmap_rads_sub-002_run-01.nii.gz
 flirt -in fmap/sub-002_run-01_magnitude.nii -ref func/rasub-002_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-002_run-01.nii.gz -ref func/rasub-002_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-002_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-002_run-01.nii.gz -ref func/rasub-002_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-002_run-01.nii.gz
 fugue -i func/rasub-002_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-002_run-01.nii.gz --unwarpdir=y- -u func/urasub-002_task-main_run-01_bold.nii.gz -v
 % ----------- s05_02 -----------
 % Unzip rfmap* and ura* files and create JSONs (BIDS-compliant)
@@ -153,7 +151,7 @@ fugue -i func/rasub-002_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fma
 % blocking the fsl_prepare_fieldmap. Those runs have an additional line (flirt), to cut the magnitude to the exact size of phasediff.
 %
 % flirt -in fmap/sub-006_run-01_magnitude_brain.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-% flirt -in fmap/fmap_rads_sub-006_run-01.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-006_run-01.nii.gz
+% flirt -in fmap/fmap_rads_sub-006_run-01.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat  -out fmap/rfmap_rads_sub-006_run-01.nii.gz
 % flirt: used for registration, the main options are an input (-in), a reference (-ref) volume, the calculated affine transformation that registers 
 % the input to the reference which is saved as a 4x4 affine matrix (-omat), and output volume (-out) where the transform  is applied to the input 
 % volume to align it with the reference volume. To apply a saved transformation to a volume: -applyxfm, -init and -out. For these usage the reference 
@@ -161,9 +159,6 @@ fugue -i func/rasub-002_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fma
 
 % fslmaths fmap/fmap_rads_sub-008_run-01.nii -nan fmap/fmap_rads_sub-008_run-01.nii
 % replaces NaNs with 0
-
-% fslmaths fmap/fmap_rads_sub-002_run-01.nii.gz -s 2 fmap/fmap_rads_sub-002_run-01.nii.gz
-% for subjects with fake magnitudes, we perform smoothing to eliminate "phantom voxels" outside the brain
 
 %% SUB-002
 
@@ -173,72 +168,64 @@ cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/su
 fslmaths ../../../rawdata/sub-002/fmap/sub-002_run-01_phasediff.nii -div 2 fmap/sub-002_run-01_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-002_run-01_phasediff_half.nii.gz fmap/sub-002_run-01_magnitude.nii fmap/fmap_rads_sub-002_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-002_run-01.nii.gz -nan fmap/fmap_rads_sub-002_run-01.nii.gz
-fslmaths fmap/fmap_rads_sub-002_run-01.nii.gz -s 2 fmap/fmap_rads_sub-002_run-01.nii.gz
 flirt -in fmap/sub-002_run-01_magnitude.nii -ref func/rasub-002_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-002_run-01.nii.gz -ref func/rasub-002_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-002_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-002_run-01.nii.gz -ref func/rasub-002_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-002_run-01.nii.gz
 fugue -i func/rasub-002_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-002_run-01.nii.gz --unwarpdir=y- -u func/urasub-002_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
 fslmaths ../../../rawdata/sub-002/fmap/sub-002_run-02_phasediff.nii -div 2 fmap/sub-002_run-02_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-002_run-02_phasediff_half.nii.gz fmap/sub-002_run-01_magnitude.nii fmap/fmap_rads_sub-002_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-002_run-02.nii.gz -nan fmap/fmap_rads_sub-002_run-02.nii.gz
-fslmaths fmap/fmap_rads_sub-002_run-02.nii.gz -s 2 fmap/fmap_rads_sub-002_run-02.nii.gz
 flirt -in fmap/sub-002_run-01_magnitude.nii -ref func/rasub-002_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-002_run-02.nii.gz -ref func/rasub-002_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-002_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-002_run-02.nii.gz -ref func/rasub-002_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-002_run-02.nii.gz
 fugue -i func/rasub-002_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-002_run-02.nii.gz --unwarpdir=y- -u func/urasub-002_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
 fslmaths ../../../rawdata/sub-002/fmap/sub-002_run-03_phasediff.nii -div 2 fmap/sub-002_run-03_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-002_run-03_phasediff_half.nii.gz fmap/sub-002_run-01_magnitude.nii fmap/fmap_rads_sub-002_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-002_run-03.nii.gz -nan fmap/fmap_rads_sub-002_run-03.nii.gz
-fslmaths fmap/fmap_rads_sub-002_run-03.nii.gz -s 2 fmap/fmap_rads_sub-002_run-03.nii.gz
 flirt -in fmap/sub-002_run-01_magnitude.nii -ref func/rasub-002_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-002_run-03.nii.gz -ref func/rasub-002_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-002_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-002_run-03.nii.gz -ref func/rasub-002_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-002_run-03.nii.gz
 fugue -i func/rasub-002_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-002_run-03.nii.gz --unwarpdir=y- -u func/urasub-002_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
 fslmaths ../../../rawdata/sub-002/fmap/sub-002_run-04_phasediff.nii -div 2 fmap/sub-002_run-04_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-002_run-04_phasediff_half.nii.gz fmap/sub-002_run-01_magnitude.nii fmap/fmap_rads_sub-002_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-002_run-04.nii.gz -nan fmap/fmap_rads_sub-002_run-04.nii.gz
-fslmaths fmap/fmap_rads_sub-002_run-04.nii.gz -s 2 fmap/fmap_rads_sub-002_run-04.nii.gz
 flirt -in fmap/sub-002_run-01_magnitude.nii -ref func/rasub-002_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-002_run-04.nii.gz -ref func/rasub-002_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-002_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-002_run-04.nii.gz -ref func/rasub-002_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-002_run-04.nii.gz
 fugue -i func/rasub-002_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-002_run-04.nii.gz --unwarpdir=y- -u func/urasub-002_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
 fslmaths ../../../rawdata/sub-002/fmap/sub-002_run-05_phasediff.nii -div 2 fmap/sub-002_run-05_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-002_run-05_phasediff_half.nii.gz fmap/sub-002_run-01_magnitude.nii fmap/fmap_rads_sub-002_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-002_run-05.nii.gz -nan fmap/fmap_rads_sub-002_run-05.nii.gz
-fslmaths fmap/fmap_rads_sub-002_run-05.nii.gz -s 2 fmap/fmap_rads_sub-002_run-05.nii.gz
 flirt -in fmap/sub-002_run-01_magnitude.nii -ref func/rasub-002_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-002_run-05.nii.gz -ref func/rasub-002_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-002_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-002_run-05.nii.gz -ref func/rasub-002_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-002_run-05.nii.gz
 fugue -i func/rasub-002_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-002_run-05.nii.gz --unwarpdir=y- -u func/urasub-002_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
 fslmaths ../../../rawdata/sub-002/fmap/sub-002_run-06_phasediff.nii -div 2 fmap/sub-002_run-06_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-002_run-06_phasediff_half.nii.gz fmap/sub-002_run-01_magnitude.nii fmap/fmap_rads_sub-002_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-002_run-06.nii.gz -nan fmap/fmap_rads_sub-002_run-06.nii.gz
-fslmaths fmap/fmap_rads_sub-002_run-06.nii.gz -s 2 fmap/fmap_rads_sub-002_run-06.nii.gz
 flirt -in fmap/sub-002_run-01_magnitude.nii -ref func/rasub-002_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-002_run-06.nii.gz -ref func/rasub-002_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-002_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-002_run-06.nii.gz -ref func/rasub-002_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-002_run-06.nii.gz
 fugue -i func/rasub-002_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-002_run-06.nii.gz --unwarpdir=y- -u func/urasub-002_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
 fslmaths ../../../rawdata/sub-002/fmap/sub-002_run-07_phasediff.nii -div 2 fmap/sub-002_run-07_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-002_run-07_phasediff_half.nii.gz fmap/sub-002_run-01_magnitude.nii fmap/fmap_rads_sub-002_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-002_run-07.nii.gz -nan fmap/fmap_rads_sub-002_run-07.nii.gz
-fslmaths fmap/fmap_rads_sub-002_run-07.nii.gz -s 2 fmap/fmap_rads_sub-002_run-07.nii.gz
 flirt -in fmap/sub-002_run-01_magnitude.nii -ref func/rasub-002_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-002_run-07.nii.gz -ref func/rasub-002_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-002_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-002_run-07.nii.gz -ref func/rasub-002_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-002_run-07.nii.gz
 fugue -i func/rasub-002_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-002_run-07.nii.gz --unwarpdir=y- -u func/urasub-002_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
 fslmaths ../../../rawdata/sub-002/fmap/sub-002_run-08_phasediff.nii -div 2 fmap/sub-002_run-08_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-002_run-08_phasediff_half.nii.gz fmap/sub-002_run-01_magnitude.nii fmap/fmap_rads_sub-002_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-002_run-08.nii.gz -nan fmap/fmap_rads_sub-002_run-08.nii.gz
-fslmaths fmap/fmap_rads_sub-002_run-08.nii.gz -s 2 fmap/fmap_rads_sub-002_run-08.nii.gz
 flirt -in fmap/sub-002_run-01_magnitude.nii -ref func/rasub-002_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-002_run-08.nii.gz -ref func/rasub-002_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-002_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-002_run-08.nii.gz -ref func/rasub-002_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-002_run-08.nii.gz
 fugue -i func/rasub-002_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-002_run-08.nii.gz --unwarpdir=y- -u func/urasub-002_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -252,72 +239,64 @@ cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/su
 fslmaths ../../../rawdata/sub-003/fmap/sub-003_run-01_phasediff.nii -div 2 fmap/sub-003_run-01_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-003_run-01_phasediff_half.nii.gz fmap/sub-003_run-01_magnitude.nii fmap/fmap_rads_sub-003_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-003_run-01.nii.gz -nan fmap/fmap_rads_sub-003_run-01.nii.gz
-fslmaths fmap/fmap_rads_sub-003_run-01.nii.gz -s 2 fmap/fmap_rads_sub-003_run-01.nii.gz
 flirt -in fmap/sub-003_run-01_magnitude.nii -ref func/rasub-003_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-003_run-01.nii.gz -ref func/rasub-003_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-003_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-003_run-01.nii.gz -ref func/rasub-003_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-003_run-01.nii.gz
 fugue -i func/rasub-003_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-003_run-01.nii.gz --unwarpdir=y- -u func/urasub-003_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
 fslmaths ../../../rawdata/sub-003/fmap/sub-003_run-02_phasediff.nii -div 2 fmap/sub-003_run-02_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-003_run-02_phasediff_half.nii.gz fmap/sub-003_run-01_magnitude.nii fmap/fmap_rads_sub-003_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-003_run-02.nii.gz -nan fmap/fmap_rads_sub-003_run-02.nii.gz
-fslmaths fmap/fmap_rads_sub-003_run-02.nii.gz -s 2 fmap/fmap_rads_sub-003_run-02.nii.gz
 flirt -in fmap/sub-003_run-01_magnitude.nii -ref func/rasub-003_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-003_run-02.nii.gz -ref func/rasub-003_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-003_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-003_run-02.nii.gz -ref func/rasub-003_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-003_run-02.nii.gz
 fugue -i func/rasub-003_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-003_run-02.nii.gz --unwarpdir=y- -u func/urasub-003_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
 fslmaths ../../../rawdata/sub-003/fmap/sub-003_run-03_phasediff.nii -div 2 fmap/sub-003_run-03_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-003_run-03_phasediff_half.nii.gz fmap/sub-003_run-01_magnitude.nii fmap/fmap_rads_sub-003_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-003_run-03.nii.gz -nan fmap/fmap_rads_sub-003_run-03.nii.gz
-fslmaths fmap/fmap_rads_sub-003_run-03.nii.gz -s 2 fmap/fmap_rads_sub-003_run-03.nii.gz
 flirt -in fmap/sub-003_run-01_magnitude.nii -ref func/rasub-003_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-003_run-03.nii.gz -ref func/rasub-003_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-003_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-003_run-03.nii.gz -ref func/rasub-003_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-003_run-03.nii.gz
 fugue -i func/rasub-003_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-003_run-03.nii.gz --unwarpdir=y- -u func/urasub-003_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
 fslmaths ../../../rawdata/sub-003/fmap/sub-003_run-04_phasediff.nii -div 2 fmap/sub-003_run-04_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-003_run-04_phasediff_half.nii.gz fmap/sub-003_run-01_magnitude.nii fmap/fmap_rads_sub-003_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-003_run-04.nii.gz -nan fmap/fmap_rads_sub-003_run-04.nii.gz
-fslmaths fmap/fmap_rads_sub-003_run-04.nii.gz -s 2 fmap/fmap_rads_sub-003_run-04.nii.gz
 flirt -in fmap/sub-003_run-01_magnitude.nii -ref func/rasub-003_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-003_run-04.nii.gz -ref func/rasub-003_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-003_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-003_run-04.nii.gz -ref func/rasub-003_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-003_run-04.nii.gz
 fugue -i func/rasub-003_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-003_run-04.nii.gz --unwarpdir=y- -u func/urasub-003_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
 fslmaths ../../../rawdata/sub-003/fmap/sub-003_run-05_phasediff.nii -div 2 fmap/sub-003_run-05_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-003_run-05_phasediff_half.nii.gz fmap/sub-003_run-01_magnitude.nii fmap/fmap_rads_sub-003_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-003_run-05.nii.gz -nan fmap/fmap_rads_sub-003_run-05.nii.gz
-fslmaths fmap/fmap_rads_sub-003_run-05.nii.gz -s 2 fmap/fmap_rads_sub-003_run-05.nii.gz
 flirt -in fmap/sub-003_run-01_magnitude.nii -ref func/rasub-003_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-003_run-05.nii.gz -ref func/rasub-003_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-003_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-003_run-05.nii.gz -ref func/rasub-003_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-003_run-05.nii.gz
 fugue -i func/rasub-003_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-003_run-05.nii.gz --unwarpdir=y- -u func/urasub-003_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
 fslmaths ../../../rawdata/sub-003/fmap/sub-003_run-06_phasediff.nii -div 2 fmap/sub-003_run-06_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-003_run-06_phasediff_half.nii.gz fmap/sub-003_run-01_magnitude.nii fmap/fmap_rads_sub-003_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-003_run-06.nii.gz -nan fmap/fmap_rads_sub-003_run-06.nii.gz
-fslmaths fmap/fmap_rads_sub-003_run-06.nii.gz -s 2 fmap/fmap_rads_sub-003_run-06.nii.gz
 flirt -in fmap/sub-003_run-01_magnitude.nii -ref func/rasub-003_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-003_run-06.nii.gz -ref func/rasub-003_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-003_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-003_run-06.nii.gz -ref func/rasub-003_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-003_run-06.nii.gz
 fugue -i func/rasub-003_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-003_run-06.nii.gz --unwarpdir=y- -u func/urasub-003_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
 fslmaths ../../../rawdata/sub-003/fmap/sub-003_run-07_phasediff.nii -div 2 fmap/sub-003_run-07_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-003_run-07_phasediff_half.nii.gz fmap/sub-003_run-01_magnitude.nii fmap/fmap_rads_sub-003_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-003_run-07.nii.gz -nan fmap/fmap_rads_sub-003_run-07.nii.gz
-fslmaths fmap/fmap_rads_sub-003_run-07.nii.gz -s 2 fmap/fmap_rads_sub-003_run-07.nii.gz
 flirt -in fmap/sub-003_run-01_magnitude.nii -ref func/rasub-003_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-003_run-07.nii.gz -ref func/rasub-003_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-003_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-003_run-07.nii.gz -ref func/rasub-003_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-003_run-07.nii.gz
 fugue -i func/rasub-003_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-003_run-07.nii.gz --unwarpdir=y- -u func/urasub-003_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
 fslmaths ../../../rawdata/sub-003/fmap/sub-003_run-08_phasediff.nii -div 2 fmap/sub-003_run-08_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-003_run-08_phasediff_half.nii.gz fmap/sub-003_run-01_magnitude.nii fmap/fmap_rads_sub-003_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-003_run-08.nii.gz -nan fmap/fmap_rads_sub-003_run-08.nii.gz
-fslmaths fmap/fmap_rads_sub-003_run-08.nii.gz -s 2 fmap/fmap_rads_sub-003_run-08.nii.gz
 flirt -in fmap/sub-003_run-01_magnitude.nii -ref func/rasub-003_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-003_run-08.nii.gz -ref func/rasub-003_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-003_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-003_run-08.nii.gz -ref func/rasub-003_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-003_run-08.nii.gz
 fugue -i func/rasub-003_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-003_run-08.nii.gz --unwarpdir=y- -u func/urasub-003_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -331,72 +310,64 @@ cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/su
 fslmaths ../../../rawdata/sub-004/fmap/sub-004_run-01_phasediff.nii -div 2 fmap/sub-004_run-01_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-004_run-01_phasediff_half.nii.gz fmap/sub-004_run-01_magnitude.nii fmap/fmap_rads_sub-004_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-004_run-01.nii.gz -nan fmap/fmap_rads_sub-004_run-01.nii.gz
-fslmaths fmap/fmap_rads_sub-004_run-01.nii.gz -s 2 fmap/fmap_rads_sub-004_run-01.nii.gz
 flirt -in fmap/sub-004_run-01_magnitude.nii -ref func/rasub-004_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-004_run-01.nii.gz -ref func/rasub-004_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-004_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-004_run-01.nii.gz -ref func/rasub-004_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-004_run-01.nii.gz
 fugue -i func/rasub-004_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-004_run-01.nii.gz --unwarpdir=y- -u func/urasub-004_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
 fslmaths ../../../rawdata/sub-004/fmap/sub-004_run-02_phasediff.nii -div 2 fmap/sub-004_run-02_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-004_run-02_phasediff_half.nii.gz fmap/sub-004_run-01_magnitude.nii fmap/fmap_rads_sub-004_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-004_run-02.nii.gz -nan fmap/fmap_rads_sub-004_run-02.nii.gz
-fslmaths fmap/fmap_rads_sub-004_run-02.nii.gz -s 2 fmap/fmap_rads_sub-004_run-02.nii.gz
 flirt -in fmap/sub-004_run-01_magnitude.nii -ref func/rasub-004_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-004_run-02.nii.gz -ref func/rasub-004_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-004_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-004_run-02.nii.gz -ref func/rasub-004_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-004_run-02.nii.gz
 fugue -i func/rasub-004_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-004_run-02.nii.gz --unwarpdir=y- -u func/urasub-004_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
 fslmaths ../../../rawdata/sub-004/fmap/sub-004_run-03_phasediff.nii -div 2 fmap/sub-004_run-03_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-004_run-03_phasediff_half.nii.gz fmap/sub-004_run-01_magnitude.nii fmap/fmap_rads_sub-004_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-004_run-03.nii.gz -nan fmap/fmap_rads_sub-004_run-03.nii.gz
-fslmaths fmap/fmap_rads_sub-004_run-03.nii.gz -s 2 fmap/fmap_rads_sub-004_run-03.nii.gz
 flirt -in fmap/sub-004_run-01_magnitude.nii -ref func/rasub-004_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-004_run-03.nii.gz -ref func/rasub-004_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-004_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-004_run-03.nii.gz -ref func/rasub-004_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-004_run-03.nii.gz
 fugue -i func/rasub-004_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-004_run-03.nii.gz --unwarpdir=y- -u func/urasub-004_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
 fslmaths ../../../rawdata/sub-004/fmap/sub-004_run-04_phasediff.nii -div 2 fmap/sub-004_run-04_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-004_run-04_phasediff_half.nii.gz fmap/sub-004_run-01_magnitude.nii fmap/fmap_rads_sub-004_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-004_run-04.nii.gz -nan fmap/fmap_rads_sub-004_run-04.nii.gz
-fslmaths fmap/fmap_rads_sub-004_run-04.nii.gz -s 2 fmap/fmap_rads_sub-004_run-04.nii.gz
 flirt -in fmap/sub-004_run-01_magnitude.nii -ref func/rasub-004_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-004_run-04.nii.gz -ref func/rasub-004_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-004_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-004_run-04.nii.gz -ref func/rasub-004_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-004_run-04.nii.gz
 fugue -i func/rasub-004_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-004_run-04.nii.gz --unwarpdir=y- -u func/urasub-004_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
 fslmaths ../../../rawdata/sub-004/fmap/sub-004_run-05_phasediff.nii -div 2 fmap/sub-004_run-05_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-004_run-05_phasediff_half.nii.gz fmap/sub-004_run-01_magnitude.nii fmap/fmap_rads_sub-004_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-004_run-05.nii.gz -nan fmap/fmap_rads_sub-004_run-05.nii.gz
-fslmaths fmap/fmap_rads_sub-004_run-05.nii.gz -s 2 fmap/fmap_rads_sub-004_run-05.nii.gz
 flirt -in fmap/sub-004_run-01_magnitude.nii -ref func/rasub-004_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-004_run-05.nii.gz -ref func/rasub-004_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-004_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-004_run-05.nii.gz -ref func/rasub-004_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-004_run-05.nii.gz
 fugue -i func/rasub-004_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-004_run-05.nii.gz --unwarpdir=y- -u func/urasub-004_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
 fslmaths ../../../rawdata/sub-004/fmap/sub-004_run-06_phasediff.nii -div 2 fmap/sub-004_run-06_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-004_run-06_phasediff_half.nii.gz fmap/sub-004_run-01_magnitude.nii fmap/fmap_rads_sub-004_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-004_run-06.nii.gz -nan fmap/fmap_rads_sub-004_run-06.nii.gz
-fslmaths fmap/fmap_rads_sub-004_run-06.nii.gz -s 2 fmap/fmap_rads_sub-004_run-06.nii.gz
 flirt -in fmap/sub-004_run-01_magnitude.nii -ref func/rasub-004_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-004_run-06.nii.gz -ref func/rasub-004_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-004_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-004_run-06.nii.gz -ref func/rasub-004_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-004_run-06.nii.gz
 fugue -i func/rasub-004_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-004_run-06.nii.gz --unwarpdir=y- -u func/urasub-004_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
 fslmaths ../../../rawdata/sub-004/fmap/sub-004_run-07_phasediff.nii -div 2 fmap/sub-004_run-07_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-004_run-07_phasediff_half.nii.gz fmap/sub-004_run-01_magnitude.nii fmap/fmap_rads_sub-004_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-004_run-07.nii.gz -nan fmap/fmap_rads_sub-004_run-07.nii.gz
-fslmaths fmap/fmap_rads_sub-004_run-07.nii.gz -s 2 fmap/fmap_rads_sub-004_run-07.nii.gz
 flirt -in fmap/sub-004_run-01_magnitude.nii -ref func/rasub-004_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-004_run-07.nii.gz -ref func/rasub-004_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-004_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-004_run-07.nii.gz -ref func/rasub-004_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-004_run-07.nii.gz
 fugue -i func/rasub-004_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-004_run-07.nii.gz --unwarpdir=y- -u func/urasub-004_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
 fslmaths ../../../rawdata/sub-004/fmap/sub-004_run-08_phasediff.nii -div 2 fmap/sub-004_run-08_phasediff_half.nii.gz
 fsl_prepare_fieldmap SIEMENS fmap/sub-004_run-08_phasediff_half.nii.gz fmap/sub-004_run-01_magnitude.nii fmap/fmap_rads_sub-004_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-004_run-08.nii.gz -nan fmap/fmap_rads_sub-004_run-08.nii.gz
-fslmaths fmap/fmap_rads_sub-004_run-08.nii.gz -s 2 fmap/fmap_rads_sub-004_run-08.nii.gz
 flirt -in fmap/sub-004_run-01_magnitude.nii -ref func/rasub-004_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-004_run-08.nii.gz -ref func/rasub-004_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-004_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-004_run-08.nii.gz -ref func/rasub-004_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-004_run-08.nii.gz
 fugue -i func/rasub-004_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-004_run-08.nii.gz --unwarpdir=y- -u func/urasub-004_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -414,7 +385,7 @@ fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-01_phasediff_half.nii.gz fmap/sub-006_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-006_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-006_run-01.nii.gz -nan fmap/fmap_rads_sub-006_run-01.nii.gz
 flirt -in fmap/sub-006_run-01_magnitude_brain.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-006_run-01.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-006_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-006_run-01.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-006_run-01.nii.gz
 fugue -i func/rasub-006_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-006_run-01.nii.gz --unwarpdir=y- -u func/urasub-006_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -424,7 +395,7 @@ fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-02_phasediff_half.nii.gz fmap/sub-006_run-02_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-006_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-006_run-02.nii.gz -nan fmap/fmap_rads_sub-006_run-02.nii.gz
 flirt -in fmap/sub-006_run-02_magnitude_brain_matched.nii.gz -ref func/rasub-006_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-006_run-02.nii.gz -ref func/rasub-006_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-006_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-006_run-02.nii.gz -ref func/rasub-006_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-006_run-02.nii.gz
 fugue -i func/rasub-006_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-006_run-02.nii.gz --unwarpdir=y- -u func/urasub-006_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -434,7 +405,7 @@ fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-03_phasediff_half.nii.gz fmap/sub-006_run-03_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-006_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-006_run-03.nii.gz -nan fmap/fmap_rads_sub-006_run-03.nii.gz
 flirt -in fmap/sub-006_run-03_magnitude_brain_matched.nii.gz -ref func/rasub-006_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-006_run-03.nii.gz -ref func/rasub-006_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-006_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-006_run-03.nii.gz -ref func/rasub-006_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-006_run-03.nii.gz
 fugue -i func/rasub-006_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-006_run-03.nii.gz --unwarpdir=y- -u func/urasub-006_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -443,7 +414,7 @@ fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-04_phasediff_half.nii.gz fmap/sub-006_run-04_magnitude_brain.nii.gz fmap/fmap_rads_sub-006_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-006_run-04.nii.gz -nan fmap/fmap_rads_sub-006_run-04.nii.gz
 flirt -in fmap/sub-006_run-04_magnitude_brain.nii.gz -ref func/rasub-006_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-006_run-04.nii.gz -ref func/rasub-006_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-006_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-006_run-04.nii.gz -ref func/rasub-006_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-006_run-04.nii.gz
 fugue -i func/rasub-006_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-006_run-04.nii.gz --unwarpdir=y- -u func/urasub-006_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -452,7 +423,7 @@ fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-05_phasediff_half.nii.gz fmap/sub-006_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-006_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-006_run-05.nii.gz -nan fmap/fmap_rads_sub-006_run-05.nii.gz
 flirt -in fmap/sub-006_run-05_magnitude_brain.nii.gz -ref func/rasub-006_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-006_run-05.nii.gz -ref func/rasub-006_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-006_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-006_run-05.nii.gz -ref func/rasub-006_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-006_run-05.nii.gz
 fugue -i func/rasub-006_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-006_run-05.nii.gz --unwarpdir=y- -u func/urasub-006_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -462,7 +433,7 @@ fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-06_phasediff_half.nii.gz fmap/sub-006_run-06_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-006_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-006_run-06.nii.gz -nan fmap/fmap_rads_sub-006_run-06.nii.gz
 flirt -in fmap/sub-006_run-06_magnitude_brain_matched.nii.gz -ref func/rasub-006_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-006_run-06.nii.gz -ref func/rasub-006_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-006_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-006_run-06.nii.gz -ref func/rasub-006_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-006_run-06.nii.gz
 fugue -i func/rasub-006_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-006_run-06.nii.gz --unwarpdir=y- -u func/urasub-006_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -472,7 +443,7 @@ fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-07_phasediff_half.nii.gz fmap/sub-006_run-07_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-006_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-006_run-07.nii.gz -nan fmap/fmap_rads_sub-006_run-07.nii.gz
 flirt -in fmap/sub-006_run-07_magnitude_brain_matched.nii.gz -ref func/rasub-006_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-006_run-07.nii.gz -ref func/rasub-006_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-006_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-006_run-07.nii.gz -ref func/rasub-006_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-006_run-07.nii.gz
 fugue -i func/rasub-006_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-006_run-07.nii.gz --unwarpdir=y- -u func/urasub-006_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -481,7 +452,7 @@ fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-08_phasediff_half.nii.gz fmap/sub-006_run-08_magnitude_brain.nii.gz fmap/fmap_rads_sub-006_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-006_run-08.nii.gz -nan fmap/fmap_rads_sub-006_run-08.nii.gz
 flirt -in fmap/sub-006_run-08_magnitude_brain.nii.gz -ref func/rasub-006_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-006_run-08.nii.gz -ref func/rasub-006_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-006_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-006_run-08.nii.gz -ref func/rasub-006_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-006_run-08.nii.gz
 fugue -i func/rasub-006_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-006_run-08.nii.gz --unwarpdir=y- -u func/urasub-006_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -499,7 +470,7 @@ fslmaths ../../../rawdata/sub-007/fmap/sub-007_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-007_run-01_phasediff_half.nii.gz fmap/sub-007_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-007_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-007_run-01.nii.gz -nan fmap/fmap_rads_sub-007_run-01.nii.gz
 flirt -in fmap/sub-007_run-01_magnitude_brain.nii.gz -ref func/rasub-007_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-007_run-01.nii.gz -ref func/rasub-007_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-007_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-007_run-01.nii.gz -ref func/rasub-007_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-007_run-01.nii.gz
 fugue -i func/rasub-007_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-007_run-01.nii.gz --unwarpdir=y- -u func/urasub-007_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -508,7 +479,7 @@ fslmaths ../../../rawdata/sub-007/fmap/sub-007_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-007_run-02_phasediff_half.nii.gz fmap/sub-007_run-02_magnitude_brain.nii.gz fmap/fmap_rads_sub-007_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-007_run-02.nii.gz -nan fmap/fmap_rads_sub-007_run-02.nii.gz
 flirt -in fmap/sub-007_run-02_magnitude_brain.nii.gz -ref func/rasub-007_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-007_run-02.nii.gz -ref func/rasub-007_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-007_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-007_run-02.nii.gz -ref func/rasub-007_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-007_run-02.nii.gz
 fugue -i func/rasub-007_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-007_run-02.nii.gz --unwarpdir=y- -u func/urasub-007_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -517,7 +488,7 @@ fslmaths ../../../rawdata/sub-007/fmap/sub-007_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-007_run-03_phasediff_half.nii.gz fmap/sub-007_run-03_magnitude_brain.nii.gz fmap/fmap_rads_sub-007_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-007_run-03.nii.gz -nan fmap/fmap_rads_sub-007_run-03.nii.gz
 flirt -in fmap/sub-007_run-03_magnitude_brain.nii.gz -ref func/rasub-007_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-007_run-03.nii.gz -ref func/rasub-007_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-007_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-007_run-03.nii.gz -ref func/rasub-007_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-007_run-03.nii.gz
 fugue -i func/rasub-007_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-007_run-03.nii.gz --unwarpdir=y- -u func/urasub-007_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -526,7 +497,7 @@ fslmaths ../../../rawdata/sub-007/fmap/sub-007_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-007_run-04_phasediff_half.nii.gz fmap/sub-007_run-04_magnitude_brain.nii.gz fmap/fmap_rads_sub-007_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-007_run-04.nii.gz -nan fmap/fmap_rads_sub-007_run-04.nii.gz
 flirt -in fmap/sub-007_run-04_magnitude_brain.nii.gz -ref func/rasub-007_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-007_run-04.nii.gz -ref func/rasub-007_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-007_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-007_run-04.nii.gz -ref func/rasub-007_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-007_run-04.nii.gz
 fugue -i func/rasub-007_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-007_run-04.nii.gz --unwarpdir=y- -u func/urasub-007_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -535,7 +506,7 @@ fslmaths ../../../rawdata/sub-007/fmap/sub-007_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-007_run-05_phasediff_half.nii.gz fmap/sub-007_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-007_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-007_run-05.nii.gz -nan fmap/fmap_rads_sub-007_run-05.nii.gz
 flirt -in fmap/sub-007_run-05_magnitude_brain.nii.gz -ref func/rasub-007_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-007_run-05.nii.gz -ref func/rasub-007_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-007_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-007_run-05.nii.gz -ref func/rasub-007_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-007_run-05.nii.gz
 fugue -i func/rasub-007_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-007_run-05.nii.gz --unwarpdir=y- -u func/urasub-007_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -544,7 +515,7 @@ fslmaths ../../../rawdata/sub-007/fmap/sub-007_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-007_run-06_phasediff_half.nii.gz fmap/sub-007_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-007_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-007_run-06.nii.gz -nan fmap/fmap_rads_sub-007_run-06.nii.gz
 flirt -in fmap/sub-007_run-06_magnitude_brain.nii.gz -ref func/rasub-007_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-007_run-06.nii.gz -ref func/rasub-007_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-007_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-007_run-06.nii.gz -ref func/rasub-007_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-007_run-06.nii.gz
 fugue -i func/rasub-007_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-007_run-06.nii.gz --unwarpdir=y- -u func/urasub-007_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -553,7 +524,7 @@ fslmaths ../../../rawdata/sub-007/fmap/sub-007_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-007_run-07_phasediff_half.nii.gz fmap/sub-007_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-007_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-007_run-07.nii.gz -nan fmap/fmap_rads_sub-007_run-07.nii.gz
 flirt -in fmap/sub-007_run-07_magnitude_brain.nii.gz -ref func/rasub-007_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-007_run-07.nii.gz -ref func/rasub-007_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-007_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-007_run-07.nii.gz -ref func/rasub-007_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-007_run-07.nii.gz
 fugue -i func/rasub-007_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-007_run-07.nii.gz --unwarpdir=y- -u func/urasub-007_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -562,7 +533,7 @@ fslmaths ../../../rawdata/sub-007/fmap/sub-007_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-007_run-08_phasediff_half.nii.gz fmap/sub-007_run-08_magnitude_brain.nii.gz fmap/fmap_rads_sub-007_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-007_run-08.nii.gz -nan fmap/fmap_rads_sub-007_run-08.nii.gz
 flirt -in fmap/sub-007_run-08_magnitude_brain.nii.gz -ref func/rasub-007_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-007_run-08.nii.gz -ref func/rasub-007_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-007_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-007_run-08.nii.gz -ref func/rasub-007_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-007_run-08.nii.gz
 fugue -i func/rasub-007_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-007_run-08.nii.gz --unwarpdir=y- -u func/urasub-007_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -580,7 +551,7 @@ fslmaths ../../../rawdata/sub-008/fmap/sub-008_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-008_run-01_phasediff_half.nii.gz fmap/sub-008_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-008_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-008_run-01.nii.gz -nan fmap/fmap_rads_sub-008_run-01.nii.gz
 flirt -in fmap/sub-008_run-01_magnitude_brain.nii.gz -ref func/rasub-008_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-008_run-01.nii.gz -ref func/rasub-008_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-008_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-008_run-01.nii.gz -ref func/rasub-008_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-008_run-01.nii.gz
 fugue -i func/rasub-008_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-008_run-01.nii.gz --unwarpdir=y- -u func/urasub-008_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -589,7 +560,7 @@ fslmaths ../../../rawdata/sub-008/fmap/sub-008_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-008_run-02_phasediff_half.nii.gz fmap/sub-008_run-02_magnitude_brain.nii.gz fmap/fmap_rads_sub-008_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-008_run-02.nii.gz -nan fmap/fmap_rads_sub-008_run-02.nii.gz
 flirt -in fmap/sub-008_run-02_magnitude_brain.nii.gz -ref func/rasub-008_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-008_run-02.nii.gz -ref func/rasub-008_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-008_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-008_run-02.nii.gz -ref func/rasub-008_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-008_run-02.nii.gz
 fugue -i func/rasub-008_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-008_run-02.nii.gz --unwarpdir=y- -u func/urasub-008_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -598,7 +569,7 @@ fslmaths ../../../rawdata/sub-008/fmap/sub-008_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-008_run-03_phasediff_half.nii.gz fmap/sub-008_run-03_magnitude_brain.nii.gz fmap/fmap_rads_sub-008_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-008_run-03.nii.gz -nan fmap/fmap_rads_sub-008_run-03.nii.gz
 flirt -in fmap/sub-008_run-03_magnitude_brain.nii.gz -ref func/rasub-008_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-008_run-03.nii.gz -ref func/rasub-008_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-008_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-008_run-03.nii.gz -ref func/rasub-008_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-008_run-03.nii.gz
 fugue -i func/rasub-008_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-008_run-03.nii.gz --unwarpdir=y- -u func/urasub-008_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -607,7 +578,7 @@ fslmaths ../../../rawdata/sub-008/fmap/sub-008_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-008_run-04_phasediff_half.nii.gz fmap/sub-008_run-04_magnitude_brain.nii.gz fmap/fmap_rads_sub-008_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-008_run-04.nii.gz -nan fmap/fmap_rads_sub-008_run-04.nii.gz
 flirt -in fmap/sub-008_run-04_magnitude_brain.nii.gz -ref func/rasub-008_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-008_run-04.nii.gz -ref func/rasub-008_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-008_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-008_run-04.nii.gz -ref func/rasub-008_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-008_run-04.nii.gz
 fugue -i func/rasub-008_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-008_run-04.nii.gz --unwarpdir=y- -u func/urasub-008_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -616,7 +587,7 @@ fslmaths ../../../rawdata/sub-008/fmap/sub-008_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-008_run-05_phasediff_half.nii.gz fmap/sub-008_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-008_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-008_run-05.nii.gz -nan fmap/fmap_rads_sub-008_run-05.nii.gz
 flirt -in fmap/sub-008_run-05_magnitude_brain.nii.gz -ref func/rasub-008_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-008_run-05.nii.gz -ref func/rasub-008_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-008_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-008_run-05.nii.gz -ref func/rasub-008_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-008_run-05.nii.gz
 fugue -i func/rasub-008_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-008_run-05.nii.gz --unwarpdir=y- -u func/urasub-008_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -625,7 +596,7 @@ fslmaths ../../../rawdata/sub-008/fmap/sub-008_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-008_run-06_phasediff_half.nii.gz fmap/sub-008_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-008_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-008_run-06.nii.gz -nan fmap/fmap_rads_sub-008_run-06.nii.gz
 flirt -in fmap/sub-008_run-06_magnitude_brain.nii.gz -ref func/rasub-008_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-008_run-06.nii.gz -ref func/rasub-008_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-008_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-008_run-06.nii.gz -ref func/rasub-008_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-008_run-06.nii.gz
 fugue -i func/rasub-008_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-008_run-06.nii.gz --unwarpdir=y- -u func/urasub-008_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -634,7 +605,7 @@ fslmaths ../../../rawdata/sub-008/fmap/sub-008_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-008_run-07_phasediff_half.nii.gz fmap/sub-008_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-008_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-008_run-07.nii.gz -nan fmap/fmap_rads_sub-008_run-07.nii.gz
 flirt -in fmap/sub-008_run-07_magnitude_brain.nii.gz -ref func/rasub-008_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-008_run-07.nii.gz -ref func/rasub-008_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-008_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-008_run-07.nii.gz -ref func/rasub-008_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-008_run-07.nii.gz
 fugue -i func/rasub-008_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-008_run-07.nii.gz --unwarpdir=y- -u func/urasub-008_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -643,7 +614,7 @@ fslmaths ../../../rawdata/sub-008/fmap/sub-008_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-008_run-08_phasediff_half.nii.gz fmap/sub-008_run-08_magnitude_brain.nii.gz fmap/fmap_rads_sub-008_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-008_run-08.nii.gz -nan fmap/fmap_rads_sub-008_run-08.nii.gz
 flirt -in fmap/sub-008_run-08_magnitude_brain.nii.gz -ref func/rasub-008_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-008_run-08.nii.gz -ref func/rasub-008_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-008_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-008_run-08.nii.gz -ref func/rasub-008_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-008_run-08.nii.gz
 fugue -i func/rasub-008_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-008_run-08.nii.gz --unwarpdir=y- -u func/urasub-008_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -662,7 +633,7 @@ fslmaths ../../../rawdata/sub-009/fmap/sub-009_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-01_phasediff_half.nii.gz fmap/sub-009_run-01_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-009_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-009_run-01.nii.gz -nan fmap/fmap_rads_sub-009_run-01.nii.gz
 flirt -in fmap/sub-009_run-01_magnitude_brain_matched.nii.gz -ref func/rasub-009_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-009_run-01.nii.gz -ref func/rasub-009_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-009_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-009_run-01.nii.gz -ref func/rasub-009_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-009_run-01.nii.gz
 fugue -i func/rasub-009_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-009_run-01.nii.gz --unwarpdir=y- -u func/urasub-009_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -672,7 +643,7 @@ fslmaths ../../../rawdata/sub-009/fmap/sub-009_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-02_phasediff_half.nii.gz fmap/sub-009_run-02_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-009_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-009_run-02.nii.gz -nan fmap/fmap_rads_sub-009_run-02.nii.gz
 flirt -in fmap/sub-009_run-02_magnitude_brain_matched.nii.gz -ref func/rasub-009_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-009_run-02.nii.gz -ref func/rasub-009_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-009_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-009_run-02.nii.gz -ref func/rasub-009_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-009_run-02.nii.gz
 fugue -i func/rasub-009_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-009_run-02.nii.gz --unwarpdir=y- -u func/urasub-009_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -682,7 +653,7 @@ fslmaths ../../../rawdata/sub-009/fmap/sub-009_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-03_phasediff_half.nii.gz fmap/sub-009_run-03_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-009_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-009_run-03.nii.gz -nan fmap/fmap_rads_sub-009_run-03.nii.gz
 flirt -in fmap/sub-009_run-03_magnitude_brain_matched.nii.gz -ref func/rasub-009_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-009_run-03.nii.gz -ref func/rasub-009_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-009_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-009_run-03.nii.gz -ref func/rasub-009_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-009_run-03.nii.gz
 fugue -i func/rasub-009_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-009_run-03.nii.gz --unwarpdir=y- -u func/urasub-009_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -692,7 +663,7 @@ fslmaths ../../../rawdata/sub-009/fmap/sub-009_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-04_phasediff_half.nii.gz fmap/sub-009_run-04_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-009_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-009_run-04.nii.gz -nan fmap/fmap_rads_sub-009_run-04.nii.gz
 flirt -in fmap/sub-009_run-04_magnitude_brain_matched.nii.gz -ref func/rasub-009_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-009_run-04.nii.gz -ref func/rasub-009_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-009_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-009_run-04.nii.gz -ref func/rasub-009_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-009_run-04.nii.gz
 fugue -i func/rasub-009_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-009_run-04.nii.gz --unwarpdir=y- -u func/urasub-009_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -701,7 +672,7 @@ fslmaths ../../../rawdata/sub-009/fmap/sub-009_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-05_phasediff_half.nii.gz fmap/sub-009_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-009_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-009_run-05.nii.gz -nan fmap/fmap_rads_sub-009_run-05.nii.gz
 flirt -in fmap/sub-009_run-05_magnitude_brain.nii.gz -ref func/rasub-009_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-009_run-05.nii.gz -ref func/rasub-009_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-009_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-009_run-05.nii.gz -ref func/rasub-009_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-009_run-05.nii.gz
 fugue -i func/rasub-009_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-009_run-05.nii.gz --unwarpdir=y- -u func/urasub-009_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -711,7 +682,7 @@ fslmaths ../../../rawdata/sub-009/fmap/sub-009_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-06_phasediff_half.nii.gz fmap/sub-009_run-06_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-009_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-009_run-06.nii.gz -nan fmap/fmap_rads_sub-009_run-06.nii.gz
 flirt -in fmap/sub-009_run-06_magnitude_brain_matched.nii.gz -ref func/rasub-009_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-009_run-06.nii.gz -ref func/rasub-009_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-009_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-009_run-06.nii.gz -ref func/rasub-009_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-009_run-06.nii.gz
 fugue -i func/rasub-009_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-009_run-06.nii.gz --unwarpdir=y- -u func/urasub-009_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -720,7 +691,7 @@ fslmaths ../../../rawdata/sub-009/fmap/sub-009_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-07_phasediff_half.nii.gz fmap/sub-009_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-009_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-009_run-07.nii.gz -nan fmap/fmap_rads_sub-009_run-07.nii.gz
 flirt -in fmap/sub-009_run-07_magnitude_brain.nii.gz -ref func/rasub-009_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-009_run-07.nii.gz -ref func/rasub-009_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-009_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-009_run-07.nii.gz -ref func/rasub-009_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-009_run-07.nii.gz
 fugue -i func/rasub-009_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-009_run-07.nii.gz --unwarpdir=y- -u func/urasub-009_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -730,7 +701,7 @@ fslmaths ../../../rawdata/sub-009/fmap/sub-009_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-009_run-08_phasediff_half.nii.gz fmap/sub-009_run-08_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-009_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-009_run-08.nii.gz -nan fmap/fmap_rads_sub-009_run-08.nii.gz
 flirt -in fmap/sub-009_run-08_magnitude_brain_matched.nii.gz -ref func/rasub-009_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-009_run-08.nii.gz -ref func/rasub-009_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-009_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-009_run-08.nii.gz -ref func/rasub-009_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-009_run-08.nii.gz
 fugue -i func/rasub-009_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-009_run-08.nii.gz --unwarpdir=y- -u func/urasub-009_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -748,7 +719,7 @@ fslmaths ../../../rawdata/sub-011/fmap/sub-011_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-011_run-01_phasediff_half.nii.gz fmap/sub-011_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-011_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-011_run-01.nii.gz -nan fmap/fmap_rads_sub-011_run-01.nii.gz
 flirt -in fmap/sub-011_run-01_magnitude_brain.nii.gz -ref func/rasub-011_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-011_run-01.nii.gz -ref func/rasub-011_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-011_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-011_run-01.nii.gz -ref func/rasub-011_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-011_run-01.nii.gz
 fugue -i func/rasub-011_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-011_run-01.nii.gz --unwarpdir=y- -u func/urasub-011_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -757,7 +728,7 @@ fslmaths ../../../rawdata/sub-011/fmap/sub-011_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-011_run-02_phasediff_half.nii.gz fmap/sub-011_run-02_magnitude_brain.nii.gz fmap/fmap_rads_sub-011_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-011_run-02.nii.gz -nan fmap/fmap_rads_sub-011_run-02.nii.gz
 flirt -in fmap/sub-011_run-02_magnitude_brain.nii.gz -ref func/rasub-011_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-011_run-02.nii.gz -ref func/rasub-011_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-011_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-011_run-02.nii.gz -ref func/rasub-011_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-011_run-02.nii.gz
 fugue -i func/rasub-011_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-011_run-02.nii.gz --unwarpdir=y- -u func/urasub-011_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -766,7 +737,7 @@ fslmaths ../../../rawdata/sub-011/fmap/sub-011_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-011_run-03_phasediff_half.nii.gz fmap/sub-011_run-03_magnitude_brain.nii.gz fmap/fmap_rads_sub-011_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-011_run-03.nii.gz -nan fmap/fmap_rads_sub-011_run-03.nii.gz
 flirt -in fmap/sub-011_run-03_magnitude_brain.nii.gz -ref func/rasub-011_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-011_run-03.nii.gz -ref func/rasub-011_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-011_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-011_run-03.nii.gz -ref func/rasub-011_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-011_run-03.nii.gz
 fugue -i func/rasub-011_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-011_run-03.nii.gz --unwarpdir=y- -u func/urasub-011_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -775,7 +746,7 @@ fslmaths ../../../rawdata/sub-011/fmap/sub-011_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-011_run-04_phasediff_half.nii.gz fmap/sub-011_run-04_magnitude_brain.nii.gz fmap/fmap_rads_sub-011_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-011_run-04.nii.gz -nan fmap/fmap_rads_sub-011_run-04.nii.gz
 flirt -in fmap/sub-011_run-04_magnitude_brain.nii.gz -ref func/rasub-011_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-011_run-04.nii.gz -ref func/rasub-011_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-011_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-011_run-04.nii.gz -ref func/rasub-011_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-011_run-04.nii.gz
 fugue -i func/rasub-011_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-011_run-04.nii.gz --unwarpdir=y- -u func/urasub-011_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -784,7 +755,7 @@ fslmaths ../../../rawdata/sub-011/fmap/sub-011_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-011_run-05_phasediff_half.nii.gz fmap/sub-011_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-011_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-011_run-05.nii.gz -nan fmap/fmap_rads_sub-011_run-05.nii.gz
 flirt -in fmap/sub-011_run-05_magnitude_brain.nii.gz -ref func/rasub-011_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-011_run-05.nii.gz -ref func/rasub-011_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-011_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-011_run-05.nii.gz -ref func/rasub-011_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-011_run-05.nii.gz
 fugue -i func/rasub-011_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-011_run-05.nii.gz --unwarpdir=y- -u func/urasub-011_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -793,7 +764,7 @@ fslmaths ../../../rawdata/sub-011/fmap/sub-011_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-011_run-06_phasediff_half.nii.gz fmap/sub-011_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-011_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-011_run-06.nii.gz -nan fmap/fmap_rads_sub-011_run-06.nii.gz
 flirt -in fmap/sub-011_run-06_magnitude_brain.nii.gz -ref func/rasub-011_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-011_run-06.nii.gz -ref func/rasub-011_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-011_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-011_run-06.nii.gz -ref func/rasub-011_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-011_run-06.nii.gz
 fugue -i func/rasub-011_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-011_run-06.nii.gz --unwarpdir=y- -u func/urasub-011_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -802,7 +773,7 @@ fslmaths ../../../rawdata/sub-011/fmap/sub-011_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-011_run-07_phasediff_half.nii.gz fmap/sub-011_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-011_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-011_run-07.nii.gz -nan fmap/fmap_rads_sub-011_run-07.nii.gz
 flirt -in fmap/sub-011_run-07_magnitude_brain.nii.gz -ref func/rasub-011_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-011_run-07.nii.gz -ref func/rasub-011_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-011_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-011_run-07.nii.gz -ref func/rasub-011_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-011_run-07.nii.gz
 fugue -i func/rasub-011_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-011_run-07.nii.gz --unwarpdir=y- -u func/urasub-011_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -811,7 +782,7 @@ fslmaths ../../../rawdata/sub-011/fmap/sub-011_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-011_run-08_phasediff_half.nii.gz fmap/sub-011_run-08_magnitude_brain.nii.gz fmap/fmap_rads_sub-011_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-011_run-08.nii.gz -nan fmap/fmap_rads_sub-011_run-08.nii.gz
 flirt -in fmap/sub-011_run-08_magnitude_brain.nii.gz -ref func/rasub-011_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-011_run-08.nii.gz -ref func/rasub-011_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-011_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-011_run-08.nii.gz -ref func/rasub-011_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-011_run-08.nii.gz
 fugue -i func/rasub-011_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-011_run-08.nii.gz --unwarpdir=y- -u func/urasub-011_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -829,7 +800,7 @@ fslmaths ../../../rawdata/sub-012/fmap/sub-012_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-012_run-01_phasediff_half.nii.gz fmap/sub-012_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-012_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-012_run-01.nii.gz -nan fmap/fmap_rads_sub-012_run-01.nii.gz
 flirt -in fmap/sub-012_run-01_magnitude_brain.nii.gz -ref func/rasub-012_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-012_run-01.nii.gz -ref func/rasub-012_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-012_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-012_run-01.nii.gz -ref func/rasub-012_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-012_run-01.nii.gz
 fugue -i func/rasub-012_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-012_run-01.nii.gz --unwarpdir=y- -u func/urasub-012_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -838,7 +809,7 @@ fslmaths ../../../rawdata/sub-012/fmap/sub-012_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-012_run-02_phasediff_half.nii.gz fmap/sub-012_run-02_magnitude_brain.nii.gz fmap/fmap_rads_sub-012_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-012_run-02.nii.gz -nan fmap/fmap_rads_sub-012_run-02.nii.gz
 flirt -in fmap/sub-012_run-02_magnitude_brain.nii.gz -ref func/rasub-012_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-012_run-02.nii.gz -ref func/rasub-012_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-012_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-012_run-02.nii.gz -ref func/rasub-012_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-012_run-02.nii.gz
 fugue -i func/rasub-012_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-012_run-02.nii.gz --unwarpdir=y- -u func/urasub-012_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -847,7 +818,7 @@ fslmaths ../../../rawdata/sub-012/fmap/sub-012_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-012_run-03_phasediff_half.nii.gz fmap/sub-012_run-03_magnitude_brain.nii.gz fmap/fmap_rads_sub-012_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-012_run-03.nii.gz -nan fmap/fmap_rads_sub-012_run-03.nii.gz
 flirt -in fmap/sub-012_run-03_magnitude_brain.nii.gz -ref func/rasub-012_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-012_run-03.nii.gz -ref func/rasub-012_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-012_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-012_run-03.nii.gz -ref func/rasub-012_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-012_run-03.nii.gz
 fugue -i func/rasub-012_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-012_run-03.nii.gz --unwarpdir=y- -u func/urasub-012_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -856,7 +827,7 @@ fslmaths ../../../rawdata/sub-012/fmap/sub-012_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-012_run-04_phasediff_half.nii.gz fmap/sub-012_run-04_magnitude_brain.nii.gz fmap/fmap_rads_sub-012_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-012_run-04.nii.gz -nan fmap/fmap_rads_sub-012_run-04.nii.gz
 flirt -in fmap/sub-012_run-04_magnitude_brain.nii.gz -ref func/rasub-012_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-012_run-04.nii.gz -ref func/rasub-012_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-012_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-012_run-04.nii.gz -ref func/rasub-012_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-012_run-04.nii.gz
 fugue -i func/rasub-012_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-012_run-04.nii.gz --unwarpdir=y- -u func/urasub-012_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -865,7 +836,7 @@ fslmaths ../../../rawdata/sub-012/fmap/sub-012_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-012_run-05_phasediff_half.nii.gz fmap/sub-012_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-012_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-012_run-05.nii.gz -nan fmap/fmap_rads_sub-012_run-05.nii.gz
 flirt -in fmap/sub-012_run-05_magnitude_brain.nii.gz -ref func/rasub-012_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-012_run-05.nii.gz -ref func/rasub-012_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-012_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-012_run-05.nii.gz -ref func/rasub-012_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-012_run-05.nii.gz
 fugue -i func/rasub-012_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-012_run-05.nii.gz --unwarpdir=y- -u func/urasub-012_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -874,7 +845,7 @@ fslmaths ../../../rawdata/sub-012/fmap/sub-012_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-012_run-06_phasediff_half.nii.gz fmap/sub-012_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-012_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-012_run-06.nii.gz -nan fmap/fmap_rads_sub-012_run-06.nii.gz
 flirt -in fmap/sub-012_run-06_magnitude_brain.nii.gz -ref func/rasub-012_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-012_run-06.nii.gz -ref func/rasub-012_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-012_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-012_run-06.nii.gz -ref func/rasub-012_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-012_run-06.nii.gz
 fugue -i func/rasub-012_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-012_run-06.nii.gz --unwarpdir=y- -u func/urasub-012_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -883,7 +854,7 @@ fslmaths ../../../rawdata/sub-012/fmap/sub-012_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-012_run-07_phasediff_half.nii.gz fmap/sub-012_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-012_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-012_run-07.nii.gz -nan fmap/fmap_rads_sub-012_run-07.nii.gz
 flirt -in fmap/sub-012_run-07_magnitude_brain.nii.gz -ref func/rasub-012_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-012_run-07.nii.gz -ref func/rasub-012_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-012_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-012_run-07.nii.gz -ref func/rasub-012_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-012_run-07.nii.gz
 fugue -i func/rasub-012_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-012_run-07.nii.gz --unwarpdir=y- -u func/urasub-012_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -892,7 +863,7 @@ fslmaths ../../../rawdata/sub-012/fmap/sub-012_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-012_run-08_phasediff_half.nii.gz fmap/sub-012_run-08_magnitude_brain.nii.gz fmap/fmap_rads_sub-012_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-012_run-08.nii.gz -nan fmap/fmap_rads_sub-012_run-08.nii.gz
 flirt -in fmap/sub-012_run-08_magnitude_brain.nii.gz -ref func/rasub-012_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-012_run-08.nii.gz -ref func/rasub-012_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-012_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-012_run-08.nii.gz -ref func/rasub-012_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-012_run-08.nii.gz
 fugue -i func/rasub-012_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-012_run-08.nii.gz --unwarpdir=y- -u func/urasub-012_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -910,7 +881,7 @@ fslmaths ../../../rawdata/sub-013/fmap/sub-013_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-013_run-01_phasediff_half.nii.gz fmap/sub-013_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-013_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-013_run-01.nii.gz -nan fmap/fmap_rads_sub-013_run-01.nii.gz
 flirt -in fmap/sub-013_run-01_magnitude_brain.nii.gz -ref func/rasub-013_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-013_run-01.nii.gz -ref func/rasub-013_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-013_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-013_run-01.nii.gz -ref func/rasub-013_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-013_run-01.nii.gz
 fugue -i func/rasub-013_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-013_run-01.nii.gz --unwarpdir=y- -u func/urasub-013_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -919,7 +890,7 @@ fslmaths ../../../rawdata/sub-013/fmap/sub-013_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-013_run-02_phasediff_half.nii.gz fmap/sub-013_run-02_magnitude_brain.nii.gz fmap/fmap_rads_sub-013_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-013_run-02.nii.gz -nan fmap/fmap_rads_sub-013_run-02.nii.gz
 flirt -in fmap/sub-013_run-02_magnitude_brain.nii.gz -ref func/rasub-013_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-013_run-02.nii.gz -ref func/rasub-013_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-013_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-013_run-02.nii.gz -ref func/rasub-013_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-013_run-02.nii.gz
 fugue -i func/rasub-013_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-013_run-02.nii.gz --unwarpdir=y- -u func/urasub-013_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -928,7 +899,7 @@ fslmaths ../../../rawdata/sub-013/fmap/sub-013_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-013_run-03_phasediff_half.nii.gz fmap/sub-013_run-03_magnitude_brain.nii.gz fmap/fmap_rads_sub-013_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-013_run-03.nii.gz -nan fmap/fmap_rads_sub-013_run-03.nii.gz
 flirt -in fmap/sub-013_run-03_magnitude_brain.nii.gz -ref func/rasub-013_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-013_run-03.nii.gz -ref func/rasub-013_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-013_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-013_run-03.nii.gz -ref func/rasub-013_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-013_run-03.nii.gz
 fugue -i func/rasub-013_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-013_run-03.nii.gz --unwarpdir=y- -u func/urasub-013_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -937,7 +908,7 @@ fslmaths ../../../rawdata/sub-013/fmap/sub-013_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-013_run-04_phasediff_half.nii.gz fmap/sub-013_run-04_magnitude_brain.nii.gz fmap/fmap_rads_sub-013_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-013_run-04.nii.gz -nan fmap/fmap_rads_sub-013_run-04.nii.gz
 flirt -in fmap/sub-013_run-04_magnitude_brain.nii.gz -ref func/rasub-013_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-013_run-04.nii.gz -ref func/rasub-013_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-013_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-013_run-04.nii.gz -ref func/rasub-013_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-013_run-04.nii.gz
 fugue -i func/rasub-013_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-013_run-04.nii.gz --unwarpdir=y- -u func/urasub-013_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -946,7 +917,7 @@ fslmaths ../../../rawdata/sub-013/fmap/sub-013_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-013_run-05_phasediff_half.nii.gz fmap/sub-013_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-013_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-013_run-05.nii.gz -nan fmap/fmap_rads_sub-013_run-05.nii.gz
 flirt -in fmap/sub-013_run-05_magnitude_brain.nii.gz -ref func/rasub-013_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-013_run-05.nii.gz -ref func/rasub-013_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-013_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-013_run-05.nii.gz -ref func/rasub-013_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-013_run-05.nii.gz
 fugue -i func/rasub-013_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-013_run-05.nii.gz --unwarpdir=y- -u func/urasub-013_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -955,7 +926,7 @@ fslmaths ../../../rawdata/sub-013/fmap/sub-013_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-013_run-06_phasediff_half.nii.gz fmap/sub-013_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-013_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-013_run-06.nii.gz -nan fmap/fmap_rads_sub-013_run-06.nii.gz
 flirt -in fmap/sub-013_run-06_magnitude_brain.nii.gz -ref func/rasub-013_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-013_run-06.nii.gz -ref func/rasub-013_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-013_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-013_run-06.nii.gz -ref func/rasub-013_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-013_run-06.nii.gz
 fugue -i func/rasub-013_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-013_run-06.nii.gz --unwarpdir=y- -u func/urasub-013_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -964,7 +935,7 @@ fslmaths ../../../rawdata/sub-013/fmap/sub-013_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-013_run-07_phasediff_half.nii.gz fmap/sub-013_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-013_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-013_run-07.nii.gz -nan fmap/fmap_rads_sub-013_run-07.nii.gz
 flirt -in fmap/sub-013_run-07_magnitude_brain.nii.gz -ref func/rasub-013_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-013_run-07.nii.gz -ref func/rasub-013_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-013_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-013_run-07.nii.gz -ref func/rasub-013_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-013_run-07.nii.gz
 fugue -i func/rasub-013_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-013_run-07.nii.gz --unwarpdir=y- -u func/urasub-013_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -973,7 +944,7 @@ fslmaths ../../../rawdata/sub-013/fmap/sub-013_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-013_run-08_phasediff_half.nii.gz fmap/sub-013_run-08_magnitude_brain.nii.gz fmap/fmap_rads_sub-013_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-013_run-08.nii.gz -nan fmap/fmap_rads_sub-013_run-08.nii.gz
 flirt -in fmap/sub-013_run-08_magnitude_brain.nii.gz -ref func/rasub-013_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-013_run-08.nii.gz -ref func/rasub-013_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-013_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-013_run-08.nii.gz -ref func/rasub-013_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-013_run-08.nii.gz
 fugue -i func/rasub-013_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-013_run-08.nii.gz --unwarpdir=y- -u func/urasub-013_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -991,7 +962,7 @@ fslmaths ../../../rawdata/sub-014/fmap/sub-014_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-014_run-01_phasediff_half.nii.gz fmap/sub-014_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-014_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-014_run-01.nii.gz -nan fmap/fmap_rads_sub-014_run-01.nii.gz
 flirt -in fmap/sub-014_run-01_magnitude_brain.nii.gz -ref func/rasub-014_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-014_run-01.nii.gz -ref func/rasub-014_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-014_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-014_run-01.nii.gz -ref func/rasub-014_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-014_run-01.nii.gz
 fugue -i func/rasub-014_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-014_run-01.nii.gz --unwarpdir=y- -u func/urasub-014_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -1000,7 +971,7 @@ fslmaths ../../../rawdata/sub-014/fmap/sub-014_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-014_run-02_phasediff_half.nii.gz fmap/sub-014_run-02_magnitude_brain.nii.gz fmap/fmap_rads_sub-014_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-014_run-02.nii.gz -nan fmap/fmap_rads_sub-014_run-02.nii.gz
 flirt -in fmap/sub-014_run-02_magnitude_brain.nii.gz -ref func/rasub-014_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-014_run-02.nii.gz -ref func/rasub-014_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-014_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-014_run-02.nii.gz -ref func/rasub-014_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-014_run-02.nii.gz
 fugue -i func/rasub-014_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-014_run-02.nii.gz --unwarpdir=y- -u func/urasub-014_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -1009,7 +980,7 @@ fslmaths ../../../rawdata/sub-014/fmap/sub-014_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-014_run-03_phasediff_half.nii.gz fmap/sub-014_run-03_magnitude_brain.nii.gz fmap/fmap_rads_sub-014_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-014_run-03.nii.gz -nan fmap/fmap_rads_sub-014_run-03.nii.gz
 flirt -in fmap/sub-014_run-03_magnitude_brain.nii.gz -ref func/rasub-014_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-014_run-03.nii.gz -ref func/rasub-014_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-014_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-014_run-03.nii.gz -ref func/rasub-014_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-014_run-03.nii.gz
 fugue -i func/rasub-014_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-014_run-03.nii.gz --unwarpdir=y- -u func/urasub-014_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -1018,7 +989,7 @@ fslmaths ../../../rawdata/sub-014/fmap/sub-014_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-014_run-04_phasediff_half.nii.gz fmap/sub-014_run-04_magnitude_brain.nii.gz fmap/fmap_rads_sub-014_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-014_run-04.nii.gz -nan fmap/fmap_rads_sub-014_run-04.nii.gz
 flirt -in fmap/sub-014_run-04_magnitude_brain.nii.gz -ref func/rasub-014_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-014_run-04.nii.gz -ref func/rasub-014_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-014_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-014_run-04.nii.gz -ref func/rasub-014_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-014_run-04.nii.gz
 fugue -i func/rasub-014_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-014_run-04.nii.gz --unwarpdir=y- -u func/urasub-014_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -1027,7 +998,7 @@ fslmaths ../../../rawdata/sub-014/fmap/sub-014_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-014_run-05_phasediff_half.nii.gz fmap/sub-014_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-014_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-014_run-05.nii.gz -nan fmap/fmap_rads_sub-014_run-05.nii.gz
 flirt -in fmap/sub-014_run-05_magnitude_brain.nii.gz -ref func/rasub-014_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-014_run-05.nii.gz -ref func/rasub-014_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-014_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-014_run-05.nii.gz -ref func/rasub-014_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-014_run-05.nii.gz
 fugue -i func/rasub-014_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-014_run-05.nii.gz --unwarpdir=y- -u func/urasub-014_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -1036,7 +1007,7 @@ fslmaths ../../../rawdata/sub-014/fmap/sub-014_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-014_run-06_phasediff_half.nii.gz fmap/sub-014_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-014_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-014_run-06.nii.gz -nan fmap/fmap_rads_sub-014_run-06.nii.gz
 flirt -in fmap/sub-014_run-06_magnitude_brain.nii.gz -ref func/rasub-014_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-014_run-06.nii.gz -ref func/rasub-014_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-014_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-014_run-06.nii.gz -ref func/rasub-014_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-014_run-06.nii.gz
 fugue -i func/rasub-014_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-014_run-06.nii.gz --unwarpdir=y- -u func/urasub-014_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -1045,7 +1016,7 @@ fslmaths ../../../rawdata/sub-014/fmap/sub-014_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-014_run-07_phasediff_half.nii.gz fmap/sub-014_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-014_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-014_run-07.nii.gz -nan fmap/fmap_rads_sub-014_run-07.nii.gz
 flirt -in fmap/sub-014_run-07_magnitude_brain.nii.gz -ref func/rasub-014_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-014_run-07.nii.gz -ref func/rasub-014_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-014_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-014_run-07.nii.gz -ref func/rasub-014_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-014_run-07.nii.gz
 fugue -i func/rasub-014_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-014_run-07.nii.gz --unwarpdir=y- -u func/urasub-014_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -1054,7 +1025,7 @@ fslmaths ../../../rawdata/sub-014/fmap/sub-014_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-014_run-08_phasediff_half.nii.gz fmap/sub-014_run-08_magnitude_brain.nii.gz fmap/fmap_rads_sub-014_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-014_run-08.nii.gz -nan fmap/fmap_rads_sub-014_run-08.nii.gz
 flirt -in fmap/sub-014_run-08_magnitude_brain.nii.gz -ref func/rasub-014_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-014_run-08.nii.gz -ref func/rasub-014_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-014_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-014_run-08.nii.gz -ref func/rasub-014_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-014_run-08.nii.gz
 fugue -i func/rasub-014_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-014_run-08.nii.gz --unwarpdir=y- -u func/urasub-014_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -1072,7 +1043,7 @@ fslmaths ../../../rawdata/sub-015/fmap/sub-015_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-01_phasediff_half.nii.gz fmap/sub-015_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-015_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-015_run-01.nii.gz -nan fmap/fmap_rads_sub-015_run-01.nii.gz
 flirt -in fmap/sub-015_run-01_magnitude_brain.nii.gz -ref func/rasub-015_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-015_run-01.nii.gz -ref func/rasub-015_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-015_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-015_run-01.nii.gz -ref func/rasub-015_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-015_run-01.nii.gz
 fugue -i func/rasub-015_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-015_run-01.nii.gz --unwarpdir=y- -u func/urasub-015_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -1082,7 +1053,7 @@ fslmaths ../../../rawdata/sub-015/fmap/sub-015_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-02_phasediff_half.nii.gz fmap/sub-015_run-02_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-015_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-015_run-02.nii.gz -nan fmap/fmap_rads_sub-015_run-02.nii.gz
 flirt -in fmap/sub-015_run-02_magnitude_brain_matched.nii.gz -ref func/rasub-015_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-015_run-02.nii.gz -ref func/rasub-015_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-015_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-015_run-02.nii.gz -ref func/rasub-015_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-015_run-02.nii.gz
 fugue -i func/rasub-015_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-015_run-02.nii.gz --unwarpdir=y- -u func/urasub-015_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -1091,7 +1062,7 @@ fslmaths ../../../rawdata/sub-015/fmap/sub-015_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-03_phasediff_half.nii.gz fmap/sub-015_run-03_magnitude_brain.nii.gz fmap/fmap_rads_sub-015_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-015_run-03.nii.gz -nan fmap/fmap_rads_sub-015_run-03.nii.gz
 flirt -in fmap/sub-015_run-03_magnitude_brain.nii.gz -ref func/rasub-015_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-015_run-03.nii.gz -ref func/rasub-015_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-015_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-015_run-03.nii.gz -ref func/rasub-015_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-015_run-03.nii.gz
 fugue -i func/rasub-015_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-015_run-03.nii.gz --unwarpdir=y- -u func/urasub-015_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -1101,7 +1072,7 @@ fslmaths ../../../rawdata/sub-015/fmap/sub-015_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-04_phasediff_half.nii.gz fmap/sub-015_run-04_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-015_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-015_run-04.nii.gz -nan fmap/fmap_rads_sub-015_run-04.nii.gz
 flirt -in fmap/sub-015_run-04_magnitude_brain_matched.nii.gz -ref func/rasub-015_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-015_run-04.nii.gz -ref func/rasub-015_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-015_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-015_run-04.nii.gz -ref func/rasub-015_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-015_run-04.nii.gz
 fugue -i func/rasub-015_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-015_run-04.nii.gz --unwarpdir=y- -u func/urasub-015_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -1111,7 +1082,7 @@ fslmaths ../../../rawdata/sub-015/fmap/sub-015_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-05_phasediff_half.nii.gz fmap/sub-015_run-05_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-015_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-015_run-05.nii.gz -nan fmap/fmap_rads_sub-015_run-05.nii.gz
 flirt -in fmap/sub-015_run-05_magnitude_brain_matched.nii.gz -ref func/rasub-015_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-015_run-05.nii.gz -ref func/rasub-015_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-015_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-015_run-05.nii.gz -ref func/rasub-015_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-015_run-05.nii.gz
 fugue -i func/rasub-015_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-015_run-05.nii.gz --unwarpdir=y- -u func/urasub-015_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -1120,7 +1091,7 @@ fslmaths ../../../rawdata/sub-015/fmap/sub-015_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-06_phasediff_half.nii.gz fmap/sub-015_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-015_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-015_run-06.nii.gz -nan fmap/fmap_rads_sub-015_run-06.nii.gz
 flirt -in fmap/sub-015_run-06_magnitude_brain.nii.gz -ref func/rasub-015_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-015_run-06.nii.gz -ref func/rasub-015_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-015_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-015_run-06.nii.gz -ref func/rasub-015_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-015_run-06.nii.gz
 fugue -i func/rasub-015_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-015_run-06.nii.gz --unwarpdir=y- -u func/urasub-015_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -1129,7 +1100,7 @@ fslmaths ../../../rawdata/sub-015/fmap/sub-015_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-07_phasediff_half.nii.gz fmap/sub-015_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-015_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-015_run-07.nii.gz -nan fmap/fmap_rads_sub-015_run-07.nii.gz
 flirt -in fmap/sub-015_run-07_magnitude_brain.nii.gz -ref func/rasub-015_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-015_run-07.nii.gz -ref func/rasub-015_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-015_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-015_run-07.nii.gz -ref func/rasub-015_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-015_run-07.nii.gz
 fugue -i func/rasub-015_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-015_run-07.nii.gz --unwarpdir=y- -u func/urasub-015_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -1139,7 +1110,7 @@ fslmaths ../../../rawdata/sub-015/fmap/sub-015_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-015_run-08_phasediff_half.nii.gz fmap/sub-015_run-08_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-015_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-015_run-08.nii.gz -nan fmap/fmap_rads_sub-015_run-08.nii.gz
 flirt -in fmap/sub-015_run-08_magnitude_brain_matched.nii.gz -ref func/rasub-015_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-015_run-08.nii.gz -ref func/rasub-015_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-015_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-015_run-08.nii.gz -ref func/rasub-015_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-015_run-08.nii.gz
 fugue -i func/rasub-015_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-015_run-08.nii.gz --unwarpdir=y- -u func/urasub-015_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -1157,7 +1128,7 @@ fslmaths ../../../rawdata/sub-016/fmap/sub-016_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-016_run-01_phasediff_half.nii.gz fmap/sub-016_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-016_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-016_run-01.nii.gz -nan fmap/fmap_rads_sub-016_run-01.nii.gz
 flirt -in fmap/sub-016_run-01_magnitude_brain.nii.gz -ref func/rasub-016_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-016_run-01.nii.gz -ref func/rasub-016_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-016_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-016_run-01.nii.gz -ref func/rasub-016_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-016_run-01.nii.gz
 fugue -i func/rasub-016_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-016_run-01.nii.gz --unwarpdir=y- -u func/urasub-016_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -1166,7 +1137,7 @@ fslmaths ../../../rawdata/sub-016/fmap/sub-016_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-016_run-02_phasediff_half.nii.gz fmap/sub-016_run-02_magnitude_brain.nii.gz fmap/fmap_rads_sub-016_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-016_run-02.nii.gz -nan fmap/fmap_rads_sub-016_run-02.nii.gz
 flirt -in fmap/sub-016_run-02_magnitude_brain.nii.gz -ref func/rasub-016_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-016_run-02.nii.gz -ref func/rasub-016_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-016_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-016_run-02.nii.gz -ref func/rasub-016_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-016_run-02.nii.gz
 fugue -i func/rasub-016_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-016_run-02.nii.gz --unwarpdir=y- -u func/urasub-016_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -1175,7 +1146,7 @@ fslmaths ../../../rawdata/sub-016/fmap/sub-016_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-016_run-03_phasediff_half.nii.gz fmap/sub-016_run-03_magnitude_brain.nii.gz fmap/fmap_rads_sub-016_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-016_run-03.nii.gz -nan fmap/fmap_rads_sub-016_run-03.nii.gz
 flirt -in fmap/sub-016_run-03_magnitude_brain.nii.gz -ref func/rasub-016_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-016_run-03.nii.gz -ref func/rasub-016_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-016_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-016_run-03.nii.gz -ref func/rasub-016_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-016_run-03.nii.gz
 fugue -i func/rasub-016_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-016_run-03.nii.gz --unwarpdir=y- -u func/urasub-016_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -1184,7 +1155,7 @@ fslmaths ../../../rawdata/sub-016/fmap/sub-016_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-016_run-04_phasediff_half.nii.gz fmap/sub-016_run-04_magnitude_brain.nii.gz fmap/fmap_rads_sub-016_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-016_run-04.nii.gz -nan fmap/fmap_rads_sub-016_run-04.nii.gz
 flirt -in fmap/sub-016_run-04_magnitude_brain.nii.gz -ref func/rasub-016_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-016_run-04.nii.gz -ref func/rasub-016_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-016_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-016_run-04.nii.gz -ref func/rasub-016_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-016_run-04.nii.gz
 fugue -i func/rasub-016_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-016_run-04.nii.gz --unwarpdir=y- -u func/urasub-016_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -1193,7 +1164,7 @@ fslmaths ../../../rawdata/sub-016/fmap/sub-016_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-016_run-05_phasediff_half.nii.gz fmap/sub-016_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-016_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-016_run-05.nii.gz -nan fmap/fmap_rads_sub-016_run-05.nii.gz
 flirt -in fmap/sub-016_run-05_magnitude_brain.nii.gz -ref func/rasub-016_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-016_run-05.nii.gz -ref func/rasub-016_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-016_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-016_run-05.nii.gz -ref func/rasub-016_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-016_run-05.nii.gz
 fugue -i func/rasub-016_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-016_run-05.nii.gz --unwarpdir=y- -u func/urasub-016_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -1202,7 +1173,7 @@ fslmaths ../../../rawdata/sub-016/fmap/sub-016_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-016_run-06_phasediff_half.nii.gz fmap/sub-016_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-016_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-016_run-06.nii.gz -nan fmap/fmap_rads_sub-016_run-06.nii.gz
 flirt -in fmap/sub-016_run-06_magnitude_brain.nii.gz -ref func/rasub-016_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-016_run-06.nii.gz -ref func/rasub-016_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-016_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-016_run-06.nii.gz -ref func/rasub-016_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-016_run-06.nii.gz
 fugue -i func/rasub-016_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-016_run-06.nii.gz --unwarpdir=y- -u func/urasub-016_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -1211,7 +1182,7 @@ fslmaths ../../../rawdata/sub-016/fmap/sub-016_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-016_run-07_phasediff_half.nii.gz fmap/sub-016_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-016_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-016_run-07.nii.gz -nan fmap/fmap_rads_sub-016_run-07.nii.gz
 flirt -in fmap/sub-016_run-07_magnitude_brain.nii.gz -ref func/rasub-016_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-016_run-07.nii.gz -ref func/rasub-016_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-016_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-016_run-07.nii.gz -ref func/rasub-016_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-016_run-07.nii.gz
 fugue -i func/rasub-016_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-016_run-07.nii.gz --unwarpdir=y- -u func/urasub-016_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -1220,7 +1191,7 @@ fslmaths ../../../rawdata/sub-016/fmap/sub-016_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-016_run-08_phasediff_half.nii.gz fmap/sub-016_run-08_magnitude_brain.nii.gz fmap/fmap_rads_sub-016_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-016_run-08.nii.gz -nan fmap/fmap_rads_sub-016_run-08.nii.gz
 flirt -in fmap/sub-016_run-08_magnitude_brain.nii.gz -ref func/rasub-016_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-016_run-08.nii.gz -ref func/rasub-016_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-016_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-016_run-08.nii.gz -ref func/rasub-016_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-016_run-08.nii.gz
 fugue -i func/rasub-016_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-016_run-08.nii.gz --unwarpdir=y- -u func/urasub-016_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -1238,7 +1209,7 @@ fslmaths ../../../rawdata/sub-017/fmap/sub-017_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-017_run-01_phasediff_half.nii.gz fmap/sub-017_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-017_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-017_run-01.nii.gz -nan fmap/fmap_rads_sub-017_run-01.nii.gz
 flirt -in fmap/sub-017_run-01_magnitude_brain.nii.gz -ref func/rasub-017_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-017_run-01.nii.gz -ref func/rasub-017_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-017_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-017_run-01.nii.gz -ref func/rasub-017_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-017_run-01.nii.gz
 fugue -i func/rasub-017_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-017_run-01.nii.gz --unwarpdir=y- -u func/urasub-017_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -1247,7 +1218,7 @@ fslmaths ../../../rawdata/sub-017/fmap/sub-017_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-017_run-02_phasediff_half.nii.gz fmap/sub-017_run-02_magnitude_brain.nii.gz fmap/fmap_rads_sub-017_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-017_run-02.nii.gz -nan fmap/fmap_rads_sub-017_run-02.nii.gz
 flirt -in fmap/sub-017_run-02_magnitude_brain.nii.gz -ref func/rasub-017_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-017_run-02.nii.gz -ref func/rasub-017_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-017_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-017_run-02.nii.gz -ref func/rasub-017_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-017_run-02.nii.gz
 fugue -i func/rasub-017_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-017_run-02.nii.gz --unwarpdir=y- -u func/urasub-017_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -1256,7 +1227,7 @@ fslmaths ../../../rawdata/sub-017/fmap/sub-017_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-017_run-03_phasediff_half.nii.gz fmap/sub-017_run-03_magnitude_brain.nii.gz fmap/fmap_rads_sub-017_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-017_run-03.nii.gz -nan fmap/fmap_rads_sub-017_run-03.nii.gz
 flirt -in fmap/sub-017_run-03_magnitude_brain.nii.gz -ref func/rasub-017_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-017_run-03.nii.gz -ref func/rasub-017_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-017_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-017_run-03.nii.gz -ref func/rasub-017_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-017_run-03.nii.gz
 fugue -i func/rasub-017_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-017_run-03.nii.gz --unwarpdir=y- -u func/urasub-017_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -1265,7 +1236,7 @@ fslmaths ../../../rawdata/sub-017/fmap/sub-017_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-017_run-04_phasediff_half.nii.gz fmap/sub-017_run-04_magnitude_brain.nii.gz fmap/fmap_rads_sub-017_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-017_run-04.nii.gz -nan fmap/fmap_rads_sub-017_run-04.nii.gz
 flirt -in fmap/sub-017_run-04_magnitude_brain.nii.gz -ref func/rasub-017_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-017_run-04.nii.gz -ref func/rasub-017_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-017_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-017_run-04.nii.gz -ref func/rasub-017_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-017_run-04.nii.gz
 fugue -i func/rasub-017_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-017_run-04.nii.gz --unwarpdir=y- -u func/urasub-017_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -1274,7 +1245,7 @@ fslmaths ../../../rawdata/sub-017/fmap/sub-017_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-017_run-05_phasediff_half.nii.gz fmap/sub-017_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-017_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-017_run-05.nii.gz -nan fmap/fmap_rads_sub-017_run-05.nii.gz
 flirt -in fmap/sub-017_run-05_magnitude_brain.nii.gz -ref func/rasub-017_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-017_run-05.nii.gz -ref func/rasub-017_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-017_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-017_run-05.nii.gz -ref func/rasub-017_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-017_run-05.nii.gz
 fugue -i func/rasub-017_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-017_run-05.nii.gz --unwarpdir=y- -u func/urasub-017_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -1283,7 +1254,7 @@ fslmaths ../../../rawdata/sub-017/fmap/sub-017_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-017_run-06_phasediff_half.nii.gz fmap/sub-017_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-017_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-017_run-06.nii.gz -nan fmap/fmap_rads_sub-017_run-06.nii.gz
 flirt -in fmap/sub-017_run-06_magnitude_brain.nii.gz -ref func/rasub-017_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-017_run-06.nii.gz -ref func/rasub-017_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-017_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-017_run-06.nii.gz -ref func/rasub-017_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-017_run-06.nii.gz
 fugue -i func/rasub-017_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-017_run-06.nii.gz --unwarpdir=y- -u func/urasub-017_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -1292,7 +1263,7 @@ fslmaths ../../../rawdata/sub-017/fmap/sub-017_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-017_run-07_phasediff_half.nii.gz fmap/sub-017_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-017_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-017_run-07.nii.gz -nan fmap/fmap_rads_sub-017_run-07.nii.gz
 flirt -in fmap/sub-017_run-07_magnitude_brain.nii.gz -ref func/rasub-017_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-017_run-07.nii.gz -ref func/rasub-017_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-017_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-017_run-07.nii.gz -ref func/rasub-017_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-017_run-07.nii.gz
 fugue -i func/rasub-017_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-017_run-07.nii.gz --unwarpdir=y- -u func/urasub-017_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -1301,7 +1272,7 @@ fslmaths ../../../rawdata/sub-017/fmap/sub-017_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-017_run-08_phasediff_half.nii.gz fmap/sub-017_run-08_magnitude_brain.nii.gz fmap/fmap_rads_sub-017_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-017_run-08.nii.gz -nan fmap/fmap_rads_sub-017_run-08.nii.gz
 flirt -in fmap/sub-017_run-08_magnitude_brain.nii.gz -ref func/rasub-017_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-017_run-08.nii.gz -ref func/rasub-017_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-017_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-017_run-08.nii.gz -ref func/rasub-017_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-017_run-08.nii.gz
 fugue -i func/rasub-017_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-017_run-08.nii.gz --unwarpdir=y- -u func/urasub-017_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -1319,7 +1290,7 @@ fslmaths ../../../rawdata/sub-018/fmap/sub-018_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-018_run-01_phasediff_half.nii.gz fmap/sub-018_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-018_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-018_run-01.nii.gz -nan fmap/fmap_rads_sub-018_run-01.nii.gz
 flirt -in fmap/sub-018_run-01_magnitude_brain.nii.gz -ref func/rasub-018_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-018_run-01.nii.gz -ref func/rasub-018_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-018_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-018_run-01.nii.gz -ref func/rasub-018_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-018_run-01.nii.gz
 fugue -i func/rasub-018_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-018_run-01.nii.gz --unwarpdir=y- -u func/urasub-018_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -1328,7 +1299,7 @@ fslmaths ../../../rawdata/sub-018/fmap/sub-018_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-018_run-02_phasediff_half.nii.gz fmap/sub-018_run-02_magnitude_brain.nii.gz fmap/fmap_rads_sub-018_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-018_run-02.nii.gz -nan fmap/fmap_rads_sub-018_run-02.nii.gz
 flirt -in fmap/sub-018_run-02_magnitude_brain.nii.gz -ref func/rasub-018_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-018_run-02.nii.gz -ref func/rasub-018_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-018_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-018_run-02.nii.gz -ref func/rasub-018_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-018_run-02.nii.gz
 fugue -i func/rasub-018_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-018_run-02.nii.gz --unwarpdir=y- -u func/urasub-018_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -1337,7 +1308,7 @@ fslmaths ../../../rawdata/sub-018/fmap/sub-018_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-018_run-03_phasediff_half.nii.gz fmap/sub-018_run-03_magnitude_brain.nii.gz fmap/fmap_rads_sub-018_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-018_run-03.nii.gz -nan fmap/fmap_rads_sub-018_run-03.nii.gz
 flirt -in fmap/sub-018_run-03_magnitude_brain.nii.gz -ref func/rasub-018_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-018_run-03.nii.gz -ref func/rasub-018_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-018_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-018_run-03.nii.gz -ref func/rasub-018_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-018_run-03.nii.gz
 fugue -i func/rasub-018_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-018_run-03.nii.gz --unwarpdir=y- -u func/urasub-018_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -1346,7 +1317,7 @@ fslmaths ../../../rawdata/sub-018/fmap/sub-018_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-018_run-04_phasediff_half.nii.gz fmap/sub-018_run-04_magnitude_brain.nii.gz fmap/fmap_rads_sub-018_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-018_run-04.nii.gz -nan fmap/fmap_rads_sub-018_run-04.nii.gz
 flirt -in fmap/sub-018_run-04_magnitude_brain.nii.gz -ref func/rasub-018_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-018_run-04.nii.gz -ref func/rasub-018_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-018_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-018_run-04.nii.gz -ref func/rasub-018_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-018_run-04.nii.gz
 fugue -i func/rasub-018_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-018_run-04.nii.gz --unwarpdir=y- -u func/urasub-018_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -1355,7 +1326,7 @@ fslmaths ../../../rawdata/sub-018/fmap/sub-018_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-018_run-05_phasediff_half.nii.gz fmap/sub-018_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-018_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-018_run-05.nii.gz -nan fmap/fmap_rads_sub-018_run-05.nii.gz
 flirt -in fmap/sub-018_run-05_magnitude_brain.nii.gz -ref func/rasub-018_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-018_run-05.nii.gz -ref func/rasub-018_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-018_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-018_run-05.nii.gz -ref func/rasub-018_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-018_run-05.nii.gz
 fugue -i func/rasub-018_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-018_run-05.nii.gz --unwarpdir=y- -u func/urasub-018_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -1364,7 +1335,7 @@ fslmaths ../../../rawdata/sub-018/fmap/sub-018_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-018_run-06_phasediff_half.nii.gz fmap/sub-018_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-018_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-018_run-06.nii.gz -nan fmap/fmap_rads_sub-018_run-06.nii.gz
 flirt -in fmap/sub-018_run-06_magnitude_brain.nii.gz -ref func/rasub-018_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-018_run-06.nii.gz -ref func/rasub-018_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-018_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-018_run-06.nii.gz -ref func/rasub-018_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-018_run-06.nii.gz
 fugue -i func/rasub-018_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-018_run-06.nii.gz --unwarpdir=y- -u func/urasub-018_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -1373,7 +1344,7 @@ fslmaths ../../../rawdata/sub-018/fmap/sub-018_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-018_run-07_phasediff_half.nii.gz fmap/sub-018_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-018_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-018_run-07.nii.gz -nan fmap/fmap_rads_sub-018_run-07.nii.gz
 flirt -in fmap/sub-018_run-07_magnitude_brain.nii.gz -ref func/rasub-018_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-018_run-07.nii.gz -ref func/rasub-018_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-018_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-018_run-07.nii.gz -ref func/rasub-018_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-018_run-07.nii.gz
 fugue -i func/rasub-018_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-018_run-07.nii.gz --unwarpdir=y- -u func/urasub-018_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -1382,7 +1353,7 @@ fslmaths ../../../rawdata/sub-018/fmap/sub-018_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-018_run-08_phasediff_half.nii.gz fmap/sub-018_run-08_magnitude_brain.nii.gz fmap/fmap_rads_sub-018_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-018_run-08.nii.gz -nan fmap/fmap_rads_sub-018_run-08.nii.gz
 flirt -in fmap/sub-018_run-08_magnitude_brain.nii.gz -ref func/rasub-018_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-018_run-08.nii.gz -ref func/rasub-018_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-018_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-018_run-08.nii.gz -ref func/rasub-018_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-018_run-08.nii.gz
 fugue -i func/rasub-018_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-018_run-08.nii.gz --unwarpdir=y- -u func/urasub-018_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -1400,7 +1371,7 @@ fslmaths ../../../rawdata/sub-019/fmap/sub-019_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-01_phasediff_half.nii.gz fmap/sub-019_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-019_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-019_run-01.nii.gz -nan fmap/fmap_rads_sub-019_run-01.nii.gz
 flirt -in fmap/sub-019_run-01_magnitude_brain.nii.gz -ref func/rasub-019_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-019_run-01.nii.gz -ref func/rasub-019_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-019_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-019_run-01.nii.gz -ref func/rasub-019_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-019_run-01.nii.gz
 fugue -i func/rasub-019_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-019_run-01.nii.gz --unwarpdir=y- -u func/urasub-019_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -1409,7 +1380,7 @@ fslmaths ../../../rawdata/sub-019/fmap/sub-019_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-02_phasediff_half.nii.gz fmap/sub-019_run-02_magnitude_brain.nii.gz fmap/fmap_rads_sub-019_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-019_run-02.nii.gz -nan fmap/fmap_rads_sub-019_run-02.nii.gz
 flirt -in fmap/sub-019_run-02_magnitude_brain.nii.gz -ref func/rasub-019_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-019_run-02.nii.gz -ref func/rasub-019_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-019_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-019_run-02.nii.gz -ref func/rasub-019_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-019_run-02.nii.gz
 fugue -i func/rasub-019_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-019_run-02.nii.gz --unwarpdir=y- -u func/urasub-019_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -1419,7 +1390,7 @@ fslmaths ../../../rawdata/sub-019/fmap/sub-019_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-03_phasediff_half.nii.gz fmap/sub-019_run-03_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-019_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-019_run-03.nii.gz -nan fmap/fmap_rads_sub-019_run-03.nii.gz
 flirt -in fmap/sub-019_run-03_magnitude_brain_matched.nii.gz -ref func/rasub-019_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-019_run-03.nii.gz -ref func/rasub-019_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-019_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-019_run-03.nii.gz -ref func/rasub-019_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-019_run-03.nii.gz
 fugue -i func/rasub-019_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-019_run-03.nii.gz --unwarpdir=y- -u func/urasub-019_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -1429,7 +1400,7 @@ fslmaths ../../../rawdata/sub-019/fmap/sub-019_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-04_phasediff_half.nii.gz fmap/sub-019_run-04_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-019_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-019_run-04.nii.gz -nan fmap/fmap_rads_sub-019_run-04.nii.gz
 flirt -in fmap/sub-019_run-04_magnitude_brain_matched.nii.gz -ref func/rasub-019_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-019_run-04.nii.gz -ref func/rasub-019_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-019_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-019_run-04.nii.gz -ref func/rasub-019_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-019_run-04.nii.gz
 fugue -i func/rasub-019_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-019_run-04.nii.gz --unwarpdir=y- -u func/urasub-019_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -1439,7 +1410,7 @@ fslmaths ../../../rawdata/sub-019/fmap/sub-019_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-05_phasediff_half.nii.gz fmap/sub-019_run-05_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-019_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-019_run-05.nii.gz -nan fmap/fmap_rads_sub-019_run-05.nii.gz
 flirt -in fmap/sub-019_run-05_magnitude_brain_matched.nii.gz -ref func/rasub-019_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-019_run-05.nii.gz -ref func/rasub-019_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-019_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-019_run-05.nii.gz -ref func/rasub-019_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-019_run-05.nii.gz
 fugue -i func/rasub-019_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-019_run-05.nii.gz --unwarpdir=y- -u func/urasub-019_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -1448,7 +1419,7 @@ fslmaths ../../../rawdata/sub-019/fmap/sub-019_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-06_phasediff_half.nii.gz fmap/sub-019_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-019_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-019_run-06.nii.gz -nan fmap/fmap_rads_sub-019_run-06.nii.gz
 flirt -in fmap/sub-019_run-06_magnitude_brain.nii.gz -ref func/rasub-019_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-019_run-06.nii.gz -ref func/rasub-019_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-019_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-019_run-06.nii.gz -ref func/rasub-019_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-019_run-06.nii.gz
 fugue -i func/rasub-019_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-019_run-06.nii.gz --unwarpdir=y- -u func/urasub-019_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -1458,7 +1429,7 @@ fslmaths ../../../rawdata/sub-019/fmap/sub-019_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-07_phasediff_half.nii.gz fmap/sub-019_run-07_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-019_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-019_run-07.nii.gz -nan fmap/fmap_rads_sub-019_run-07.nii.gz
 flirt -in fmap/sub-019_run-07_magnitude_brain_matched.nii.gz -ref func/rasub-019_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-019_run-07.nii.gz -ref func/rasub-019_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-019_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-019_run-07.nii.gz -ref func/rasub-019_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-019_run-07.nii.gz
 fugue -i func/rasub-019_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-019_run-07.nii.gz --unwarpdir=y- -u func/urasub-019_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -1468,7 +1439,7 @@ fslmaths ../../../rawdata/sub-019/fmap/sub-019_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-019_run-08_phasediff_half.nii.gz fmap/sub-019_run-08_magnitude_brain_matched.nii.gz fmap/fmap_rads_sub-019_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-019_run-08.nii.gz -nan fmap/fmap_rads_sub-019_run-08.nii.gz
 flirt -in fmap/sub-019_run-08_magnitude_brain_matched.nii.gz -ref func/rasub-019_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-019_run-08.nii.gz -ref func/rasub-019_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-019_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-019_run-08.nii.gz -ref func/rasub-019_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-019_run-08.nii.gz
 fugue -i func/rasub-019_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-019_run-08.nii.gz --unwarpdir=y- -u func/urasub-019_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -1486,7 +1457,7 @@ fslmaths ../../../rawdata/sub-020/fmap/sub-020_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-020_run-01_phasediff_half.nii.gz fmap/sub-020_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-020_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-020_run-01.nii.gz -nan fmap/fmap_rads_sub-020_run-01.nii.gz
 flirt -in fmap/sub-020_run-01_magnitude_brain.nii.gz -ref func/rasub-020_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-020_run-01.nii.gz -ref func/rasub-020_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-020_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-020_run-01.nii.gz -ref func/rasub-020_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-020_run-01.nii.gz
 fugue -i func/rasub-020_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-020_run-01.nii.gz --unwarpdir=y- -u func/urasub-020_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -1495,7 +1466,7 @@ fslmaths ../../../rawdata/sub-020/fmap/sub-020_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-020_run-02_phasediff_half.nii.gz fmap/sub-020_run-02_magnitude_brain.nii.gz fmap/fmap_rads_sub-020_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-020_run-02.nii.gz -nan fmap/fmap_rads_sub-020_run-02.nii.gz
 flirt -in fmap/sub-020_run-02_magnitude_brain.nii.gz -ref func/rasub-020_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-020_run-02.nii.gz -ref func/rasub-020_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-020_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-020_run-02.nii.gz -ref func/rasub-020_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-020_run-02.nii.gz
 fugue -i func/rasub-020_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-020_run-02.nii.gz --unwarpdir=y- -u func/urasub-020_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -1504,7 +1475,7 @@ fslmaths ../../../rawdata/sub-020/fmap/sub-020_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-020_run-03_phasediff_half.nii.gz fmap/sub-020_run-03_magnitude_brain.nii.gz fmap/fmap_rads_sub-020_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-020_run-03.nii.gz -nan fmap/fmap_rads_sub-020_run-03.nii.gz
 flirt -in fmap/sub-020_run-03_magnitude_brain.nii.gz -ref func/rasub-020_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-020_run-03.nii.gz -ref func/rasub-020_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-020_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-020_run-03.nii.gz -ref func/rasub-020_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-020_run-03.nii.gz
 fugue -i func/rasub-020_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-020_run-03.nii.gz --unwarpdir=y- -u func/urasub-020_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -1513,7 +1484,7 @@ fslmaths ../../../rawdata/sub-020/fmap/sub-020_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-020_run-04_phasediff_half.nii.gz fmap/sub-020_run-04_magnitude_brain.nii.gz fmap/fmap_rads_sub-020_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-020_run-04.nii.gz -nan fmap/fmap_rads_sub-020_run-04.nii.gz
 flirt -in fmap/sub-020_run-04_magnitude_brain.nii.gz -ref func/rasub-020_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-020_run-04.nii.gz -ref func/rasub-020_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-020_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-020_run-04.nii.gz -ref func/rasub-020_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-020_run-04.nii.gz
 fugue -i func/rasub-020_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-020_run-04.nii.gz --unwarpdir=y- -u func/urasub-020_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -1522,7 +1493,7 @@ fslmaths ../../../rawdata/sub-020/fmap/sub-020_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-020_run-05_phasediff_half.nii.gz fmap/sub-020_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-020_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-020_run-05.nii.gz -nan fmap/fmap_rads_sub-020_run-05.nii.gz
 flirt -in fmap/sub-020_run-05_magnitude_brain.nii.gz -ref func/rasub-020_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-020_run-05.nii.gz -ref func/rasub-020_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-020_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-020_run-05.nii.gz -ref func/rasub-020_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-020_run-05.nii.gz
 fugue -i func/rasub-020_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-020_run-05.nii.gz --unwarpdir=y- -u func/urasub-020_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -1531,7 +1502,7 @@ fslmaths ../../../rawdata/sub-020/fmap/sub-020_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-020_run-06_phasediff_half.nii.gz fmap/sub-020_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-020_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-020_run-06.nii.gz -nan fmap/fmap_rads_sub-020_run-06.nii.gz
 flirt -in fmap/sub-020_run-06_magnitude_brain.nii.gz -ref func/rasub-020_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-020_run-06.nii.gz -ref func/rasub-020_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-020_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-020_run-06.nii.gz -ref func/rasub-020_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-020_run-06.nii.gz
 fugue -i func/rasub-020_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-020_run-06.nii.gz --unwarpdir=y- -u func/urasub-020_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -1540,7 +1511,7 @@ fslmaths ../../../rawdata/sub-020/fmap/sub-020_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-020_run-07_phasediff_half.nii.gz fmap/sub-020_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-020_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-020_run-07.nii.gz -nan fmap/fmap_rads_sub-020_run-07.nii.gz
 flirt -in fmap/sub-020_run-07_magnitude_brain.nii.gz -ref func/rasub-020_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-020_run-07.nii.gz -ref func/rasub-020_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-020_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-020_run-07.nii.gz -ref func/rasub-020_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-020_run-07.nii.gz
 fugue -i func/rasub-020_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-020_run-07.nii.gz --unwarpdir=y- -u func/urasub-020_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -1549,7 +1520,7 @@ fslmaths ../../../rawdata/sub-020/fmap/sub-020_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-020_run-08_phasediff_half.nii.gz fmap/sub-020_run-08_magnitude_brain.nii.gz fmap/fmap_rads_sub-020_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-020_run-08.nii.gz -nan fmap/fmap_rads_sub-020_run-08.nii.gz
 flirt -in fmap/sub-020_run-08_magnitude_brain.nii.gz -ref func/rasub-020_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-020_run-08.nii.gz -ref func/rasub-020_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-020_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-020_run-08.nii.gz -ref func/rasub-020_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-020_run-08.nii.gz
 fugue -i func/rasub-020_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-020_run-08.nii.gz --unwarpdir=y- -u func/urasub-020_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -1567,7 +1538,7 @@ fslmaths ../../../rawdata/sub-021/fmap/sub-021_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-021_run-01_phasediff_half.nii.gz fmap/sub-021_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-021_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-021_run-01.nii.gz -nan fmap/fmap_rads_sub-021_run-01.nii.gz
 flirt -in fmap/sub-021_run-01_magnitude_brain.nii.gz -ref func/rasub-021_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-021_run-01.nii.gz -ref func/rasub-021_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-021_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-021_run-01.nii.gz -ref func/rasub-021_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-021_run-01.nii.gz
 fugue -i func/rasub-021_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-021_run-01.nii.gz --unwarpdir=y- -u func/urasub-021_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -1576,7 +1547,7 @@ fslmaths ../../../rawdata/sub-021/fmap/sub-021_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-021_run-02_phasediff_half.nii.gz fmap/sub-021_run-02_magnitude_brain.nii.gz fmap/fmap_rads_sub-021_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-021_run-02.nii.gz -nan fmap/fmap_rads_sub-021_run-02.nii.gz
 flirt -in fmap/sub-021_run-02_magnitude_brain.nii.gz -ref func/rasub-021_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-021_run-02.nii.gz -ref func/rasub-021_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-021_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-021_run-02.nii.gz -ref func/rasub-021_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-021_run-02.nii.gz
 fugue -i func/rasub-021_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-021_run-02.nii.gz --unwarpdir=y- -u func/urasub-021_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -1585,7 +1556,7 @@ fslmaths ../../../rawdata/sub-021/fmap/sub-021_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-021_run-03_phasediff_half.nii.gz fmap/sub-021_run-03_magnitude_brain.nii.gz fmap/fmap_rads_sub-021_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-021_run-03.nii.gz -nan fmap/fmap_rads_sub-021_run-03.nii.gz
 flirt -in fmap/sub-021_run-03_magnitude_brain.nii.gz -ref func/rasub-021_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-021_run-03.nii.gz -ref func/rasub-021_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-021_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-021_run-03.nii.gz -ref func/rasub-021_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-021_run-03.nii.gz
 fugue -i func/rasub-021_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-021_run-03.nii.gz --unwarpdir=y- -u func/urasub-021_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -1594,7 +1565,7 @@ fslmaths ../../../rawdata/sub-021/fmap/sub-021_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-021_run-04_phasediff_half.nii.gz fmap/sub-021_run-04_magnitude_brain.nii.gz fmap/fmap_rads_sub-021_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-021_run-04.nii.gz -nan fmap/fmap_rads_sub-021_run-04.nii.gz
 flirt -in fmap/sub-021_run-04_magnitude_brain.nii.gz -ref func/rasub-021_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-021_run-04.nii.gz -ref func/rasub-021_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-021_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-021_run-04.nii.gz -ref func/rasub-021_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-021_run-04.nii.gz
 fugue -i func/rasub-021_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-021_run-04.nii.gz --unwarpdir=y- -u func/urasub-021_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -1603,7 +1574,7 @@ fslmaths ../../../rawdata/sub-021/fmap/sub-021_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-021_run-05_phasediff_half.nii.gz fmap/sub-021_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-021_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-021_run-05.nii.gz -nan fmap/fmap_rads_sub-021_run-05.nii.gz
 flirt -in fmap/sub-021_run-05_magnitude_brain.nii.gz -ref func/rasub-021_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-021_run-05.nii.gz -ref func/rasub-021_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-021_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-021_run-05.nii.gz -ref func/rasub-021_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-021_run-05.nii.gz
 fugue -i func/rasub-021_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-021_run-05.nii.gz --unwarpdir=y- -u func/urasub-021_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -1612,7 +1583,7 @@ fslmaths ../../../rawdata/sub-021/fmap/sub-021_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-021_run-06_phasediff_half.nii.gz fmap/sub-021_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-021_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-021_run-06.nii.gz -nan fmap/fmap_rads_sub-021_run-06.nii.gz
 flirt -in fmap/sub-021_run-06_magnitude_brain.nii.gz -ref func/rasub-021_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-021_run-06.nii.gz -ref func/rasub-021_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-021_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-021_run-06.nii.gz -ref func/rasub-021_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-021_run-06.nii.gz
 fugue -i func/rasub-021_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-021_run-06.nii.gz --unwarpdir=y- -u func/urasub-021_task-main_run-06_bold.nii.gz -v
 # RUN-07
 bet ../../../rawdata/sub-021/fmap/sub-021_run-07_magnitude.nii fmap/sub-021_run-07_magnitude_brain.nii.gz -f 0.5 -m
@@ -1620,7 +1591,7 @@ fslmaths ../../../rawdata/sub-021/fmap/sub-021_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-021_run-07_phasediff_half.nii.gz fmap/sub-021_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-021_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-021_run-07.nii.gz -nan fmap/fmap_rads_sub-021_run-07.nii.gz
 flirt -in fmap/sub-021_run-07_magnitude_brain.nii.gz -ref func/rasub-021_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-021_run-07.nii.gz -ref func/rasub-021_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-021_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-021_run-07.nii.gz -ref func/rasub-021_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-021_run-07.nii.gz
 fugue -i func/rasub-021_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-021_run-07.nii.gz --unwarpdir=y- -u func/urasub-021_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -1629,7 +1600,7 @@ fslmaths ../../../rawdata/sub-021/fmap/sub-021_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-021_run-08_phasediff_half.nii.gz fmap/sub-021_run-08_magnitude_brain.nii.gz fmap/fmap_rads_sub-021_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-021_run-08.nii.gz -nan fmap/fmap_rads_sub-021_run-08.nii.gz
 flirt -in fmap/sub-021_run-08_magnitude_brain.nii.gz -ref func/rasub-021_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-021_run-08.nii.gz -ref func/rasub-021_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-021_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-021_run-08.nii.gz -ref func/rasub-021_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-021_run-08.nii.gz
 fugue -i func/rasub-021_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-021_run-08.nii.gz --unwarpdir=y- -u func/urasub-021_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -1647,7 +1618,7 @@ fslmaths ../../../rawdata/sub-022/fmap/sub-022_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-022_run-01_phasediff_half.nii.gz fmap/sub-022_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-022_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-022_run-01.nii.gz -nan fmap/fmap_rads_sub-022_run-01.nii.gz
 flirt -in fmap/sub-022_run-01_magnitude_brain.nii.gz -ref func/rasub-022_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-022_run-01.nii.gz -ref func/rasub-022_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-022_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-022_run-01.nii.gz -ref func/rasub-022_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-022_run-01.nii.gz
 fugue -i func/rasub-022_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-022_run-01.nii.gz --unwarpdir=y- -u func/urasub-022_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -1656,7 +1627,7 @@ fslmaths ../../../rawdata/sub-022/fmap/sub-022_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-022_run-02_phasediff_half.nii.gz fmap/sub-022_run-02_magnitude_brain.nii.gz fmap/fmap_rads_sub-022_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-022_run-02.nii.gz -nan fmap/fmap_rads_sub-022_run-02.nii.gz
 flirt -in fmap/sub-022_run-02_magnitude_brain.nii.gz -ref func/rasub-022_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-022_run-02.nii.gz -ref func/rasub-022_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-022_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-022_run-02.nii.gz -ref func/rasub-022_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-022_run-02.nii.gz
 fugue -i func/rasub-022_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-022_run-02.nii.gz --unwarpdir=y- -u func/urasub-022_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -1665,7 +1636,7 @@ fslmaths ../../../rawdata/sub-022/fmap/sub-022_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-022_run-03_phasediff_half.nii.gz fmap/sub-022_run-03_magnitude_brain.nii.gz fmap/fmap_rads_sub-022_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-022_run-03.nii.gz -nan fmap/fmap_rads_sub-022_run-03.nii.gz
 flirt -in fmap/sub-022_run-03_magnitude_brain.nii.gz -ref func/rasub-022_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-022_run-03.nii.gz -ref func/rasub-022_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-022_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-022_run-03.nii.gz -ref func/rasub-022_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-022_run-03.nii.gz
 fugue -i func/rasub-022_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-022_run-03.nii.gz --unwarpdir=y- -u func/urasub-022_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -1674,7 +1645,7 @@ fslmaths ../../../rawdata/sub-022/fmap/sub-022_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-022_run-04_phasediff_half.nii.gz fmap/sub-022_run-04_magnitude_brain.nii.gz fmap/fmap_rads_sub-022_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-022_run-04.nii.gz -nan fmap/fmap_rads_sub-022_run-04.nii.gz
 flirt -in fmap/sub-022_run-04_magnitude_brain.nii.gz -ref func/rasub-022_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-022_run-04.nii.gz -ref func/rasub-022_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-022_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-022_run-04.nii.gz -ref func/rasub-022_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-022_run-04.nii.gz
 fugue -i func/rasub-022_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-022_run-04.nii.gz --unwarpdir=y- -u func/urasub-022_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -1683,7 +1654,7 @@ fslmaths ../../../rawdata/sub-022/fmap/sub-022_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-022_run-05_phasediff_half.nii.gz fmap/sub-022_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-022_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-022_run-05.nii.gz -nan fmap/fmap_rads_sub-022_run-05.nii.gz
 flirt -in fmap/sub-022_run-05_magnitude_brain.nii.gz -ref func/rasub-022_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-022_run-05.nii.gz -ref func/rasub-022_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-022_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-022_run-05.nii.gz -ref func/rasub-022_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-022_run-05.nii.gz
 fugue -i func/rasub-022_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-022_run-05.nii.gz --unwarpdir=y- -u func/urasub-022_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -1692,7 +1663,7 @@ fslmaths ../../../rawdata/sub-022/fmap/sub-022_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-022_run-06_phasediff_half.nii.gz fmap/sub-022_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-022_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-022_run-06.nii.gz -nan fmap/fmap_rads_sub-022_run-06.nii.gz
 flirt -in fmap/sub-022_run-06_magnitude_brain.nii.gz -ref func/rasub-022_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-022_run-06.nii.gz -ref func/rasub-022_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-022_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-022_run-06.nii.gz -ref func/rasub-022_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-022_run-06.nii.gz
 fugue -i func/rasub-022_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-022_run-06.nii.gz --unwarpdir=y- -u func/urasub-022_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -1701,7 +1672,7 @@ fslmaths ../../../rawdata/sub-022/fmap/sub-022_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-022_run-07_phasediff_half.nii.gz fmap/sub-022_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-022_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-022_run-07.nii.gz -nan fmap/fmap_rads_sub-022_run-07.nii.gz
 flirt -in fmap/sub-022_run-07_magnitude_brain.nii.gz -ref func/rasub-022_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-022_run-07.nii.gz -ref func/rasub-022_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-022_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-022_run-07.nii.gz -ref func/rasub-022_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-022_run-07.nii.gz
 fugue -i func/rasub-022_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-022_run-07.nii.gz --unwarpdir=y- -u func/urasub-022_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -1710,7 +1681,7 @@ fslmaths ../../../rawdata/sub-022/fmap/sub-022_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-022_run-08_phasediff_half.nii.gz fmap/sub-022_run-08_magnitude_brain.nii.gz fmap/fmap_rads_sub-022_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-022_run-08.nii.gz -nan fmap/fmap_rads_sub-022_run-08.nii.gz
 flirt -in fmap/sub-022_run-08_magnitude_brain.nii.gz -ref func/rasub-022_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-022_run-08.nii.gz -ref func/rasub-022_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-022_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-022_run-08.nii.gz -ref func/rasub-022_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-022_run-08.nii.gz
 fugue -i func/rasub-022_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-022_run-08.nii.gz --unwarpdir=y- -u func/urasub-022_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
@@ -1728,7 +1699,7 @@ fslmaths ../../../rawdata/sub-023/fmap/sub-023_run-01_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-023_run-01_phasediff_half.nii.gz fmap/sub-023_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-023_run-01.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-023_run-01.nii.gz -nan fmap/fmap_rads_sub-023_run-01.nii.gz
 flirt -in fmap/sub-023_run-01_magnitude_brain.nii.gz -ref func/rasub-023_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-flirt -in fmap/fmap_rads_sub-023_run-01.nii.gz -ref func/rasub-023_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -interp spline -out fmap/rfmap_rads_sub-023_run-01.nii.gz
+flirt -in fmap/fmap_rads_sub-023_run-01.nii.gz -ref func/rasub-023_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-023_run-01.nii.gz
 fugue -i func/rasub-023_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-023_run-01.nii.gz --unwarpdir=y- -u func/urasub-023_task-main_run-01_bold.nii.gz -v
 
 # RUN-02
@@ -1737,7 +1708,7 @@ fslmaths ../../../rawdata/sub-023/fmap/sub-023_run-02_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-023_run-02_phasediff_half.nii.gz fmap/sub-023_run-02_magnitude_brain.nii.gz fmap/fmap_rads_sub-023_run-02.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-023_run-02.nii.gz -nan fmap/fmap_rads_sub-023_run-02.nii.gz
 flirt -in fmap/sub-023_run-02_magnitude_brain.nii.gz -ref func/rasub-023_task-main_run-02_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-02.mat
-flirt -in fmap/fmap_rads_sub-023_run-02.nii.gz -ref func/rasub-023_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -interp spline -out fmap/rfmap_rads_sub-023_run-02.nii.gz
+flirt -in fmap/fmap_rads_sub-023_run-02.nii.gz -ref func/rasub-023_task-main_run-02_bold.nii -applyxfm -init fmap/fieldmap2epi_run-02.mat -out fmap/rfmap_rads_sub-023_run-02.nii.gz
 fugue -i func/rasub-023_task-main_run-02_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-023_run-02.nii.gz --unwarpdir=y- -u func/urasub-023_task-main_run-02_bold.nii.gz -v
 
 # RUN-03
@@ -1746,7 +1717,7 @@ fslmaths ../../../rawdata/sub-023/fmap/sub-023_run-03_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-023_run-03_phasediff_half.nii.gz fmap/sub-023_run-03_magnitude_brain.nii.gz fmap/fmap_rads_sub-023_run-03.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-023_run-03.nii.gz -nan fmap/fmap_rads_sub-023_run-03.nii.gz
 flirt -in fmap/sub-023_run-03_magnitude_brain.nii.gz -ref func/rasub-023_task-main_run-03_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-03.mat
-flirt -in fmap/fmap_rads_sub-023_run-03.nii.gz -ref func/rasub-023_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -interp spline -out fmap/rfmap_rads_sub-023_run-03.nii.gz
+flirt -in fmap/fmap_rads_sub-023_run-03.nii.gz -ref func/rasub-023_task-main_run-03_bold.nii -applyxfm -init fmap/fieldmap2epi_run-03.mat -out fmap/rfmap_rads_sub-023_run-03.nii.gz
 fugue -i func/rasub-023_task-main_run-03_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-023_run-03.nii.gz --unwarpdir=y- -u func/urasub-023_task-main_run-03_bold.nii.gz -v
 
 # RUN-04
@@ -1755,7 +1726,7 @@ fslmaths ../../../rawdata/sub-023/fmap/sub-023_run-04_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-023_run-04_phasediff_half.nii.gz fmap/sub-023_run-04_magnitude_brain.nii.gz fmap/fmap_rads_sub-023_run-04.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-023_run-04.nii.gz -nan fmap/fmap_rads_sub-023_run-04.nii.gz
 flirt -in fmap/sub-023_run-04_magnitude_brain.nii.gz -ref func/rasub-023_task-main_run-04_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-04.mat
-flirt -in fmap/fmap_rads_sub-023_run-04.nii.gz -ref func/rasub-023_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -interp spline -out fmap/rfmap_rads_sub-023_run-04.nii.gz
+flirt -in fmap/fmap_rads_sub-023_run-04.nii.gz -ref func/rasub-023_task-main_run-04_bold.nii -applyxfm -init fmap/fieldmap2epi_run-04.mat -out fmap/rfmap_rads_sub-023_run-04.nii.gz
 fugue -i func/rasub-023_task-main_run-04_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-023_run-04.nii.gz --unwarpdir=y- -u func/urasub-023_task-main_run-04_bold.nii.gz -v
 
 # RUN-05
@@ -1764,7 +1735,7 @@ fslmaths ../../../rawdata/sub-023/fmap/sub-023_run-05_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-023_run-05_phasediff_half.nii.gz fmap/sub-023_run-05_magnitude_brain.nii.gz fmap/fmap_rads_sub-023_run-05.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-023_run-05.nii.gz -nan fmap/fmap_rads_sub-023_run-05.nii.gz
 flirt -in fmap/sub-023_run-05_magnitude_brain.nii.gz -ref func/rasub-023_task-main_run-05_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-05.mat
-flirt -in fmap/fmap_rads_sub-023_run-05.nii.gz -ref func/rasub-023_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -interp spline -out fmap/rfmap_rads_sub-023_run-05.nii.gz
+flirt -in fmap/fmap_rads_sub-023_run-05.nii.gz -ref func/rasub-023_task-main_run-05_bold.nii -applyxfm -init fmap/fieldmap2epi_run-05.mat -out fmap/rfmap_rads_sub-023_run-05.nii.gz
 fugue -i func/rasub-023_task-main_run-05_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-023_run-05.nii.gz --unwarpdir=y- -u func/urasub-023_task-main_run-05_bold.nii.gz -v
 
 # RUN-06
@@ -1773,7 +1744,7 @@ fslmaths ../../../rawdata/sub-023/fmap/sub-023_run-06_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-023_run-06_phasediff_half.nii.gz fmap/sub-023_run-06_magnitude_brain.nii.gz fmap/fmap_rads_sub-023_run-06.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-023_run-06.nii.gz -nan fmap/fmap_rads_sub-023_run-06.nii.gz
 flirt -in fmap/sub-023_run-06_magnitude_brain.nii.gz -ref func/rasub-023_task-main_run-06_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-06.mat
-flirt -in fmap/fmap_rads_sub-023_run-06.nii.gz -ref func/rasub-023_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -interp spline -out fmap/rfmap_rads_sub-023_run-06.nii.gz
+flirt -in fmap/fmap_rads_sub-023_run-06.nii.gz -ref func/rasub-023_task-main_run-06_bold.nii -applyxfm -init fmap/fieldmap2epi_run-06.mat -out fmap/rfmap_rads_sub-023_run-06.nii.gz
 fugue -i func/rasub-023_task-main_run-06_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-023_run-06.nii.gz --unwarpdir=y- -u func/urasub-023_task-main_run-06_bold.nii.gz -v
 
 # RUN-07
@@ -1782,7 +1753,7 @@ fslmaths ../../../rawdata/sub-023/fmap/sub-023_run-07_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-023_run-07_phasediff_half.nii.gz fmap/sub-023_run-07_magnitude_brain.nii.gz fmap/fmap_rads_sub-023_run-07.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-023_run-07.nii.gz -nan fmap/fmap_rads_sub-023_run-07.nii.gz
 flirt -in fmap/sub-023_run-07_magnitude_brain.nii.gz -ref func/rasub-023_task-main_run-07_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-07.mat
-flirt -in fmap/fmap_rads_sub-023_run-07.nii.gz -ref func/rasub-023_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -interp spline -out fmap/rfmap_rads_sub-023_run-07.nii.gz
+flirt -in fmap/fmap_rads_sub-023_run-07.nii.gz -ref func/rasub-023_task-main_run-07_bold.nii -applyxfm -init fmap/fieldmap2epi_run-07.mat -out fmap/rfmap_rads_sub-023_run-07.nii.gz
 fugue -i func/rasub-023_task-main_run-07_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-023_run-07.nii.gz --unwarpdir=y- -u func/urasub-023_task-main_run-07_bold.nii.gz -v
 
 # RUN-08
@@ -1791,7 +1762,7 @@ fslmaths ../../../rawdata/sub-023/fmap/sub-023_run-08_phasediff.nii -div 2 fmap/
 fsl_prepare_fieldmap SIEMENS fmap/sub-023_run-08_phasediff_half.nii.gz fmap/sub-023_run-08_magnitude_brain.nii.gz fmap/fmap_rads_sub-023_run-08.nii.gz 2.46 --nocheck
 fslmaths fmap/fmap_rads_sub-023_run-08.nii.gz -nan fmap/fmap_rads_sub-023_run-08.nii.gz
 flirt -in fmap/sub-023_run-08_magnitude_brain.nii.gz -ref func/rasub-023_task-main_run-08_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-08.mat
-flirt -in fmap/fmap_rads_sub-023_run-08.nii.gz -ref func/rasub-023_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -interp spline -out fmap/rfmap_rads_sub-023_run-08.nii.gz
+flirt -in fmap/fmap_rads_sub-023_run-08.nii.gz -ref func/rasub-023_task-main_run-08_bold.nii -applyxfm -init fmap/fieldmap2epi_run-08.mat -out fmap/rfmap_rads_sub-023_run-08.nii.gz
 fugue -i func/rasub-023_task-main_run-08_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-023_run-08.nii.gz --unwarpdir=y- -u func/urasub-023_task-main_run-08_bold.nii.gz -v
 
 # Face Localizer
