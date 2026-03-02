@@ -5,7 +5,7 @@
 
 **Date created:** January 2026
 
-**Last updated:** February 2026
+**Last updated:** March 2026
 
 **Identifer:** DOI (xxxxx)
 
@@ -15,7 +15,7 @@
 
 **Description:** This repository contains the complete pipeline for fMRI data preprocessing and analysis on SPM for the (xxxx) study.
 
-This repository consists of a SPM project ran on MatLab, with (xxx) scripts and (xxx) folders containing the data either needed to run these scripts or created by these scripts. All outputs follow the BIDS naming convention. For a detailed description of all folders and files, please see below. To run this repository, first download MatLab and SPM (versions provided below). The scripts are named in the order that they should be run. For any further information about this repository, please contact: Dulce Travassos, email: uc2021216844 [at] student [dot] uc [dot] pt.
+This repository consists of a SPM project ran on MatLab, with (xxx) scripts needed to replicate the results from the (xxx) study. All outputs follow the BIDS naming convention. For a detailed description of all folders and files, please see below. To run this repository, first download MatLab and SPM (versions provided below). The scripts are named in the order that they should be run. The data either needed to run these scripts or created by these scripts is available at (xxx). For any further information about this repository, please contact: Dulce Travassos, email: uc2021216844 [at] student [dot] uc [dot] pt.
 
 ## Information about folders and files within:
 (explain what all folders and files contain, following the format:
