@@ -71,3 +71,8 @@ NOTE: Being a .m file containing bash code, you are supposed to copy-paste the c
 Bridges the FSL outputs back to the SPM environment. It automatically unzips the FSL-generated *.nii.gz files (rfmap_rads* and ura*) into standard .nii files.
 Additionally, it generates BIDS-compliant JSON sidecars for both the fieldmaps and the new unwarped functional images. For the functional data, it reads the original 'ra*.json' metadata and appends the appropriate Distortion Correction tags and information.
 
+
+
+--------------------------------------------- s06_coregistration --------------------------------------------- 
+Matches the anatomical image to the mean functional image. This script is "Estimate Only" and, therefore, does not create a new 'r*' anatomical file, but updates the header of the existing T1w image. This avoids an extra interpolation and preserves the high resolution of the anatomical image for subsequent steps. This script also updates the JSON sidecar for the T1w file.
+
