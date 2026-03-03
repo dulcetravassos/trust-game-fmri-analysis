@@ -9,7 +9,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 02/03/2026                                                  %
-%   Last update: 02/03/2026                                              %
+%   Last update: 03/03/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -66,11 +66,12 @@ for s = 1:length(subjects)
         fprintf('[WARNING] No anatomical file found for %s. Skipping.\n',subj);
         continue;
     end
-    anat_file_path = fullfile(anat_dir,anat_struct(1).name);
+    anat_file = fullfile(anat_dir,anat_struct(1).name);
 
     % ####################### SPM Batch #######################
     clear matlabbatch;
-    matlabbatch{1}.spm.spatial.normalise.write.subj = struct('def', {def_file}, 'resample', {anat_file_path});
+    matlabbatch{1}.spm.spatial.normalise.write.subj.def = {def_file};
+    matlabbatch{1}.spm.spatial.normalise.write.subj.resample = {anat_file};
     matlabbatch{1}.spm.spatial.normalise.write.woptions.bb = [-78 -112 -70
                                                               78 76 85];
     matlabbatch{1}.spm.spatial.normalise.write.woptions.vox = mni_voxel_size;
