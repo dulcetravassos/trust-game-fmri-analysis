@@ -13,6 +13,8 @@
 #									         #
 ##################################################################################
 
+Note*: Scripts not specifying time of running took only a couple of minutes. Time is only specified for scripts that took longer to run.
+
 --------------------------------------------- s00_dicom_to_nifti --------------------------------------------- 
 
 Converts raw DICOM MRI data (anatomical, functional, fieldmaps) into NIfTI files suitable for preprocessing and analysis in SPM12. Saves a JSON file with metadata. Output filenames follow BIDS conventions, when applicable.
@@ -72,7 +74,29 @@ Bridges the FSL outputs back to the SPM environment. It automatically unzips the
 Additionally, it generates BIDS-compliant JSON sidecars for both the fieldmaps and the new unwarped functional images. For the functional data, it reads the original 'ra*.json' metadata and appends the appropriate Distortion Correction tags and information.
 
 
-
 --------------------------------------------- s06_coregistration --------------------------------------------- 
+
 Matches the anatomical image to the mean functional image. This script is "Estimate Only" and, therefore, does not create a new 'r*' anatomical file, but updates the header of the existing T1w image. This avoids an extra interpolation and preserves the high resolution of the anatomical image for subsequent steps. This script also updates the JSON sidecar for the T1w file.
 
+
+------------------------------------------------ s07_segmentation ------------------------------------------------ 
+
+Partitions the coregistered anatomical image into different tissues (Grey Matter, White Matter, CSF, etc.). Generates the spatial deformation parameters (Forward Deformation Field, 'y_*') needed to normalize both the anatomical and functional images to MNI space later, and a bias-corrected structural image ('m*).
+
+
+--------------------------------------------- s08_01_normalization_func --------------------------------------------- 
+
+Normalizes the functional images to MNI space, by applying the Forward Deformation Field (y_*) generated during the Segmentation.
+Time: ~17 minutes per subject (Main Task + Face Localizer).
+
+
+--------------------------------------------- s08_02_normalization_anat ---------------------------------------------
+
+Similar to the previous script, but applies the deformation field to the bias-corrected anatomical image (m*), resulting in the normalized structural image (wm*).
+
+
+------------------------------------------------- s09_smoothing -------------------------------------------------
+
+Applies a spatial Gaussian filter to the normalized functional images (wura*), increasing the Signal-to-Noise Ratio and 
+accommodating anatomical variations between subjects for group stats.
+Time: ~30 minutes per subject (Main Task + Face Localizer).
