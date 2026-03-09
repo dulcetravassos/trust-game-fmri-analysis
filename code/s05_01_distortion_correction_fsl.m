@@ -11,13 +11,19 @@
 %   fieldmaps ('rfmap_rads_*.nii.gz'). Finally, FSL FUGUE applies these  %
 %   resliced fieldmaps to the previously realigned BOLD images. The      %
 %   output is a new set of functional images prefixed with 'u'           %
-%   (unwarped) corrected for B0 magnetic field inhomogeneities.          %                                               %
+%   (unwarped) corrected for B0 magnetic field inhomogeneities.          %
 %   This script handles multiple magnitudes (magnitude1, magnitude2)     %
 %   with matrix size mismatches and "fake" magnitudes derived from T1w   %
 %   (see scrip s04). Fieldmap smoothing prior to unwarping was           %
 %   intentionally omitted to prevent signal degradation, with any        %
 %   residual ghost voxels left to be addressed by smoothing and          %
 %   implicit masking during 1st-level GLM estimation.                    %
+%   Note: a 6 degree of freedom rigid-body transformation was enforced   %
+%   in FLIRT, restricting the registration to translations and rotations %
+%   only. This prevents the introduction of non-rigid (affine)           %
+%   transformations that could artificially distort the geometry of the  %
+%   fieldmap in order to better match the EPI data. This preserves the   %
+%   physical integrity of the B0 fieldmap.                               %
 %                                                                        %
 %   To install FSL, follow the guide:                                    %
 %   https://fsl.fmrib.ox.ac.uk/fsl/docs/install/windows.html             %
