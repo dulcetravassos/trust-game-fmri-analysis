@@ -10,7 +10,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 22/02/2026                                                  %
-%   Last update: 27/02/2026                                              %
+%   Last update: 09/03/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -24,6 +24,7 @@
 % https://fsl.fmrib.ox.ac.uk/fsl/docs/structural/bet.html
 % https://web.mit.edu/fsl_v5.0.10/fsl/doc/wiki/BET(2f)UserGuide.html
 % https://web.mit.edu/fsl_v5.0.10/fsl/doc/wiki/FLIRT(2f)UserGuide.html
+% https://fsl.fmrib.ox.ac.uk/fsl/docs/registration/flirt/faq.html
 % Some commands are not described in the links above and were found by 
 % typing the toolbox name in the Ubuntu terminal.
 
@@ -80,6 +81,16 @@
 % uses a previously calculated fieldmap
 %
 % Note the option -s 0.5 is an example of how to specify the regularisation to apply to the fieldmap (2D Gaussian smoothing of sigma=0.5 in this case which is a reasonable default).
+
+% flirt -in inimage -out outimage -ref refimage -applyxfm -init savedtransform.mat
+% The transformation is automatically saved in a file with an extension of .mat and this transformation can be applied to the input image (for resampling) with the 
+% GUI ApplyXFM which allows the output image voxel size and FOV to be specified either directly or by using a reference image with the appropriate size. 
+% At the command line, the transformation can be saved using the -omat option. This file can then be used for resampling by specifying it with the -init and -applyxfm options. 
+% In this form the reference image is used to specify the voxel size and FOV only - all intensities within it are ignored. 
+
+% flirt -in im3 -ref imref -dof 12 -out imout3 -omat im3_to_imref.mat
+% Register each image in the set to the reference image, using flirt, and saving the output images
+% -dof: degrees of freedom
 
 %% Regular subjects (with real magnitude)
 
