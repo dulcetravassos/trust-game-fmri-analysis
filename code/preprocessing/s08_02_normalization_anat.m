@@ -71,7 +71,7 @@ for s = 1:length(subjects)
         continue;
     end
     anat_file = fullfile(anat_dir,anat_struct(1).name);
-    %resample_files{end+1,1} = anat_file;
+    resample_files{end+1,1} = anat_file;
 
     % Get Tissue Probability Maps (c1, c2, c3)
     prefixes = {'c1','c2','c3'};
