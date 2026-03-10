@@ -3,13 +3,14 @@
 %   Normalization - Anatomical images (BIDS ready)                       %
 %                                                                        %
 %   Applies the Forward Deformation Field (y_*) generated during the     %
-%   anatomical segmentation step to the bias-corrected anatomical image  %
-%   (m*), warping it into standard MNI space. Outputs are saved with a   %
-%   'w' prefix (wm*) and JSON sidecars are created accordingly.          %
+%   anatomical segmentation step to both the bias-corrected anatomical   %
+%   image (m*) and the Tissue Probability Maps (c1, c2, c3), warping it  %
+%   into standard MNI space. Outputs are saved with a 'w' prefix (wm*,   %
+%   wc1*, wc2*, wc3*) and JSON sidecars are created accordingly.         %
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 02/03/2026                                                  %
-%   Last update: 03/03/2026                                              %
+%   Last update: 09/03/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -59,6 +60,9 @@ for s = 1:length(subjects)
     end
     def_file = fullfile(anat_dir,def_struct(1).name);
        
+    % List of files to resample (m*, c1, c2, c3)
+    resample_files = {};
+
     % Get bias-corrected anatomical file (m*)
     anat_pattern = sprintf('m*%s_desc-defaced_T1w.nii',subj);
     anat_struct = dir(fullfile(anat_dir,anat_pattern));
@@ -67,11 +71,30 @@ for s = 1:length(subjects)
         continue;
     end
     anat_file = fullfile(anat_dir,anat_struct(1).name);
+    %resample_files{end+1,1} = anat_file;
+
+    % Get Tissue Probability Maps (c1, c2, c3)
+    prefixes = {'c1','c2','c3'};
+    for p = 1:length(prefixes)
+        c_pattern = sprintf('%s%s_desc-defaced_T1w.nii',prefixes{p},subj);
+        c_struct = dir(fullfile(anat_dir,c_pattern));
+        if ~isempty(c_struct)
+            resample_files{end+1,1} = fullfile(anat_dir,c_struct(1).name);
+        else
+            fprintf('[WARNING] Tissue map %s not found for %s.\n',prefixes{p},subj);
+        end
+    end
+
+    if isempty(resample_files)
+        fprintf('[ERROR] No images to resample for %s. Skipping...\n',subj);
+        continue;
+    end
+
 
     % ####################### SPM Batch #######################
     clear matlabbatch;
     matlabbatch{1}.spm.spatial.normalise.write.subj.def = {def_file};
-    matlabbatch{1}.spm.spatial.normalise.write.subj.resample = {anat_file};
+    matlabbatch{1}.spm.spatial.normalise.write.subj.resample = resample_files;
     matlabbatch{1}.spm.spatial.normalise.write.woptions.bb = [-78 -112 -70
                                                               78 76 85];
     matlabbatch{1}.spm.spatial.normalise.write.woptions.vox = mni_voxel_size;
@@ -83,12 +106,14 @@ for s = 1:length(subjects)
         fprintf('>>> Normalization completed for %s\n', subj);
         
         % Create JSONs for the new files
-        orig_anat_name = anat_struct(1).name;
-        new_anat_name = ['w' orig_anat_name];
-        source_json = fullfile(anat_dir,replace(orig_anat_name,'.nii','.json'));
-        target_json = fullfile(anat_dir,replace(new_anat_name,'.nii','.json'));
-        create_norm_json(source_json,target_json);
-
+        for i = 1:length(resample_files)
+            [~,fname,ext] = fileparts(resample_files{i});
+            orig_name = [fname ext];
+            new_name = ['w' orig_name];
+            source_json = fullfile(anat_dir,replace(orig_name,'.nii','.json'));
+            target_json = fullfile(anat_dir,replace(new_name,'.nii','.json'));
+            create_norm_json(source_json,target_json);
+        end
     catch ME
         fprintf('[CRITICAL ERROR] SPM failed for %s: %s\n',subj,ME.message);
         continue;
