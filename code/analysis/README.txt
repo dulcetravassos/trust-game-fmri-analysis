@@ -1,0 +1,25 @@
+##################################################################################
+#									         #
+#  The code was developed and tested on a PC with the following specifications:  #
+#									         #
+#  Software: MATLAB R2024b (Update 4 - 24.2.0.2833386)			         #
+#  	     SPM12 (7771)							 #
+#  OS: Microsoft Windows 10 (64-bit)					         #
+#  CPU: Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz			         #
+#  RAM: 16GB								         #
+#  GPU: NVIDIA GeForce RTX 2060 with Max-Q Design			         #
+#									         #
+##################################################################################
+
+Note*: Scripts not specifying time of running took only a couple of minutes. Time is only specified for scripts that took longer to run.
+
+--------------------------------------------- s01_get_design_matrix --------------------------------------------- 
+
+Creates a subject-specific explicit brain mask using tissue probability maps (GM + WM + CSF) to exclude ghost voxels and out-of-brain artifacts. Additionally, it generates the Design Matrix for each task and session, incorporating the 6 motion regressors. It relies on BIDS-compliant event files converted from .prt to .mat (see s00_convert_prt_to_spm).
+
+
+--------------------------------------------- s02_estimate ---------------------------------------------
+
+bbbb
+Time: ~aa minutes per subject (Main Task + Face Localizer).
+
