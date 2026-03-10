@@ -92,7 +92,7 @@ Time: ~17 minutes per subject (Main Task + Face Localizer).
 
 --------------------------------------------- s08_02_normalization_anat ---------------------------------------------
 
-Similar to the previous script, but applies the deformation field to the bias-corrected anatomical image (m*), resulting in the normalized structural image (wm*).
+Similar to the previous script, but applies the deformation field to the bias-corrected anatomical image (m*) and to the Tissue Probability Maps (c1, c2, and c3), resulting in the normalized structural images (wm*, wc1*, wc2*, wc3*).
 
 
 ------------------------------------------------- s09_smoothing -------------------------------------------------
