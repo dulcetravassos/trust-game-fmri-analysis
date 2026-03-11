@@ -15,7 +15,7 @@ Note*: Scripts not specifying time of running took only a couple of minutes. Tim
 
 --------------------------------------------- s00_convert_prt_to_spm ---------------------------------------------
 
-The function prt_to_spm(), using the function read_prt(), reads multiple .prt files from a selected folder; confirms the resolution of time (converting msec to sec); skips empty conditions (meaning 0 trials); detects start time of an event and calculates its duration; and saves a .mat file with a BIDS compliant name. 
+The function prt_to_spm(), using the function read_prt(), reads multiple .prt files from a selected folder; confirms the resolution of time (converting msec to sec); skips empty conditions (meaning 0 trials); detects start time of an event and calculates its duration; and saves a .mat file with a BIDS compliant name. Additionally, it features subject filtering (processing only a predefined list of subjects) and supports the distribution of a universal protocol (for the face localizer task).
 
 
 --------------------------------------------- s01_get_design_matrix --------------------------------------------- 
