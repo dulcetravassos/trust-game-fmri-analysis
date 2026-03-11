@@ -20,11 +20,6 @@ Note*: Scripts not specifying time of running took only a couple of minutes. Tim
 Converts raw DICOM MRI data (anatomical, functional, fieldmaps) into NIfTI files suitable for preprocessing and analysis in SPM12. Saves a JSON file with metadata. Output filenames follow BIDS conventions, when applicable.
 
 
---------------------------------------------- s00_convert_prt_to_spm ---------------------------------------------
-
-The function prt_to_spm(), using the function read_prt(), reads multiple .prt files from a selected folder; confirms the resolution of time (converting msec to sec); skips empty conditions (meaning 0 trials); detects start time of an event and calculates its duration; and saves a .mat file with a BIDS compliant name. 
-
-
 --------------------------------------------- s01_slice_timing --------------------------------------------- 
 
 Slice Timing Correction script adapted to deal with subjects with reverse slice order and variable volumes. Saves output in derivatives folder with a JSON file (BIDS friendly). 
