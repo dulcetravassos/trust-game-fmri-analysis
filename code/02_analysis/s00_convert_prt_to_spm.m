@@ -7,10 +7,12 @@
 %   of time (converting msec to sec), skips empty conditions (meaning 0  % 
 %   trials), detects time start of an event and calculates its duration  % 
 %   and, lastly, saves a .mat file with a BIDS compliant name.           %
+%   Additionally, includes subject filtering (processes only the defined %
+%   subjects) and supports the face localizer's universal protocol.      %
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 05/01/2026                                                  %
-%   Last update: 21/01/2026                                              %
+%   Last update: 11/03/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -20,14 +22,13 @@ clear all; clc;
 % Change according to your preferences
 % NOTE - some configurations may have to be changed in the read_prt function (for example, the conversion factor, currently for msec -> sec)
 
-% Input folder - congruent trials
+% Input folder - main task (congruent & incongruent trials)
 folder_prt_congruent = 'C:\Users\User\Desktop\Tese\data\protocols\task-main\version2_exclude4NrMatch\task-trustgame-congruent-trustee-eyegaze';
-
-% Input folder - incongruent trials
 folder_prt_incongruent = 'C:\Users\User\Desktop\Tese\data\protocols\task-main\version2_exclude4NrMatch\task-trustgame-incongruent-trustee-eyegaze';
 
-% Input folder - face localizer
+% Input file - face localizer (universal protocol)
 folder_prt_localizer = 'C:\Users\User\Desktop\Tese\data\protocols\task-localizer';
+localizer_prt_file = dir(fullfile(folder_prt_localizer,'*.prt'));
 
 % Output folder: /derivatives (BIDS)
 folder_out = 'C:\Users\User\Desktop\Tese\data\spm-data\derivatives\spm-events';
@@ -35,6 +36,15 @@ folder_out = 'C:\Users\User\Desktop\Tese\data\spm-data\derivatives\spm-events';
 % What is going to be converted (1 for yes, 0 for no)
 do_congruent = 1;
 do_incongruent = 1;
+do_localizer = 1;
+
+% List of Subjects
+subjects = {
+    'sub-002', 'sub-003', 'sub-004', 'sub-006', 'sub-007', 'sub-008', ...
+    'sub-009', 'sub-011', 'sub-012', 'sub-013', 'sub-014', 'sub-015', ...
+    'sub-016', 'sub-017', 'sub-018', 'sub-019', 'sub-020', 'sub-021', ...
+    'sub-022', 'sub-023'
+};
 
 %% Protocol conversion: .prt -> .mat
 
@@ -43,14 +53,39 @@ if ~exist(folder_out,'dir'); mkdir(folder_out); end
 
 if do_congruent
     disp('Initiating protocol conversion - CONGRUENT task...');
-    prt_to_spm(folder_prt_congruent,folder_out,'congruent');
+    prt_to_spm(folder_prt_congruent,folder_out,subjects,'congruent');
     disp('Congruent conversion concluded.');
 end
 
 if do_incongruent
     disp('Initiating protocol conversion - INCONGRUENT task...');
-    prt_to_spm(folder_prt_incongruent,folder_out,'incongruent');
+    prt_to_spm(folder_prt_incongruent,folder_out,subjects,'incongruent');
     disp('Incongruent conversion concluded.');
+end
+
+if do_localizer
+    disp('Initiating protocol conversion - FACE LOCALIZER task...');
+    if isempty(localizer_prt_file)
+        fprintf('[ERROR] No .prt file found for the Localizer in %s\n',folder_prt_localizer);
+    else
+        loc_path = fullfile(folder_prt_localizer,localizer_prt_file(1).name);
+        [names, onsets, durations] = read_prt(loc_path);
+        if isempty(names)
+            fprintf('[WARNING] Localizer protocol is empty.\n');
+        else
+            for s = 1:length(subjects)
+                subj = subjects{s};
+                subj_folder = fullfile(folder_out,subj,'func');
+                if ~exist(subj_folder,'dir'); mkdir(subj_folder); end;
+
+                % BIDS name generation: sub-XXX_task-localizer_run-01_events.mat
+                output_filename = fullfile(subj_folder,sprintf('%s_task-localizer_run-01_events.mat',subj));
+                save(output_filename,'names','onsets','durations');
+                fprintf("Saved -> %s/%s_events.mat\n",subj,subj);
+            end
+            disp('Localizer conversion concluded.');
+        end
+    end
 end
 
 disp('ALL JOBS FINISHED.');
@@ -58,7 +93,7 @@ disp('ALL JOBS FINISHED.');
 %% Helper Functions
 % Useful to maintain the code atomic (no need to repeat lines of code)
 
-function prt_to_spm(folder_prt,folder_out,task_type)
+function prt_to_spm(folder_prt,folder_out,subjects_list,task_type)
 
 if ~exist(folder_prt,'dir')
     fprintf('[ERROR] Folder not found: %s\n', folder_prt);
@@ -67,54 +102,65 @@ end
 
 files = dir(fullfile(folder_prt,'*.prt')); % select .prt files only
 fprintf("\n=================================================\n");
-fprintf("TASK %s - %d .prt files found.\n", upper(task_type),length(files));
+fprintf("TASK %s\n", upper(task_type));
 fprintf("=================================================\n");
 
 for i = 1:length(files)
     file_name = files(i).name;
     full_path = fullfile(folder_prt, file_name);
+    [~, base_name, ~] = fileparts(file_name); % we only want the name of the file
     
-    fprintf("Processing: %s ... ", file_name);
-    
-    try
-        [names, onsets, durations] = read_prt(full_path);
+    % Name correction: subject names in origin files do not follow BIDS (sub-x)
+    regex_pattern = 'sub-(\d+)'; % regex = Regular Expression; (\d+) detects numbers
+    tokens = regexp(base_name,regex_pattern,'tokens'); % tokens match parts of the regex expression
+
+    if isempty(tokens)
+        % localizer's protocol has no "sub-"
+        process_file = true;
+        bids_sub = '';
+    else
+        num_str = tokens{1}{1}; % Extracts the number string
+        num_val = str2double(num_str);
         
-        % If there are no valid conditions (or file is empty)
-        if isempty(names)
-            fprintf("[WARNING] No valid condition found in this file.\n");
-            continue; % skips to next file
-        end
+        bids_sub = sprintf('sub-%03d',num_val); % we want 3 digits (sub-002, sub-023, for example)
         
-        [~, base_name, ~] = fileparts(file_name); % we only want the name of the file
-        
-        % Name correction: subject names in origin files do not follow BIDS (sub-x)
-        regex_pattern = 'sub-(\d+)'; % regex = Regular Expression; (\d+) detects numbers
-        tokens = regexp(base_name,regex_pattern,'tokens'); % tokens match parts of the regex expression
-        
-        if ~isempty(tokens)
-            num_str = tokens{1}{1}; % Extracts the number string
-            num_val = str2double(num_str);
-            
-            bids_sub = sprintf('sub-%03d',num_val); % we want 3 digits (sub-002, sub-023, for example)
-            
-            % Output Folder: derivatives/spm-events/sub-0xx/func/
-            subj_folder = fullfile(folder_out, bids_sub, 'func');
-            if ~exist(subj_folder, 'dir'); mkdir(subj_folder); end
-            
-            new_base_name = regexprep(base_name, regex_pattern, bids_sub); % replaces sub-tgx for sub-0x in file name
-            output_filename = fullfile(subj_folder, sprintf('%s_events.mat',new_base_name));
-   
-            save(output_filename,'names','onsets','durations');
-            fprintf("Saved -> %s/%s_events.mat\n", bids_sub, new_base_name);
-            
+        if ismember(bids_sub,subjects_list)
+            process_file = true;
         else
-            fprintf("[WARNING] Filename does not match 'sub-tgXX' pattern. Skipping BIDS renaming.\n");
-            output_filename = fullfile(folder_out, sprintf('%s_events.mat',base_name)); % Saves file in the root
-            save(output_filename, 'names', 'onsets', 'durations');
+            process_file = false; % skip subject
         end
-        
-    catch ME
-        fprintf('[ERROR] %s\n', ME.message);
+    end
+
+    if process_file
+        fprintf("Processing: %s ... ", file_name);
+        try
+            [names, onsets, durations] = read_prt(full_path);
+            
+            % If there are no valid conditions (or file is empty)
+            if isempty(names)
+                fprintf("[WARNING] No valid condition found in this file.\n");
+                continue; % skips to next file
+            end  
+            
+            if ~isempty(bids_sub)
+                % Output Folder: derivatives/spm-events/sub-0xx/func/
+                subj_folder = fullfile(folder_out, bids_sub, 'func');
+                if ~exist(subj_folder, 'dir'); mkdir(subj_folder); end
+                
+                new_base_name = regexprep(base_name, regex_pattern, bids_sub); % replaces sub-tgx for sub-0x in file name
+                output_filename = fullfile(subj_folder, sprintf('%s_events.mat',new_base_name));
+                save(output_filename,'names','onsets','durations');
+                fprintf("Saved -> %s/%s_events.mat\n", bids_sub, new_base_name);  
+            else
+                % Non-BIDS output
+                fprintf("[WARNING] Filename does not match 'sub-tgXX' pattern. Skipping BIDS renaming.\n");
+                output_filename = fullfile(folder_out, sprintf('%s_events.mat',base_name)); % Saves file in the root
+                save(output_filename, 'names', 'onsets', 'durations');
+            end
+            
+        catch ME
+            fprintf('[ERROR] %s\n', ME.message);
+        end
     end
 end
 fprintf("=================================================\n All files analysed. Finished.\n");
