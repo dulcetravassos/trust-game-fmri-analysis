@@ -13,7 +13,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 09/03/2026                                                  %
-%   Last update: 09/03/2026                                              %
+%   Last update: 10/03/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -37,6 +37,9 @@ subjects = {
     'sub-016', 'sub-017', 'sub-018', 'sub-019', 'sub-020', 'sub-021', ...
     'sub-022', 'sub-023'
 };
+
+% Tasks
+tasks = {'task-main','task-localizer'};
 
 % Volumes - Localizer Task
 vol_localizer = 190;
@@ -115,10 +118,6 @@ for s = 1:length(subjects)
     end
 
     % ---------------------- Specify 1st-Level (GLM) ----------------------
-
-    % Tasks
-    tasks = {'task-main','task-localizer'};
-
     for t=1:length(tasks)
         current_task = tasks{t};
 
@@ -179,11 +178,11 @@ for s = 1:length(subjects)
 
             % ####################### SPM Batch - Part 2 (Run-specific parameters) #######################     
             matlabbatch{1}.spm.stats.fmri_spec.sess(valid_runs).scans = bold_frames;
-            matlabbatch{1}.spm.stats.fmri_spec.sess.cond = struct('name', {}, 'onset', {}, 'duration', {}, 'tmod', {}, 'pmod', {}, 'orth', {});
-            matlabbatch{1}.spm.stats.fmri_spec.sess.multi = {multi_cond_path}; % .mat file
-            matlabbatch{1}.spm.stats.fmri_spec.sess.regress = struct('name', {}, 'val', {});
-            matlabbatch{1}.spm.stats.fmri_spec.sess.multi_reg = {motion_path}; % movement parameters (rp*)
-            matlabbatch{1}.spm.stats.fmri_spec.sess.hpf = 128;
+            matlabbatch{1}.spm.stats.fmri_spec.sess(valid_runs).cond = struct('name', {}, 'onset', {}, 'duration', {}, 'tmod', {}, 'pmod', {}, 'orth', {});
+            matlabbatch{1}.spm.stats.fmri_spec.sess(valid_runs).multi = {multi_cond_path}; % .mat file
+            matlabbatch{1}.spm.stats.fmri_spec.sess(valid_runs).regress = struct('name', {}, 'val', {});
+            matlabbatch{1}.spm.stats.fmri_spec.sess(valid_runs).multi_reg = {motion_path}; % movement parameters (rp*)
+            matlabbatch{1}.spm.stats.fmri_spec.sess(valid_runs).hpf = 128;
         end
 
         if valid_runs==0
