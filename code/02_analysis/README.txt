@@ -13,6 +13,11 @@
 
 Note*: Scripts not specifying time of running took only a couple of minutes. Time is only specified for scripts that took longer to run.
 
+--------------------------------------------- s00_convert_prt_to_spm ---------------------------------------------
+
+The function prt_to_spm(), using the function read_prt(), reads multiple .prt files from a selected folder; confirms the resolution of time (converting msec to sec); skips empty conditions (meaning 0 trials); detects start time of an event and calculates its duration; and saves a .mat file with a BIDS compliant name. 
+
+
 --------------------------------------------- s01_get_design_matrix --------------------------------------------- 
 
 Creates a subject-specific explicit brain mask using tissue probability maps (GM + WM + CSF) to exclude ghost voxels and out-of-brain artifacts. Additionally, it generates the Design Matrix for each task and session, incorporating the 6 motion regressors. It relies on BIDS-compliant event files converted from .prt to .mat (see s00_convert_prt_to_spm).
