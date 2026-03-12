@@ -8,7 +8,8 @@
 %   regression coefficients, an image of the variance of the error       %
 %   (ResMS), an image indicating the voxels that were included in the    %
 %   analysis (mask) and an image with the estimated resels per voxel     %
-%   (RPV). The residuals are not saved, but written in the header.       %
+%   (RPV). Individual volume residuals are not saved to conserve disk    %
+%   space.                                                               %
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 12/03/2026                                                  %
