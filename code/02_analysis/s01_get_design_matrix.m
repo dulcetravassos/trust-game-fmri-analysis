@@ -13,7 +13,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 09/03/2026                                                  %
-%   Last update: 10/03/2026                                              %
+%   Last update: 12/03/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -158,7 +158,11 @@ for s = 1:length(subjects)
             if isempty(bold_frames); continue; end;
 
             % Find the corresponding .mat onsets file
-            event_pattern = sprintf('*run-%02d*_events.mat',r); % sub-00x_ses-01_task-trustgame_run-0y_events.mat
+            if strcmp(current_task,'task-main')  
+                event_pattern = sprintf('*run-%02d*_events.mat',r); % sub-00x_ses-01_task-trustgame_run-0y_events.mat
+            else
+                event_pattern = sprintf('*%s*_events.mat',current_task); % sub-00x_task-localizer_run-01_events
+            end  
             event_file = dir(fullfile(protocols_dir,subj,'func',event_pattern));
             if isempty(event_file)
                 fprintf('[WARNING] Onsets .mat file not found for %s run-%02d. Skipping run...\n',subj,r);
@@ -167,7 +171,11 @@ for s = 1:length(subjects)
             multi_cond_path = fullfile(event_file(1).folder,event_file(1).name);
 
             % Find the corresponding rp_*.txt movement file
-            rp_pattern = sprintf('rp_*%s*run-%02d*.txt',current_task,r);
+            if strcmp(current_task,'task-main')
+                rp_pattern = sprintf('rp_*%s*run-%02d*.txt',current_task,r);
+            else
+                rp_pattern = sprintf('rp_*%s*.txt',current_task);
+            end
             rp_file = dir(fullfile(func_dir,rp_pattern));
             if isempty(rp_file)
                 error('Movement file not found for %s run %d!',subj,r);
