@@ -39,7 +39,7 @@ subjects = {
 };
 
 % Tasks
-tasks = {'task-main','task-localizer'};
+tasks = {'task-main', 'task-localizer'};
 
 % Volumes - Localizer Task
 vol_localizer = 190;
@@ -167,7 +167,7 @@ for s = 1:length(subjects)
             multi_cond_path = fullfile(event_file(1).folder,event_file(1).name);
 
             % Find the corresponding rp_*.txt movement file
-            rp_pattern = sprintf('rp_*run-%02d*.txt',r);
+            rp_pattern = sprintf('rp_*%s*run-%02d*.txt',current_task,r);
             rp_file = dir(fullfile(func_dir,rp_pattern));
             if isempty(rp_file)
                 error('Movement file not found for %s run %d!',subj,r);
