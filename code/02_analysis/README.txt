@@ -23,8 +23,8 @@ The function prt_to_spm(), using the function read_prt(), reads multiple .prt fi
 Creates a subject-specific explicit brain mask using tissue probability maps (GM + WM + CSF) to exclude ghost voxels and out-of-brain artifacts. Additionally, it generates the Design Matrix for each task and session, incorporating the 6 motion regressors. It relies on BIDS-compliant event files converted from .prt to .mat (see s00_convert_prt_to_spm).
 
 
---------------------------------------------- s02_estimate ---------------------------------------------
+--------------------------------------------- s02_beta_estimation ---------------------------------------------
 
-bbbb
+Reads the Design Matrix (SPM.mat) for each subject and task, and runs the estimation algorithm (Classical - Restricted Maximum Likelihood). Generates the estimated regression coefficients (Beta images), the error variance image (ResMS), the analysis mask, and the estimated resels per voxel (RPV) image. To save disk space, individual volume residuals are not saved.
+The residuals are not directly saved, but written in the header.
 Time: ~aa minutes per subject (Main Task + Face Localizer).
-
