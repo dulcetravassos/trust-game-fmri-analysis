@@ -71,7 +71,7 @@ volumes_main = [
 % Acquisition Parameters
 TR = 2; % secs
 
-%%
+%% Specify 1st-Level
 
 % Initialize SPM
 if isempty(which('spm')); addpath(spm_path); end

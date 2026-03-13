@@ -41,7 +41,7 @@ subjects = {
 % Tasks
 tasks = {'task-main','task-localizer'};
 
-%%
+%% Beta Estimation
 
 % Initialize SPM
 if isempty(which('spm')); addpath(spm_path); end
