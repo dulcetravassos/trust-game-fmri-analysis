@@ -108,10 +108,6 @@ tasks = {'task-main','task-localizer'};
 % (8a) Run 5 > Run 4 (Immediate Conflict Cost) 
 % (8b) Runs 5-6 > Runs 3-4 (Cost of Relearning/Sustained Conflict) 
 
-% Contrast 9: Trust Magnitude (Parametric) - in which regions does the activity scale (linearly) 
-% with the amount invested (tracking subjective confidence/risk): 
-% Positive Effect of Investment Modulator 
-
 %% Register Contrasts
 
 % Initialize SPM
@@ -219,6 +215,7 @@ for s = 1:length(subjects)
                         con_2b(i) = -1;
                     end 
                 end
+
                 % Contrast 3
                 % Run 5 > Run 4 
                 if curr_run==run_trans
@@ -265,36 +262,81 @@ for s = 1:length(subjects)
                 % (6a) Averted + Directed Gaze (Congruent Phase) > Averted + Directed Gaze (Incongruent Phase) 
                 % (6b) Directed Gaze (Congruent Phase) > Directed Gaze (Incongruent Phase)  
                 % (6c) Averted Gaze (Congruent Phase) > Averted Gaze (Incongruent Phase) 
-
+                if contains(name,'directed') && ismember(curr_run,runs_cong)
+                    con_6a(i) = 1;
+                    con_6b(i) = 1;
+                elseif contains(name,'directed') && ismember(curr_run,runs_incong)
+                    con_6a(i) = -1;
+                    con_6b(i) = -1;
+                elseif contains(name,'averted') && ismember(curr_run,runs_cong)
+                    con_6a(i) = 1;
+                    con_6c(i) = 1;
+                elseif contains(name,'averted') && ismember(curr_run,runs_incong)
+                    con_6a(i) = -1;
+                    con_6c(i) = -1;
+                end
             end
 
             % ----- Feedback/Outcome Phase Contrasts -----
             if contains(name,'FEEDBACK')
                 % Contrast 7
-
+                % Run 5 > Run 4 
+                if curr_run==run_trans
+                    con_7(i)=1;
+                elseif curr_run==(run_trans-1)
+                    con_7(i)=-1;
+                end
             end
 
             % ----- Investment Phase Contrasts -----
-                
+            if contains(name,'DECISION') 
                 % Contrast 8
-                
-                % Contrast 9
-
+                % (8a) Run 5 > Run 4
+                % (8b) Runs 5-6 > Runs 3-4 
+                if curr_run==run_trans
+                    con_8a(i)=1;
+                    con_8b(i)=1;
+                elseif curr_run==(run_trans-1)
+                    con_8a(i)=-1;
+                    con_8b(i)=-1;
+                elseif curr_run==(run_trans+1)
+                    con_8b(i)=1;
+                elseif curr_run==(run_trans-2)
+                    con_8b(i)=-1;
+                end
+            end
         end
 
         % Normalize contrasts
         % The sum of the positive activations should equal 1 and the sum of
         % the negative activations should equal -1, so they balance to 0.
-        pos_sum = sum(con_1a(con_1a > 0));
-        if pos_sum>0; con_1a(con_1a > 0) = con_1a(con_1a > 0)/pos_sum; end;
-        neg_sum = sum(con_1a(con_1a < 0));
-        if neg_sum<0; con_1a(con_1a < 0) = con_1a(con_1a < 0)/neg_sum; end;
-        %...
+        all_cons = {con_1a, con_1b, con_2a, con_2b, con_3, con_4a, con_4b, con_4c, con_4d, con_5a, con_5b, ...
+            con_5c, con_6a, con_6b, con_6c, con_7, con_8a, con_8b, con_9};
+        for c = 1:length(all_cons)
+            con = all_cons{c};
+            pos_sum = sum(con(con > 0));
+            if pos_sum>0; con(con > 0) = con(con > 0)/pos_sum; end;
+            neg_sum = sum(con(con < 0));
+            if neg_sum<0; con(con < 0) = con(con < 0)/neg_sum; end;
+        end
+        [con_1a,con_1b,con_2a,con_2b,con_3,con_4a,con_4b,con_4c,con_4d,con_5a,con_5b,con_5c,con_6a,con_6b, ...
+            con_6c,con_7,con_8a,con_8b] = all_cons{:};
+
+        % Define contrast names
+        con_names = {'1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b'};
+
 
         % ####################### SPM Batch #######################     
+        % Check https://web.mit.edu/spm_v12/distrib/spm12/config/spm_cfg_con.m 
         clear matlabbatch;
-        % add matlabbatch...
-         
+        matlabbatch{1}.spm.stats.con.spmmat = {design_matrix};
+        matlabbatch{1}.spm.stats.con.delete = 1; % deletes any existing contrasts
+        for c = 1:length(con_names)
+            matlabbatch{1}.spm.stats.con.consess{c}.tcon.name = con_names{c};
+            matlabbatch{1}.spm.stats.con.consess{c}.tcon.weights = all_cons{c};
+            matlabbatch{1}.spm.stats.con.consess{c}.tcon.sessrep = 'none'; % does not replicate over sessions
+        end 
+
         try
             spm_jobman('run', matlabbatch);
             fprintf('>>> Contrasts successfully created for %s (%s)\n',subj,current_task);
