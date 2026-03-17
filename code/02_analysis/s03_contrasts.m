@@ -9,7 +9,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 16/03/2026                                                  %
-%   Last update: 16/03/2026                                              %
+%   Last update: 17/03/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -166,19 +166,35 @@ for s = 1:length(subjects)
         end
 
         % ------------------- Build Contrast Vectors -------------------  
-        con_1a = zeros(1,num_cols); % Contrast 1a
-        con_1b = zeros(1,num_cols); % Contrast 1b
+        con_1a = zeros(1,num_cols); con_1b = zeros(1,num_cols); % Contrasts 1a & 1b
+        con_2a = zeros(1,num_cols); con_2b = zeros(1,num_cols); % Contrasts 2a & 2b
+        con_3 = zeros(1,num_cols); % Contrast 3
+        con_4a = zeros(1,num_cols); con_4b = zeros(1,num_cols); con_4c = zeros(1,num_cols); con_4d = zeros(1,num_cols); % Contrasts 4a & 4b & 4c & 4d
+        con_5a = zeros(1,num_cols); con_5b = zeros(1,num_cols); con_5c = zeros(1,num_cols); % Contrasts 5a & 5b & 5c
+        con_6a = zeros(1,num_cols); con_6b = zeros(1,num_cols); con_6c = zeros(1,num_cols); % Contrasts 6a & 6b & 6c
+        con_7 = zeros(1,num_cols); % Contrast 7
+        con_8a = zeros(1,num_cols); con_8b = zeros(1,num_cols);  % Contrasts 8a & 8b
+        con_9 = zeros(1,num_cols); % Contrast 9
 
         for i = 1:num_cols
             name = col_names{i};  
             if contains(name,'excluded') || contains(name,'NO_RESPONSE')
                 continue;
             end
+
+            % Get run number from the column name ('Sn(x)')
+            tok = regexp(name,'Sn\((\d+)\)','tokens');
+            if isempty(tok)
+                continue; % this means it's not a functional run
+            end
+            curr_run = str2double(tok{1}{1});
             
             % ----- Video Phase Contrasts -----
             if contains(name,'VIDEO')
 
                 % Contrast 1
+                % (1a) Trustworthy Partner (TP) > Untrustworthy Partner (UP) 
+                % (1b) UP > TP 
                 if contains(name,'TTrust')
                     con_1a(i) = 1;
                     con_1b(i) = -1;
@@ -188,14 +204,67 @@ for s = 1:length(subjects)
                 end  
 
                 % Contrast 2
-
+                % (2a) TP Averted Gaze > TP Directed Gaze (Run 5)
+                % (2b) TP Averted Gaze > TP Directed Gaze (Runs 6-8)
+                if curr_run==run_trans
+                    if contains(name,'TTrust') && contains(name,'averted')
+                        con_2a(i) = 1;
+                    elseif contains(name,'TTrust') && contains(name,'directed')
+                        con_2a(i) = -1;
+                    end 
+                elseif ismember(curr_run,runs_incong) && curr_run~=run_trans
+                    if contains(name,'TTrust') && contains(name,'averted')
+                        con_2b(i) = 1;
+                    elseif contains(name,'TTrust') && contains(name,'directed')
+                        con_2b(i) = -1;
+                    end 
+                end
                 % Contrast 3
+                % Run 5 > Run 4 
+                if curr_run==run_trans
+                    con_3(i)=1;
+                elseif curr_run==(run_trans-1)
+                    con_3(i)=-1;
+                end
 
                 % Contrast 4
+                % (4a) Stable Runs (2-4) > Transition Run (5)  
+                % (4b) Stable Runs (6-8) > Transition Run (5) 
+                % (4c) Stable Runs (6-8) > Stable Runs (2-4) 
+                % (4d) Stable Runs (2-4) > Stable Runs (6-8)
+                if curr_run==run_trans
+                    con_4a(i) = -1;
+                    con_4b(i) = -1;
+                elseif ismember(curr_run,runs_cong) && curr_run~=1
+                    con_4a(i) = 1;
+                    con_4c(i) = -1;
+                    con_4d(i) = 1;
+                elseif ismember(curr_run,runs_incong) && curr_run~=run_trans
+                    con_4b(i) = 1;
+                    con_4c(i) = 1;
+                    con_4d(i) = -1;
+                end
 
                 % Contrast 5
+                % (5a) Transition Run (5) > Stable Runs (2-4) 
+                % (5b) Transition Run (5) > Stable Runs (6-8) 
+                % (5c) Transition Run (5) > Stable Runs (2-4,6-8) 
+                if curr_run==run_trans
+                    con_5a(i) = 1;
+                    con_5b(i) = 1;
+                    con_5c(i) = 1;
+                elseif ismember(curr_run,runs_cong) && curr_run~=1
+                    con_5a(i) = -1;
+                    con_5c(i) = -1;
+                elseif ismember(curr_run,runs_incong) && curr_run~=run_trans
+                    con_5b(i) = -1;
+                    con_5c(i) = -1;
+                end
 
                 % Contrast 6
+                % (6a) Averted + Directed Gaze (Congruent Phase) > Averted + Directed Gaze (Incongruent Phase) 
+                % (6b) Directed Gaze (Congruent Phase) > Directed Gaze (Incongruent Phase)  
+                % (6c) Averted Gaze (Congruent Phase) > Averted Gaze (Incongruent Phase) 
 
             end
 
@@ -213,6 +282,14 @@ for s = 1:length(subjects)
 
         end
 
+        % Normalize contrasts
+        % The sum of the positive activations should equal 1 and the sum of
+        % the negative activations should equal -1, so they balance to 0.
+        pos_sum = sum(con_1a(con_1a > 0));
+        if pos_sum>0; con_1a(con_1a > 0) = con_1a(con_1a > 0)/pos_sum; end;
+        neg_sum = sum(con_1a(con_1a < 0));
+        if neg_sum<0; con_1a(con_1a < 0) = con_1a(con_1a < 0)/neg_sum; end;
+        %...
 
         % ####################### SPM Batch #######################     
         clear matlabbatch;
