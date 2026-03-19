@@ -27,10 +27,8 @@ Creates a subject-specific explicit brain mask using tissue probability maps (GM
 
 Reads the Design Matrix (SPM.mat) for each subject and task, and runs the estimation algorithm (Classical - Restricted Maximum Likelihood). Generates the estimated regression coefficients (Beta images), the error variance image (ResMS), the analysis mask, and the estimated resels per voxel (RPV) image. To save disk space, individual volume residuals are not saved.
 The residuals are not directly saved, but written in the header.
-Time: ~aa minutes per subject (Main Task + Face Localizer).
 
 
 --------------------------------------------- s03_contrasts ---------------------------------------------
 
 Reads the Design Matrix (SPM.mat) to extract column names and dynamically defines the statistical contrast vectors for the 1st-Level analysis, covering both task-main and task-localizer. This script automatically adapts to atypical subjects (missing runs or early phase transitions) and handles nuisance conditions (e.g., "excluded" or "NO_RESPONSE" trials) by assigning them a contrast weight of 0. Furthermore, it includes an automatic normalization step, ensuring all contrast weights are balanced for subsequent 2nd-Level group analyses.
-Time: ~aa minutes per subject (Main Task + Face Localizer).
