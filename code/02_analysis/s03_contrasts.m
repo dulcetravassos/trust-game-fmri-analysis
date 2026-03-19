@@ -359,11 +359,19 @@ for s = 1:length(subjects)
         clear matlabbatch;
         matlabbatch{1}.spm.stats.con.spmmat = {design_matrix};
         matlabbatch{1}.spm.stats.con.delete = 1; % deletes any existing contrasts
+
+        % If there's a contrast with zeros only, skip it
+        valid_c = 1;
         for c = 1:length(con_names)
-            matlabbatch{1}.spm.stats.con.consess{c}.tcon.name = con_names{c};
-            matlabbatch{1}.spm.stats.con.consess{c}.tcon.weights = all_cons{c};
-            matlabbatch{1}.spm.stats.con.consess{c}.tcon.sessrep = 'none'; % does not replicate over sessions
-        end 
+            if any(all_cons{c})
+                matlabbatch{1}.spm.stats.con.consess{valid_c}.tcon.name = con_names{c};
+                matlabbatch{1}.spm.stats.con.consess{valid_c}.tcon.weights = all_cons{c};
+                matlabbatch{1}.spm.stats.con.consess{valid_c}.tcon.sessrep = 'none'; % does not replicate over sessions
+                valid_c = valid_c+1;
+            else
+                fprintf('-----> Skipping contrast %s (no valid runs for this subject)\n',con_names{c});
+            end 
+        end
 
         try
             spm_jobman('run', matlabbatch);
