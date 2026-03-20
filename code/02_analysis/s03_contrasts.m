@@ -7,10 +7,13 @@
 %   adjusts the vectors for subjects with missing runs and excludes      %
 %   nuisance conditions (e.g., "excluded" or "NO_RESPONSE") by assigning %
 %   them a weight of 0.                                                  %
+%   The generated outputs (con_*.nii and spmT_*.nii files) are saved in  %
+%   the subject's stats directory and are ready to be visualized and     %
+%   explored via the SPM Results GUI (or other tools like xjView).       %
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 16/03/2026                                                  %
-%   Last update: 18/03/2026                                              %
+%   Last update: 19/03/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
