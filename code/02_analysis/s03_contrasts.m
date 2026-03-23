@@ -334,26 +334,41 @@ for s = 1:length(subjects)
             con_names = {'1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b'};
 
         elseif strcmp(current_task,'task-localizer')
-            con_loc = zeros(1,num_cols);
+            con_loc_1 = zeros(1,num_cols);
+            con_loc_2 = zeros(1,num_cols);
+            con_loc_3 = zeros(1,num_cols);
             for i = 1:num_cols
                 name = col_names{i};
                 
                 if contains(name,'faces')
-                    con_loc(i) = 1;
-                elseif contains(name,'bodies') || contains(name,'objects') || contains(name,'scrambled')
-                    con_loc(i) = -1;
+                    con_loc_1(i) = 1;
+                    con_loc_2(i) = 1;
+                    con_loc_3(i) = 1;
+                elseif contains(name,'bodies')
+                    con_loc_1(i) = -1;
+                elseif contains(name,'objects')
+                    con_loc_1(i) = -1;
+                    con_loc_2(i) = -1;
+                elseif contains(name,'scrambled')
+                    con_loc_1(i) = -1;
+                    con_loc_3(i) = -1;
                 end
             end
             
-            % Normalize contrast
-            pos_sum = sum(con_loc(con_loc > 0));
-            if pos_sum > 0, con_loc(con_loc > 0) = con_loc(con_loc > 0)/pos_sum; end
-            neg_sum = sum(con_loc(con_loc < 0));
-            if neg_sum < 0, con_loc(con_loc < 0) = con_loc(con_loc < 0)/abs(neg_sum); end
-            
-            % Define contrast name
-            con_names = {'Faces > (Bodies + Objects + Scrambled)'};
-            all_cons = {con_loc};
+            % Normalize contrasts
+            all_cons = {con_loc_1, con_loc_2, con_loc_3};
+            for c = 1:length(all_cons)
+                con = all_cons{c};
+                pos_sum = sum(con(con > 0));
+                if pos_sum>0; con(con > 0) = con(con > 0)/pos_sum; end;
+                neg_sum = sum(con(con < 0));
+                if neg_sum<0; con(con < 0) = con(con < 0)/abs(neg_sum); end;
+                all_cons{c} = con;
+            end
+            [con_loc_1, con_loc_2, con_loc_3] = all_cons{:};
+
+            % Define contrasts' names
+            con_names = {'Faces > (Bodies + Objects + Scrambled)', 'Faces > Objects', 'Faces > Scrambled'};
         end
 
         
