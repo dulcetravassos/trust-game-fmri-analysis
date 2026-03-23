@@ -10,10 +10,12 @@
 %   The generated outputs (con_*.nii and spmT_*.nii files) are saved in  %
 %   the subject's stats directory and are ready to be visualized and     %
 %   explored via the SPM Results GUI (or other tools like xjView).       %
+%   This script includes two sanity check contrasts: one for visual      %
+%   activation (VIDEO>baseline) and one for motor (INVESTMENT>baseline). % 
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 16/03/2026                                                  %
-%   Last update: 19/03/2026                                              %
+%   Last update: 23/03/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -112,6 +114,16 @@ tasks = {'task-main','task-localizer'};
 % (8a) Run 5 > Run 4 (Immediate Conflict Cost) 
 % (8b) Runs 5-6 > Runs 3-4 (Cost of Relearning/Sustained Conflict) 
 
+%% Sanity Check Contrasts
+
+% Contrast 1: VIDEO phase > baseline
+% -> verifies basic sensory processing (primary visual cortex activation)
+% -> includes the 'excluded' trials (if any), but ignores 'NO_RESPONSE'
+
+% Contrast 2: INVESTMENT phase > baseline
+% -> verifies motor execution (motor cortex activation)
+% -> includes the 'excluded' trials (if any), but ignores 'NO_RESPONSE'
+
 %% Register Contrasts
 
 % Initialize SPM
@@ -177,6 +189,7 @@ for s = 1:length(subjects)
             con_7 = zeros(1,num_cols); % Contrast 7
             con_8a = zeros(1,num_cols); con_8b = zeros(1,num_cols);  % Contrasts 8a & 8b
             con_9 = zeros(1,num_cols); % Contrast 9
+            con_sc_1 = zeros(1,num_cols); con_sc_2 = zeros(1,num_cols); % Sanity Check Contrasts
     
             for i = 1:num_cols
                 name = col_names{i};  
@@ -193,6 +206,11 @@ for s = 1:length(subjects)
                 
                 % ----- Video Phase Contrasts -----
                 if contains(name,'VIDEO')
+
+                    % Sanity Check 1
+                    if ~contains(name,'NO_RESPONSE')
+                        con_sc_1(i) = 1;
+                    end
     
                     % Contrast 1
                     % (1a) Trustworthy Partner (TP) > Untrustworthy Partner (UP) 
@@ -296,6 +314,12 @@ for s = 1:length(subjects)
     
                 % ----- Investment Phase Contrasts -----
                 if contains(name,'DECISION') 
+                    
+                    % Sanity Check 2
+                    if ~contains(name,'NO_RESPONSE')
+                        con_sc_2(i) = 1;
+                    end
+                    
                     % Contrast 8
                     % (8a) Run 5 > Run 4
                     % (8b) Runs 5-6 > Runs 3-4 
@@ -317,7 +341,7 @@ for s = 1:length(subjects)
             % The sum of the positive activations should equal 1 and the sum of
             % the negative activations should equal -1, so they balance to 0.
             all_cons = {con_1a, con_1b, con_2a, con_2b, con_3, con_4a, con_4b, con_4c, con_4d, con_5a, con_5b, ...
-                con_5c, con_6a, con_6b, con_6c, con_7, con_8a, con_8b};
+                con_5c, con_6a, con_6b, con_6c, con_7, con_8a, con_8b, con_sc_1, con_sc_2};
             for c = 1:length(all_cons)
                 con = all_cons{c};
                 pos_sum = sum(con(con > 0));
@@ -328,10 +352,10 @@ for s = 1:length(subjects)
                 all_cons{c} = con;
             end
             [con_1a,con_1b,con_2a,con_2b,con_3,con_4a,con_4b,con_4c,con_4d,con_5a,con_5b,con_5c,con_6a,con_6b, ...
-                con_6c,con_7,con_8a,con_8b] = all_cons{:};
+                con_6c,con_7,con_8a,con_8b,con_sc_1,con_sc_2] = all_cons{:};
     
             % Define contrast names
-            con_names = {'1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b'};
+            con_names = {'1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b','SC VIDEO','SC INVESTMENT'};
 
         elseif strcmp(current_task,'task-localizer')
             con_loc_1 = zeros(1,num_cols);
