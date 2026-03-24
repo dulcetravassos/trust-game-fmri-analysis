@@ -137,10 +137,16 @@ for s = 1:length(subjects)
         % assigning unpredictable (extreme) beta weights to those conditions.
         
         fprintf('\n -------- Condition Number (Eigenvalues) --------\n');
+
         fprintf('kappa: if <30 Good, if 30-100 Warning, if >100 Critical\n\n');
         cond_num = cond(X_var);
-
         fprintf('Condition Number (Kappa) = %.2f\n',cond_num);
+        
+        is_motion = ~cellfun(@isempty,regexp(names_var,'R\d+','once'));
+        X_task = X_var(:,~is_motion);
+        cond_task = cond(X_task);
+        fprintf('Condition Number (task only - excl. movement regressors): %.2f\n',cond_task);
+
         fprintf('\n##############################################\n');
 
         %% Effective Degrees of Freedom
