@@ -13,7 +13,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 24/03/2026                                                  %
-%   Last update: 24/03/2026                                              %
+%   Last update: 25/03/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -188,7 +188,7 @@ for s = 1:length(subjects)
                 
                 r = corr(point_video,point_decision);
                 txt = sprintf('r = %.2f',r);
-                text(max(time_secs)*0.7,max(point_video)*0.9,txt);
+                text(max(time_secs)*0.7,max(point_video)*0.3,txt);
             end
         end
     end
