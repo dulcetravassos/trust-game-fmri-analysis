@@ -12,7 +12,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 05/01/2026                                                  %
-%   Last update: 11/03/2026                                              %
+%   Last update: 25/03/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -148,6 +148,10 @@ for i = 1:length(files)
                 if ~exist(subj_folder, 'dir'); mkdir(subj_folder); end
                 
                 new_base_name = regexprep(base_name, regex_pattern, bids_sub); % replaces sub-tgx for sub-0x in file name
+                
+                % to maintain consistency of naming, we have to rename task-trustgame to task-main
+                new_base_name = strrep(new_base_name,'task-trustgame','task-main');
+                
                 output_filename = fullfile(subj_folder, sprintf('%s_events.mat',new_base_name));
                 save(output_filename,'names','onsets','durations');
                 fprintf("Saved -> %s/%s_events.mat\n", bids_sub, new_base_name);  
