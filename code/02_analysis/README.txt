@@ -34,3 +34,15 @@ The residuals are not directly saved, but written in the header.
 Reads the Design Matrix (SPM.mat) to extract column names and dynamically defines the statistical contrast vectors for the 1st-Level analysis, covering both task-main and task-localizer. This script automatically adapts to atypical subjects (missing runs or early phase transitions) and handles nuisance conditions (e.g., "excluded" or "NO_RESPONSE" trials) by assigning them a contrast weight of 0. Furthermore, it includes an automatic normalization step, ensuring all contrast weights are balanced for subsequent 2nd-Level group analyses.
 The generated outputs (con_*.nii and spmT_*.nii files) are saved and ready to be visualized and explored via the SPM Results GUI (or other tools like xjView).
 This script includes two sanity check contrasts: one for visual activation (VIDEO > baseline) and one for motor activation (INVESTMENT > baseline).
+
+
+--------------------------------------------- s04_extra_design_quality ---------------------------------------------
+
+This supplementary script evaluates the statistical quality and efficiency of the 1st-Level GLM design matrices. It was specifically developed to assess the impact of a short and fixed Inter-Stimulus Interval (ISI) between the VIDEO and DECISION phases on model collinearity. The primary goal was to validate whether the estimated parameters remain robust and reliable, despite this experimental design limitation.
+Metrics used: 
+- Correlation Matrices: to identify specific pairwise collinearity between regressors;
+- Variance Inflation Factor (VIF): to quantify the inflation of parameter variance;
+- Condition Number: to assess the global instability of the design matrix;
+- Effective Degrees of Freedom (eDF): to ensure sufficient statistical power;
+- Visual Overlap Plots: to qualitatively inspect task regressor overlap.
+Note: The generated outputs and metrics are highly interdependent and, therefore, should be interpreted as a whole (holistically) rather than in isolation.
