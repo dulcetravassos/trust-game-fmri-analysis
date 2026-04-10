@@ -12,19 +12,19 @@ The code in this folder was developed and tested on a PC with the following spec
 ---
 
 
-#### `s00_convert_prt_to_spm`
+#### [`s00_convert_prt_to_spm`](s00_convert_prt_to_spm.m)
 
 The function prt_to_spm(), using the function read_prt(), reads multiple .prt files from a selected folder; confirms the resolution of time (converting msec to sec); skips empty conditions (meaning 0 trials); detects start time of an event and calculates its duration; and saves a .mat file with a BIDS compliant name. Additionally, it features subject filtering (processing only a predefined list of subjects) and supports the distribution of a universal protocol (for the face localizer task).
 
 <br>
 
-#### `s01_get_design_matrix` 
+#### [`s01_get_design_matrix`](s01_get_design_matrix.m)
 
 Creates a subject-specific explicit brain mask using tissue probability maps (GM + WM + CSF) to exclude ghost voxels and out-of-brain artifacts. Additionally, it generates the Design Matrix for each task and session, incorporating the 6 motion regressors. It relies on BIDS-compliant event files converted from .prt to .mat (see s00_convert_prt_to_spm).
 
 <br>
 
-#### `s02_beta_estimation`
+#### [`s02_beta_estimation`](s02_beta_estimation.m)
 
 Reads the Design Matrix (SPM.mat) for each subject and task, and runs the estimation algorithm (Classical - Restricted Maximum Likelihood). Generates the estimated regression coefficients (Beta images), the error variance image (ResMS), the analysis mask, and the estimated resels per voxel (RPV) image. To save disk space, individual volume residuals are not saved.
 
@@ -32,7 +32,7 @@ The residuals are not directly saved, but written in the header.
 
 <br>
 
-#### `s03_contrasts`
+#### [`s03_contrasts`](s03_contrasts.m)
 
 Reads the Design Matrix (SPM.mat) to extract column names and dynamically defines the statistical contrast vectors for the 1st-Level analysis, covering both task-main and task-localizer. This script automatically adapts to atypical subjects (missing runs or early phase transitions) and handles nuisance conditions (e.g., "excluded" or "NO_RESPONSE" trials) by assigning them a contrast weight of 0. Furthermore, it includes an automatic normalization step, ensuring all contrast weights are balanced for subsequent 2nd-Level group analyses.
 
@@ -42,7 +42,7 @@ This script includes two sanity check contrasts: one for visual activation (VIDE
 
 <br>
 
-#### `s04_extra_design_quality`
+#### [`s04_extra_design_quality`](s04_extra_design_quality.m)
 
 This supplementary script evaluates the statistical quality and efficiency of the 1st-Level GLM design matrices. It was specifically developed to assess the impact of a short and fixed Inter-Stimulus Interval (ISI) between the VIDEO and DECISION phases on model collinearity. The primary goal was to validate whether the estimated parameters remain robust and reliable, despite this experimental design limitation.
 
