@@ -12,13 +12,13 @@ The code in this folder was developed and tested on a PC with the following spec
 ---
 
 
-### `s00_dicom_to_nifti`
+#### `s00_dicom_to_nifti`
 
 Converts raw DICOM MRI data (anatomical, functional, fieldmaps) into NIfTI files suitable for preprocessing and analysis in SPM12. Saves a JSON file with metadata. Output filenames follow BIDS conventions, when applicable.
 
 <br>
 
-### `s01_slice_timing`
+#### `s01_slice_timing`
 
 Slice Timing Correction script adapted to deal with subjects with reverse slice order and variable volumes. Saves output in derivatives folder with a JSON file (BIDS friendly). 
 
@@ -26,13 +26,13 @@ Time: ~15 minutes per subject (Main Task + Face Localizer).
 
 <br>
 
-### `s02_set_the_origin`
+#### `s02_set_the_origin`
 
 Makes a copy of the original/raw anatomic images to the correct BIDS derivative folder and opens that copy on the SPM display, to allow the user to set the origin (AC-PC).
 
 <br>
 
-### `s03_motion_correction_realignment`
+#### `s03_motion_correction_realignment`
 
 Performs the SPM12 operation "Realign: Estimate & Reslice" on slice-timed data ('a...' files). The "Estimate" calculates the motion parameters (rp_*.txt) and the "Reslice" applies these parameters and writes new 'r...' files and generates a mean image (mean*.nii).
 
@@ -42,7 +42,7 @@ Note: Reslicing is performed at this stage to provide physical aligned files req
 
 <br>
 
-### `s04_get_magnitude_substitute`
+#### `s04_get_magnitude_substitute`
 
 Creates a 'fake magnitude' (surrogate) by skull-stripping the T1w image for subjects missing magnitude files, since performing Distortion Correction in FSL requires complete fieldmaps (magnitude + phasediff).
 
@@ -58,7 +58,7 @@ This script automatically cleans up the intermediate files generated mid-operati
 
 <br>
 
-### `s05_01_distortion_correction_fsl`
+#### `s05_01_distortion_correction_fsl`
 
 Processes the raw phasediff and magnitude files to generate a continuous fieldmap (in rad/s), coregisters it to the functional space, and applies it to correct for B0 magnetic field inhomogeneities.
 
@@ -80,7 +80,7 @@ NOTE: Being a .m file containing bash code, you are supposed to copy-paste the c
 
 <br>
 
-### `s05_02_unzip_create_json_spm`
+#### `s05_02_unzip_create_json_spm`
 
 Bridges the FSL outputs back to the SPM environment. It automatically unzips the FSL-generated *.nii.gz files (rfmap_rads* and ura*) into standard .nii files.
 
@@ -88,19 +88,19 @@ Additionally, it generates BIDS-compliant JSON sidecars for both the fieldmaps a
 
 <br>
 
-### `s06_coregistration`
+#### `s06_coregistration`
 
 Matches the anatomical image to the mean functional image. This script is "Estimate Only" and, therefore, does not create a new 'r*' anatomical file, but updates the header of the existing T1w image. This avoids an extra interpolation and preserves the high resolution of the anatomical image for subsequent steps. This script also updates the JSON sidecar for the T1w file.
 
 <br>
 
-### `s07_segmentation`
+#### `s07_segmentation`
 
 Partitions the coregistered anatomical image into different tissues (Grey Matter, White Matter, CSF, etc.). Generates the spatial deformation parameters (Forward Deformation Field, 'y_*') needed to normalize both the anatomical and functional images to MNI space later, and a bias-corrected structural image ('m*).
 
 <br>
 
-### `s08_01_normalization_func`
+#### `s08_01_normalization_func`
 
 Normalizes the functional images to MNI space, by applying the Forward Deformation Field (y_*) generated during the Segmentation.
 
@@ -108,13 +108,13 @@ Time: ~17 minutes per subject (Main Task + Face Localizer).
 
 <br>
 
-### `s08_02_normalization_anat`
+#### `s08_02_normalization_anat`
 
 Similar to the previous script, but applies the deformation field to the bias-corrected anatomical image (m*) and to the Tissue Probability Maps (c1, c2, and c3), resulting in the normalized structural images (wm*, wc1*, wc2*, wc3*).
 
 <br>
 
-### `s09_smoothing`
+#### `s09_smoothing`
 
 Applies a spatial Gaussian filter to the normalized functional images (wura*), increasing the Signal-to-Noise Ratio and accommodating anatomical variations between subjects for group stats.
 
