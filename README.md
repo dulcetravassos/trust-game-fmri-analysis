@@ -17,12 +17,26 @@
 
 This repository consists of a SPM project ran on MatLab, with (xxx) scripts needed to replicate the results from the (xxx) study. All outputs follow the BIDS naming convention. For a detailed description of all folders and files, please see below. To run this repository, first download MatLab and SPM (versions provided below). The scripts are named in the order that they should be run. The data either needed to run these scripts or created by these scripts is available at (xxx). For any further information about this repository, please contact: Dulce Travassos, email: uc2021216844 [at] student [dot] uc [dot] pt.
 
-## Information about folders and files within:
-(explain what all folders and files contain, following the format:
-- folder1: xxx
-  - file1: xxx
-  - file2: xxx
-- folder2: xxx)
+## Repository Structure (Information about folders and files within):
+- **01_preprocessing**: Contains all the sequential scripts required to take the raw/defaced BIDS-formatted DICOM files to fully processed NIfTI images ready for statistical analysis.
+  - **s00_dicom_to_nifti.m**: Converts raw DICOM MRI data to BIDS-compliant NIfTI files.
+  - **s01_slice_timing.m**: Performs Slice Timing Correction (adapted to deal with damaged subjects with reverse slice order and variable volumes).
+  - **s02_set_the_origin.m**: Allows to manually set the AC-PC origin on structural images.
+  - **s03_motion_correction_realignment.m**: Realigns functional images to correct for head motion.
+  - **s04_get_magnitude_substitute.m**: Creates a 'fake magnitude' (surrogate) for subjects missing complete fieldmap data (magnitude + phasediff).
+  - **s05_01_distortion_correction_fsl.m**: Corrects B0 magnetic field geometric inhomogeneities using FSL FUGUE.
+  - **s05_02_unzip_create_json_spm.m**: Integrates the FSL outputs back into the SPM/BIDS environment.
+  - **s06_coregistration.m**: Aligns the anatomical T1w image to the mean functional image.
+  - **s07_segmentation.m**: Partitions the coregistered anatomical image into different tissue classes and generates the deformation fields necessary to normalize to MNI space.
+  - **s08_01_normalization_func.m**: Normalizes the functional images to standard MNI space.
+  - **s08_02_normalization_anat.m**: Normalizes the anatomical images and tissue probability maps to MNI space.
+  - **s09_smoothing.m**: Applies a spatial Gaussian filter to the normalized functional images to increase the Signal-to-Noise Ratio.
+- **02_analysis**: Contains scripts for setting up, estimating, and evaluating the 1st and 2nd-level General Linear Models (GLMs).
+  - **s00_convert_prt_to_spm.m**: Converts BrainVoyager .prt logfiles to SPM-readable .mat event files.
+  - **s01_get_design_matrix.m**: Generates subject-specific Design Matrices and explicit brain masks.
+  - **s02_beta_estimation.m**: Runs the GLM estimation algorithm to generate the regression coefficients (Beta images).
+  - **s03_contrasts.m**: Dynamically defines and computes the 1st-level statistical contrast vectors.
+  - **s04_extra_design_quality.m**: Evaluates the statistical efficiency and multicollinearity of the design matrices.
 
 ## Environment 
 
