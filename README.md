@@ -7,15 +7,19 @@
 
 **Last updated:** April 2026
 
-**Identifer:** DOI (xxxxx)
+**Identifer:** DOI [xxxxx]
 
 **Category:** Project
 
 **Code License:** MIT
 
-**Description:** This repository contains the complete pipeline for fMRI data preprocessing and analysis on SPM for the (xxxx) study.
+**Description:** This repository contains the complete pipeline for fMRI data preprocessing and analysis in SPM for the [xxxx] study.
 
-This repository consists of a SPM project ran on MatLab, with (xxx) scripts needed to replicate the results from the (xxx) study. All outputs follow the BIDS naming convention. For a detailed description of all folders and files, please see below. To run this repository, first download MatLab and SPM (versions provided below). The scripts are named in the order that they should be run. The data either needed to run these scripts or created by these scripts is available at (xxx). For any further information about this repository, please contact: Dulce Travassos, email: uc2021216844 [at] student [dot] uc [dot] pt.
+This repository consists of a SPM project executed primarily in MATLAB, with (xxx) custom scripts required to replicate the results from the [xxx] study. Output files and directory structures follow the Brain Imaging Data Structure (BIDS) naming convention. For a detailed description of all folders and files, please refer to the Repository Structure section below. 
+To execute this pipeline, please ensure that MATLAB, SPM12, and FSL (versions specified below) are installed. The scripts are numbered sequentially in the order that they should be run. The data either needed to run these scripts or created by these scripts is available at [xxx]. 
+For any further information regarding this repository, please contact: Dulce Travassos, email: uc2021216844 [at] student [dot] uc [dot] pt.
+
+<br>
 
 ## Repository Structure (Information about folders and files within):
 - **01_preprocessing**: Contains all the sequential scripts required to take the raw/defaced BIDS-formatted DICOM files to fully processed NIfTI images ready for statistical analysis.
@@ -37,6 +41,8 @@ This repository consists of a SPM project ran on MatLab, with (xxx) scripts need
   - **s02_beta_estimation.m**: Runs the GLM estimation algorithm to generate the regression coefficients (Beta images).
   - **s03_contrasts.m**: Dynamically defines and computes the 1st-level statistical contrast vectors.
   - **s04_extra_design_quality.m**: Evaluates the statistical efficiency and multicollinearity of the design matrices.
+
+<br>
 
 ## Environment 
 
