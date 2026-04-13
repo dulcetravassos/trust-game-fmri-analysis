@@ -104,6 +104,8 @@ Partitions the coregistered anatomical image into different tissues (Grey Matter
 
 Normalizes the functional images to MNI space, by applying the Forward Deformation Field (y_\*) generated during the Segmentation.
 
+The Face Localizer data (originally acquired at 3.0 x 3.0 x 4.0 mm) is explicitly resampled to match the Main Task voxel resolution (2.5 x 2.5 x 3.0 mm). While this resampling does not increase the intrinsic spatial resolution of the data, it ensures consistency in voxel size across datasets.
+
 Time: ~17 minutes per subject (Main Task + Face Localizer).
 
 <br>
