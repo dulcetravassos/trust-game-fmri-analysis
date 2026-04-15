@@ -59,3 +59,9 @@ Metrics used:
 - Visual Overlap Plots: *to qualitatively inspect task regressor overlap.*
 
 Note: The generated outputs and metrics are highly interdependent and, therefore, should be interpreted as a whole (holistically) rather than in isolation.
+
+<br>
+
+#### [`s05_export_results`](s05_export_results.m)
+
+This script reads the previously estimated SPM.mat, applies a statistical threshold, and automatically exports the peak coordinates (.xls) and the thresholded brain maps (.nii) for all evaluated contrasts. It also computes and exports Conjunction Analyses. To facilitate visualization and reporting, all generated files are automatically copied and centralized into 'derivatives/1st_level_exports/\[task-name\]'.
