@@ -41,6 +41,7 @@ For any further information regarding this repository, please contact: Dulce Tra
   - **s02_beta_estimation.m**: Runs the GLM estimation algorithm to generate the regression coefficients (Beta images).
   - **s03_contrasts.m**: Dynamically defines and computes the 1st-level statistical contrast vectors.
   - **s04_extra_design_quality.m**: Evaluates the statistical efficiency and multicollinearity of the design matrices.
+  - **s05_export_results.m**: Extracts automatically 1st-level statistics, exporting peak coordinates tables (.xls) and thresholded brain maps (.nii) for main contrasts and conjunction analyses.
 
 <br>
 
