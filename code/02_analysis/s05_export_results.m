@@ -131,6 +131,57 @@ for s = 1:length(subjects)
             end
 
         end
+
+        % ######################### Conjunction Analysis #########################
+        if strcmp(current_task,'task-localizer')
+            fprintf('>>> Generating Conjunction Analysis...\n');
+            
+            idx_con1 = find(contains({SPM.xCon.name},'Faces > Objects'));
+            idx_con2 = find(contains({SPM.xCon.name},'Faces > Scrambled'));
+            if ~isempty(idx_con1) && ~isempty(idx_con2)
+                safe_conj_name = 'Conjunction_Faces_vs_Objects_AND_Scrambled';
+                
+                % ####################### SPM Batch #######################     
+                clear matlabbatch;
+                matlabbatch{1}.spm.stats.results.spmmat = {design_matrix};
+                matlabbatch{1}.spm.stats.results.conspec.titlestr = 'Faces > Objects AND Faces > Scrambled';
+                matlabbatch{1}.spm.stats.results.conspec.contrasts = [idx_con1, idx_con2];
+                matlabbatch{1}.spm.stats.results.conspec.threshdesc = p_adjust;
+                matlabbatch{1}.spm.stats.results.conspec.thresh = p_threshold;
+                matlabbatch{1}.spm.stats.results.conspec.extent = k_extent-10; % reduced to be less restritive
+                matlabbatch{1}.spm.stats.results.conspec.conjunction = 1;
+                matlabbatch{1}.spm.stats.results.conspec.mask.none = 1;
+                % Export Excel table
+                matlabbatch{1}.spm.stats.results.export{1}.xls = true;
+                % Export Thresholded SPM map (.nii)
+                matlabbatch{1}.spm.stats.results.export{2}.tspm.basename = ['thr_' safe_conj_name];
+                
+                try
+                spm_jobman('run', matlabbatch);
+                fprintf('>>> Conjunction exported successfully %s\n',safe_conj_name);
+                catch ME
+                    fprintf('[ERROR] Failed to export Conjunction for %s: %s\n',subj,ME.message);
+                    continue;
+                end
+    
+                export_dir = fullfile(base_dir,'derivatives','1st_level_exports',current_task);
+                if ~exist(export_dir,'dir'); mkdir(export_dir); end;
+    
+                % Copy NIfTI image and Excel file to the '1st_level_exports' folder
+                conj_nii = dir(fullfile(stats_dir,current_task,['*thr_' safe_conj_name '.nii']));
+                if ~isempty(conj_nii)
+                    copyfile(fullfile(stats_dir,current_task,conj_nii(1).name),fullfile(export_dir,sprintf('%s_spmT_CONJ_thr_%s.nii',subj,safe_conj_name)));
+                end
+                xls_files = dir(fullfile(stats_dir,current_task,'*.xls*'));
+                if ~isempty(xls_files)
+                    % we want to copy the most recent .xls file only
+                    [~,idx] = max([xls_files.datenum]);
+                    latest_xls = fullfile(stats_dir,current_task,xls_files(idx).name);
+                    [~,~,ext] = fileparts(latest_xls); % safety measure to detect .xlsx extensions, for example
+                    copyfile(latest_xls,fullfile(export_dir,sprintf('%s_con_CONJ_thr_%s%s',subj,safe_conj_name,ext)));
+                end
+            end
+        end
     end
 end
 
