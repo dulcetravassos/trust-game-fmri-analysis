@@ -23,11 +23,11 @@ clear all; clc;
 % NOTE - some configurations may have to be changed in the read_prt function (for example, the conversion factor, currently for msec -> sec)
 
 % Input folder - main task (congruent & incongruent trials)
-folder_prt_congruent = 'C:\Users\User\Desktop\Tese\data\protocols\task-main\version2_exclude4NrMatch\task-trustgame-congruent-trustee-eyegaze';
-folder_prt_incongruent = 'C:\Users\User\Desktop\Tese\data\protocols\task-main\version2_exclude4NrMatch\task-trustgame-incongruent-trustee-eyegaze';
+folder_prt_congruent = 'C:\Users\User\Desktop\Tese\data\spm-data\sourcedata\protocols\task-main\version2_exclude4NrMatch\task-trustgame-congruent-trustee-eyegaze';
+folder_prt_incongruent = 'C:\Users\User\Desktop\Tese\data\spm-data\sourcedata\protocols\task-main\version2_exclude4NrMatch\task-trustgame-incongruent-trustee-eyegaze';
 
 % Input file - face localizer (universal protocol)
-folder_prt_localizer = 'C:\Users\User\Desktop\Tese\data\protocols\task-localizer';
+folder_prt_localizer = 'C:\Users\User\Desktop\Tese\data\spm-data\sourcedata\protocols\task-localizer';
 localizer_prt_file = dir(fullfile(folder_prt_localizer,'*.prt'));
 
 % Output folder: /derivatives (BIDS)
