@@ -9,7 +9,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 19/01/2026                                                  %
-%   Last update: 06/02/2026                                              %
+%   Last update: 23/04/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -21,8 +21,8 @@ clear; clc;
 spm_path = 'C:\Users\User\Desktop\Tese\spm12';
 
 % Input and output directories
-raw_base_dir = 'C:\Users\User\Desktop\Tese\data\raw';
-output_base_dir = 'C:\Users\User\Desktop\Tese\data\spm-data\rawdata';
+source_dir = 'C:\Users\User\Desktop\Tese\data\spm-data\sourcedata';
+raw_dir = 'C:\Users\User\Desktop\Tese\data\spm-data\rawdata';
 
 % What is going to be converted (1 for yes, 0 for no)
 convert_anat_defaced = 1; % Defaced Anatomical
@@ -88,14 +88,14 @@ for s=1:nsubs
     if convert_anat_mprage
         fprintf('------ MPRAGE Conversion ------\n');
         % Output name: sub-00x_T1w.nii
-        convert_folder(raw_base_dir,output_base_dir,raw_subj,bids_subj,'anat','MPRAGE','T1w',runs_main);
+        convert_folder(source_dir,raw_dir,raw_subj,bids_subj,'anat','MPRAGE','T1w',runs_main);
     end
         
     % Anatomical - defaced
     if convert_anat_defaced
         fprintf('------ Defaced Image Conversion ------\n');
         % Output name: sub-00x_desc-defaced_T1w.nii
-        convert_folder(raw_base_dir,output_base_dir,raw_subj,bids_subj,'anat','defaced','desc-defaced_T1w',runs_main);
+        convert_folder(source_dir,raw_dir,raw_subj,bids_subj,'anat','defaced','desc-defaced_T1w',runs_main);
     end
 
     % FieldMaps
@@ -107,12 +107,12 @@ for s=1:nsubs
             % Magnitude
             subfolder_mag = fullfile('MAGN_PHASE', 'magnitude', run_str); % .../func/MAGN_PHASE/magnitude/runx
             suffix_mag = sprintf('run-%02d_magnitude',r);  % To follow BIDS convention: run-0x_magnitude
-            convert_folder(raw_base_dir,output_base_dir,raw_subj,bids_subj,'fmap',subfolder_mag,suffix_mag,runs_main);
+            convert_folder(source_dir,raw_dir,raw_subj,bids_subj,'fmap',subfolder_mag,suffix_mag,runs_main);
             
             % Phase
             subfolder_phase = fullfile('MAGN_PHASE', 'phase', run_str); % .../func/MAGN_PHASE/phase/runx
             suffix_phase = sprintf('run-%02d_phasediff',r);  % To follow BIDS convention: run-0x_phasediff
-            convert_folder(raw_base_dir,output_base_dir,raw_subj,bids_subj,'fmap',subfolder_phase,suffix_phase,runs_main);
+            convert_folder(source_dir,raw_dir,raw_subj,bids_subj,'fmap',subfolder_phase,suffix_phase,runs_main);
         end
     end
 
@@ -123,7 +123,7 @@ for s=1:nsubs
             run_str=sprintf('run%d',r);
             task_name = 'main';
             suffix=sprintf('task-%s_run-%02d_bold',task_name,r); % To follow BIDS convention: run-0x_bold
-            convert_folder(raw_base_dir,output_base_dir,raw_subj,bids_subj,'func',run_str,suffix,runs_main);
+            convert_folder(source_dir,raw_dir,raw_subj,bids_subj,'func',run_str,suffix,runs_main);
         end
     end
 
@@ -131,7 +131,7 @@ for s=1:nsubs
     if convert_func_loc
         fprintf('------ Face Localizers Conversion ------\n');
         %suffix = sprintf('task-localizer_run-%02d_bold',r); % To follow BIDS convention: localizer_run-0x_bold
-        convert_folder(raw_base_dir,output_base_dir,raw_subj,bids_subj,'func','FACELOCALIZERS','task-localizer_bold',runs_main);
+        convert_folder(source_dir,raw_dir,raw_subj,bids_subj,'func','FACELOCALIZERS','task-localizer_bold',runs_main);
     end
 
 end
