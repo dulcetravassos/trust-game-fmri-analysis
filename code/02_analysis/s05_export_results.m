@@ -23,6 +23,7 @@ spm_path = 'C:\Users\User\Desktop\Tese\spm12';
 % Input and output directories
 base_dir = 'C:\Users\User\Desktop\Tese\data\spm-data';
 deriv_dir = fullfile(base_dir,'derivatives','spm-preprocessing');
+export_base_dir = fullfile(base_dir,'derivatives','spm-statistics','1st-level-exports');
 
 % List of Subjects
 subjects = {
@@ -113,7 +114,7 @@ for s = 1:length(subjects)
                 continue;
             end
 
-            export_dir = fullfile(base_dir,'derivatives','1st_level_exports',current_task);
+            export_dir = fullfile(export_base_dir,current_task);
             if ~exist(export_dir,'dir'); mkdir(export_dir); end;
 
             % Copy NIfTI image and Excel file to the '1st_level_exports' folder
@@ -164,7 +165,7 @@ for s = 1:length(subjects)
                     continue;
                 end
     
-                export_dir = fullfile(base_dir,'derivatives','1st_level_exports',current_task);
+                export_dir = fullfile(export_base_dir,current_task);
                 if ~exist(export_dir,'dir'); mkdir(export_dir); end;
     
                 % Copy NIfTI image and Excel file to the '1st_level_exports' folder
