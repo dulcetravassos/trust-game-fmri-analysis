@@ -13,7 +13,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 09/03/2026                                                  %
-%   Last update: 25/03/2026                                              %
+%   Last update: 28/04/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -90,9 +90,9 @@ for s = 1:length(subjects)
     mask_name = sprintf('brainmask_%s.nii',subj);
     mask_path = fullfile(anat_dir,mask_name);
     
-    wc1 = fullfile(anat_dir,sprintf('wc1%s_desc-defaced_T1w.nii',subj));
-    wc2 = fullfile(anat_dir,sprintf('wc2%s_desc-defaced_T1w.nii',subj));
-    wc3 = fullfile(anat_dir,sprintf('wc3%s_desc-defaced_T1w.nii',subj));
+    wc1 = fullfile(anat_dir,sprintf('wc1%s_T1w.nii',subj));
+    wc2 = fullfile(anat_dir,sprintf('wc2%s_T1w.nii',subj));
+    wc3 = fullfile(anat_dir,sprintf('wc3%s_T1w.nii',subj));
 
     if exist(wc1,'file') && exist(wc2,'file') && exist(wc3,'file')
         % ####################### SPM Batch - ImCalc #######################         

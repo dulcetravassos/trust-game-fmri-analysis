@@ -12,7 +12,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 25/02/2026                                                  %
-%   Last update: 02/03/2026                                              %
+%   Last update: 28/04/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -61,7 +61,7 @@ for s = 1:length(subjects)
     mean_func = fullfile(func_dir,mean_struct(1).name);
 
     % T1w anatomical (Source - image that jiggles the best to match the reference)
-    anat_file = fullfile(anat_dir,[subj '_desc-defaced_T1w.nii']);
+    anat_file = fullfile(anat_dir,[subj '_T1w.nii']);
     if ~exist(anat_file,'file')
         fprintf('[ERROR] Missing T1w file for %s.\n',subj);
         continue;

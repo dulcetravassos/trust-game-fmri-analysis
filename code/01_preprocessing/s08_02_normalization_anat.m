@@ -10,7 +10,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 02/03/2026                                                  %
-%   Last update: 09/03/2026                                              %
+%   Last update: 28/04/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -52,7 +52,7 @@ for s = 1:length(subjects)
     anat_dir = fullfile(deriv_dir,subj,'anat');
 
     % Find the Deformation Field (y_*)
-    def_pattern = sprintf('y_%s_desc-defaced_T1w.nii',subj);
+    def_pattern = sprintf('y_%s_T1w.nii',subj);
     def_struct = dir(fullfile(anat_dir,def_pattern));
     if isempty(def_struct)
         fprintf('[ERROR] Missing Deformation Field for %s. Skipping.\n',subj);
@@ -64,7 +64,7 @@ for s = 1:length(subjects)
     resample_files = {};
 
     % Get bias-corrected anatomical file (m*)
-    anat_pattern = sprintf('m*%s_desc-defaced_T1w.nii',subj);
+    anat_pattern = sprintf('m*%s_T1w.nii',subj);
     anat_struct = dir(fullfile(anat_dir,anat_pattern));
     if isempty(anat_struct)
         fprintf('[WARNING] No anatomical file found for %s. Skipping.\n',subj);
@@ -76,7 +76,7 @@ for s = 1:length(subjects)
     % Get Tissue Probability Maps (c1, c2, c3)
     prefixes = {'c1','c2','c3'};
     for p = 1:length(prefixes)
-        c_pattern = sprintf('%s%s_desc-defaced_T1w.nii',prefixes{p},subj);
+        c_pattern = sprintf('%s%s_T1w.nii',prefixes{p},subj);
         c_struct = dir(fullfile(anat_dir,c_pattern));
         if ~isempty(c_struct)
             resample_files{end+1,1} = fullfile(anat_dir,c_struct(1).name);

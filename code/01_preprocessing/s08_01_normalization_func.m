@@ -10,7 +10,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 02/03/2026                                                  %
-%   Last update: 03/03/2026                                              %
+%   Last update: 28/04/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -80,7 +80,7 @@ for s = 1:length(subjects)
     func_dir = fullfile(deriv_dir,subj,'func');
 
     % Find the Deformation Field (y_*)
-    def_pattern = sprintf('y_%s_desc-defaced_T1w.nii',subj);
+    def_pattern = sprintf('y_%s_T1w.nii',subj);
     def_struct = dir(fullfile(anat_dir,def_pattern));
     if isempty(def_struct)
         fprintf('[ERROR] Missing Deformation Field for %s. Skipping.\n',subj);

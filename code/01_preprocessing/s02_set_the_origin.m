@@ -13,7 +13,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 12/02/2026                                                  %
-%   Last update: 12/02/2026                                              %
+%   Last update: 28/04/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -61,11 +61,11 @@ for s = 1:length(subjects)
     fprintf('\n-------------- %s --------------\n',subj);
 
     % Paths
-    raw_anat_nii = fullfile(raw_dir,subj,'anat',[subj '_desc-defaced_T1w.nii']);
-    raw_anat_json = fullfile(raw_dir,subj,'anat',[subj '_desc-defaced_T1w.json']);
+    raw_anat_nii = fullfile(raw_dir,subj,'anat',[subj '_T1w.nii']);
+    raw_anat_json = fullfile(raw_dir,subj,'anat',[subj '_T1w.json']);
     deriv_folder = fullfile(deriv_dir,subj,'anat');
-    deriv_anat_nii = fullfile(deriv_folder,[subj '_desc-defaced_T1w.nii']);
-    deriv_anat_json = fullfile(deriv_folder,[subj '_desc-defaced_T1w.json']);
+    deriv_anat_nii = fullfile(deriv_folder,[subj '_T1w.nii']);
+    deriv_anat_json = fullfile(deriv_folder,[subj '_T1w.json']);
 
     if ~exist(raw_anat_nii,'file')
         fprintf('[WARNING] Raw file not found: %s\n', raw_anat_nii);

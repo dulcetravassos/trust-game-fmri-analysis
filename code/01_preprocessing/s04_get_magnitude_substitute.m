@@ -17,7 +17,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 18/02/2026                                                  %
-%   Last update: 20/02/2026                                              %
+%   Last update: 28/04/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -62,7 +62,7 @@ for s = 1:length(subjects)
     if ~exist(fmap_dir,'dir'); mkdir(fmap_dir); end
 
     % High-Res anatomical image, with origin set
-    t1_file = fullfile(anat_dir,[subj '_desc-defaced_T1w.nii']);
+    t1_file = fullfile(anat_dir,[subj '_T1w.nii']);
     if ~exist(t1_file,'file')
         fprintf('[ERROR] T1w not found: %s',t1_file);
         continue;

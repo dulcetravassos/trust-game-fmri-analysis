@@ -13,7 +13,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 26/02/2026                                                  %
-%   Last update: 02/03/2026                                              %
+%   Last update: 28/04/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -55,7 +55,7 @@ for s = 1:length(subjects)
     anat_dir = fullfile(deriv_dir,subj,'anat');
 
     % T1w anatomical (previously coregistered)
-    anat_file = fullfile(anat_dir,[subj '_desc-defaced_T1w.nii']);
+    anat_file = fullfile(anat_dir,[subj '_T1w.nii']);
     if ~exist(anat_file,'file')
         fprintf('[ERROR] Missing T1w file for %s.\n',subj);
         continue;
