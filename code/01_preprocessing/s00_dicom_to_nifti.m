@@ -9,7 +9,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 19/01/2026                                                  %
-%   Last update: 23/04/2026                                              %
+%   Last update: 28/04/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -26,7 +26,7 @@ raw_dir = 'C:\Users\User\Desktop\Tese\data\spm-data\rawdata';
 
 % What is going to be converted (1 for yes, 0 for no)
 convert_anat_defaced = 1; % Defaced Anatomical
-convert_anat_mprage = 1; % MPRAGE Anatomical
+convert_anat_mprage = 0; % MPRAGE Anatomical
 convert_func_main = 1; % Functional Runs
 convert_func_loc = 1; % Face Localizers
 convert_fmap = 1; % Fieldmaps (Magnitude, Phase)
@@ -84,7 +84,7 @@ for s=1:nsubs
 
     fprintf('\n======== Processing %s (BIDS: %s) ========\n',raw_subj,bids_subj);
 
-    % Anatomical - MPRAGE
+    % Anatomical - MPRAGE [*NOT USED IN THE STUDY*]
     if convert_anat_mprage
         fprintf('------ MPRAGE Conversion ------\n');
         % Output name: sub-00x_T1w.nii
@@ -94,8 +94,8 @@ for s=1:nsubs
     % Anatomical - defaced
     if convert_anat_defaced
         fprintf('------ Defaced Image Conversion ------\n');
-        % Output name: sub-00x_desc-defaced_T1w.nii
-        convert_folder(source_dir,raw_dir,raw_subj,bids_subj,'anat','defaced','desc-defaced_T1w',runs_main);
+        % Output name: sub-00x_T1w.nii
+        convert_folder(source_dir,raw_dir,raw_subj,bids_subj,'anat','defaced','T1w',runs_main);
     end
 
     % FieldMaps
