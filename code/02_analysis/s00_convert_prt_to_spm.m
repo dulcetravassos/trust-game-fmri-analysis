@@ -12,7 +12,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 05/01/2026                                                  %
-%   Last update: 25/03/2026                                              %
+%   Last update: 04/05/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -23,8 +23,8 @@ clear all; clc;
 % NOTE - some configurations may have to be changed in the read_prt function (for example, the conversion factor, currently for msec -> sec)
 
 % Input folder - main task (congruent & incongruent trials)
-folder_prt_congruent = 'C:\Users\User\Desktop\Tese\data\spm-data\sourcedata\protocols\task-main\version2_exclude4NrMatch\task-trustgame-congruent-trustee-eyegaze';
-folder_prt_incongruent = 'C:\Users\User\Desktop\Tese\data\spm-data\sourcedata\protocols\task-main\version2_exclude4NrMatch\task-trustgame-incongruent-trustee-eyegaze';
+folder_prt_congruent = 'C:\Users\User\Desktop\Tese\data\spm-data\sourcedata\protocols\task-main\version2_exclude4NrMatch\prts-runs-task-tg-cong';
+folder_prt_incongruent = 'C:\Users\User\Desktop\Tese\data\spm-data\sourcedata\protocols\task-main\version2_exclude4NrMatch\prts-runs-task-tg-incong';
 
 % Input file - face localizer (universal protocol)
 folder_prt_localizer = 'C:\Users\User\Desktop\Tese\data\spm-data\sourcedata\protocols\task-localizer';
@@ -111,7 +111,7 @@ for i = 1:length(files)
     [~, base_name, ~] = fileparts(file_name); % we only want the name of the file
     
     % Name correction: subject names in origin files do not follow BIDS (sub-x)
-    regex_pattern = 'sub-(\d+)'; % regex = Regular Expression; (\d+) detects numbers
+    regex_pattern = 'sub-tg(\d+)'; % regex = Regular Expression; (\d+) detects numbers
     tokens = regexp(base_name,regex_pattern,'tokens'); % tokens match parts of the regex expression
 
     if isempty(tokens)
@@ -146,11 +146,18 @@ for i = 1:length(files)
                 % Output Folder: derivatives/spm-events/sub-0xx/func/
                 subj_folder = fullfile(folder_out, bids_sub, 'func');
                 if ~exist(subj_folder, 'dir'); mkdir(subj_folder); end
-                
-                new_base_name = regexprep(base_name, regex_pattern, bids_sub); % replaces sub-tgx for sub-0x in file name
-                
-                % to maintain consistency of naming, we have to rename task-trustgame to task-main
-                new_base_name = strrep(new_base_name,'task-trustgame','task-main');
+               
+                % Search for run number in the protocol file name (differs between cong and incong files)
+                run_tokens = regexp(base_name,'run(\d+)','tokens');
+
+                if ~isempty(run_tokens)
+                    run_val = str2double(run_tokens{1}{1});
+                    bids_run = sprintf('run-%02d',run_val); % run-01, run-02, etc.
+                    new_base_name = sprintf('%s_task-main_%s',bids_sub,bids_run); % 'sub-00x_task-main_run-0y'
+                else 
+                    % security fallback
+                    new_base_name = sprintf('%s_task-main',bids_sub);
+                end
                 
                 output_filename = fullfile(subj_folder, sprintf('%s_events.mat',new_base_name));
                 save(output_filename,'names','onsets','durations');
