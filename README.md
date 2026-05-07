@@ -24,6 +24,7 @@ For any further information regarding this repository, please contact: Dulce Tra
 ## Repository Structure (Information about folders and files within):
 - **01_preprocessing**: Contains all the sequential scripts required to take the raw/defaced BIDS-formatted DICOM files to fully processed NIfTI images ready for statistical analysis.
   - **s00_dicom_to_nifti.m**: Converts raw DICOM MRI data to BIDS-compliant NIfTI files.
+  - **s00_tr_injection.m**: Injects the correct Repetition Time (TR) into NIfTI headers for full BIDS-compliance.
   - **s01_slice_timing.m**: Performs Slice Timing Correction (adapted to deal with damaged subjects with reverse slice order and variable volumes).
   - **s02_set_the_origin.m**: Allows to manually set the AC-PC origin on structural images.
   - **s03_motion_correction_realignment.m**: Realigns functional images to correct for head motion.
