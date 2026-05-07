@@ -18,6 +18,12 @@ Converts raw DICOM MRI data (anatomical, functional, fieldmaps) into NIfTI files
 
 <br>
 
+#### [`s00_tr_injection`](s00_tr_injection.m)
+
+Scans the rawdata directory to automatically verify and inject the correct Repetition Time (TR) into NIfTI headers using SPM's @nifti class. It dynamically assigns the appropriate TR based on file modality (anat, fmap, func), creating the necessary timing data structures if missing. This ensures full BIDS-compliance.
+
+<br>
+
 #### [`s01_slice_timing`](s01_slice_timing.m)
 
 Slice Timing Correction script adapted to deal with subjects with reverse slice order and variable volumes. Saves output in derivatives folder with a JSON file (BIDS friendly). 
