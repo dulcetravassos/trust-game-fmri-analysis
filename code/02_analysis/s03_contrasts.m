@@ -15,7 +15,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 16/03/2026                                                  %
-%   Last update: 23/03/2026                                              %
+%   Last update: 7/05/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -48,14 +48,15 @@ tasks = {'task-main','task-localizer'};
 % Transition/Expectation Violation run.
 
 % However, there are some exceptions that have to be considered when constructing the contrast vectors:
-% sub-009: runs 1-4 congruent, only run 8 incongruent (missing 5-7)
-%          (in fact, runs 1-7 congruent and only run 8 incongruent; we discard runs 5-7, but the 
-%          truth is that this subject had more than the regular 4 runs to learn the pattern before
-%          relearning...)
+% sub-009: runs 1-4 congruent (runs 5-8 discarded)
+%          (this subject performed 7 congruent runs and 1 incongruent run. Run 8 (relearning 
+%          phase) was discarded because the 3 extra learning runs far exceeded the acceptable 
+%          threshold of 1 extra run, thus maintaining experimental validity and comparable 
+%          learning baselines)
 % sub-013: runs 2-4 congruent, 5-8 incongruent (missing early congruent run)
 % sub-017: runs 1-3 congruent, 4-8 incongruent (transition happens at run 4)
-%          (this means this subject had one less run to learn the pattern compared to other subjects 
-%          and had one extra incongruent run...)
+%          (this means this subject had one less run to learn the pattern compared to other 
+%          subjects and had one extra incongruent run...)
 
 
 % Additionally, to ensure robust statistical inference and homogeneity of variance, conditions with 
@@ -163,10 +164,12 @@ for s = 1:length(subjects)
     
             % Exceptions
             if strcmp(subj,'sub-009')
-                % Missing runs 5-7
-                run_trans = 5;
+                % Missing runs 5-8
+                run_trans = NaN;
                 runs_cong = [1, 2, 3, 4];
-                runs_incong = [5];
+                runs_incong = [];
+                % Note that this means that he can only participate in Contrast 1, since the others 
+                % require relearning runs or incongruent runs that this subject does not have!
             elseif strcmp(subj,'sub-013')
                 % Missing run 1
                 run_trans = 4;
@@ -340,8 +343,12 @@ for s = 1:length(subjects)
             % Normalize contrasts
             % The sum of the positive activations should equal 1 and the sum of
             % the negative activations should equal -1, so they balance to 0.
-            all_cons = {con_1a, con_1b, con_2a, con_2b, con_3, con_4a, con_4b, con_4c, con_4d, con_5a, con_5b, ...
-                con_5c, con_6a, con_6b, con_6c, con_7, con_8a, con_8b, con_sc_1, con_sc_2};
+            if strcmp(subj,'sub-009')
+                all_cons = {con_sc_1, con_sc_2, con_1a, con_1b};
+            else
+                all_cons = {con_sc_1, con_sc_2, con_1a, con_1b, con_2a, con_2b, con_3, con_4a, con_4b, con_4c, con_4d, ...
+                    con_5a, con_5b, con_5c, con_6a, con_6b, con_6c, con_7, con_8a, con_8b};
+            end
             for c = 1:length(all_cons)
                 con = all_cons{c};
                 pos_sum = sum(con(con > 0));
@@ -351,11 +358,16 @@ for s = 1:length(subjects)
 
                 all_cons{c} = con;
             end
-            [con_1a,con_1b,con_2a,con_2b,con_3,con_4a,con_4b,con_4c,con_4d,con_5a,con_5b,con_5c,con_6a,con_6b, ...
-                con_6c,con_7,con_8a,con_8b,con_sc_1,con_sc_2] = all_cons{:};
-    
-            % Define contrast names
-            con_names = {'1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b','SC VIDEO','SC INVESTMENT'};
+            if strcmp(subj,'sub-009')
+                [con_sc_1,con_sc_2,con_1a,con_1b] = all_cons{:};
+                % Define contrast names
+                con_names = {'SC VIDEO','SC INVESTMENT','1a','1b'};
+            else
+                [con_sc_1,con_sc_2,con_1a,con_1b,con_2a,con_2b,con_3,con_4a,con_4b,con_4c,con_4d,con_5a,con_5b,con_5c, ...
+                    con_6a,con_6b,con_6c,con_7,con_8a,con_8b] = all_cons{:};
+                % Define contrast names
+                con_names = {'SC VIDEO','SC INVESTMENT','1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b'};
+            end           
 
         elseif strcmp(current_task,'task-localizer')
             con_loc_1 = zeros(1,num_cols);
