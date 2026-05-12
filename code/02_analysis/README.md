@@ -66,4 +66,5 @@ Note: The generated outputs and metrics are highly interdependent and, therefore
 
 #### [`s05_export_results`](s05_export_results.m)
 
-This script reads the previously estimated SPM.mat, applies a statistical threshold, and automatically exports the peak coordinates (.xls) and the thresholded brain maps (.nii) for all evaluated contrasts. It also computes and exports Conjunction Analyses. To facilitate visualization and reporting, all generated files are automatically copied and centralized into 'derivatives/1st_level_exports/\[task-name\]'.
+This script extracts results from the previously estimated SPM.mat through an interactive prompt that allows users to define custom statistical threshold parameters (p-value, adjustment method, and minimum cluster size). It automatically generates and exports the peak coordinates (.xls) and the thresholded brain maps (.nii) for all evaluated contrasts, including Conjunction Analyses. To facilitate visualization and reporting and prevent accidental overwrites, all outputs receive a dynamic threshold signature in their filename (eg., thr_p0p001_unc_k20) and are centralized into the '\derivatives\spm-statistics\1st-level-exports\\[task-name]' directory.
+
