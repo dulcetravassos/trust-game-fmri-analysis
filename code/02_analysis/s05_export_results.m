@@ -8,7 +8,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 14/04/2026                                                  %
-%   Last update: 15/04/2026                                              %
+%   Last update: 11/05/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -37,9 +37,38 @@ subjects = {
 tasks = {'task-main','task-localizer'};
 
 % Statistical Threshold Parameters
-p_threshold = 0.001; % p-value
-p_adjust = 'none'; % 'FWE' or 'FDR' or 'none' (uncorrected)
-k_extent = 20; % minimum cluster size (min nr. voxels)
+fprintf('--------------------------------------------------\n');
+fprintf('Statistical Threshold Parameters\n');
+fprintf('--------------------------------------------------\n');
+
+% p-value
+in_p = input('Enter p-value [default: 0.001]: ','s');
+if ~isnan(str2double(in_p))
+    p_threshold = str2double(in_p);
+else
+    p_threshold = 0.001; % fallback
+end
+fprintf('Using p-value = %f\n',p_threshold);
+
+% p-value adjustment method
+in_adj = input('Enter p-value adjustment (none, FWE, FDR) [default: none]: ','s');
+if strcmp(in_adj,'none')||strcmp(in_adj,'FWE')||strcmp(in_adj,'FDR')
+    p_adjust = in_adj;
+else
+    p_adjust = 'none'; % fallback
+end
+fprintf('Using p-value adjustment = %s\n',p_adjust);
+
+% cluster size
+in_k = input('Enter minimum cluster size (k extent) [default: 20]: ','s');
+if ~isnan(str2double(in_k))
+    k_extent = round(str2double(in_k));
+else
+    k_extent = 20; % fallback
+end
+fprintf('Using k extent = %f\n',k_extent);
+
+fprintf('\n>>> Proceeding with: p < %f (%s), k >= %f voxels\n',p_threshold,p_adjust,k_extent);
 
 %% Extraction Loop
 
@@ -47,6 +76,15 @@ k_extent = 20; % minimum cluster size (min nr. voxels)
 if isempty(which('spm')); addpath(spm_path); end
 spm('defaults', 'FMRI');
 spm_jobman('initcfg');
+
+% Name formatting
+p_str = strrep(num2str(p_threshold),'.','p');
+if strcmp(p_adjust,'none')
+    adj_str = 'unc';
+else
+    adj_str = p_adjust;
+end
+thr_sig = sprintf('p%s_%s_k%d',p_str,adj_str,k_extent);
 
 for s = 1:length(subjects)
     subj = subjects{s};
@@ -104,7 +142,7 @@ for s = 1:length(subjects)
             % Export Excel table
             matlabbatch{1}.spm.stats.results.export{1}.xls = true;
             % Export Thresholded SPM map (.nii)
-            matlabbatch{1}.spm.stats.results.export{2}.tspm.basename = ['thr_' safe_name];
+            matlabbatch{1}.spm.stats.results.export{2}.tspm.basename = ['thr_' thr_sig '_' safe_name];
 
             try
                 spm_jobman('run', matlabbatch);
@@ -118,9 +156,9 @@ for s = 1:length(subjects)
             if ~exist(export_dir,'dir'); mkdir(export_dir); end;
 
             % Copy NIfTI image and Excel file to the '1st_level_exports' folder
-            tspm_file = fullfile(stats_dir,current_task,sprintf('spmT_%04d_thr_%s.nii',c,safe_name));
+            tspm_file = fullfile(stats_dir,current_task,sprintf('spmT_%04d_thr_%s_%s.nii',c,thr_sig,safe_name));
             if exist(tspm_file,'file')
-                copyfile(tspm_file,fullfile(export_dir,sprintf('%s_spmT_%04d_thr_%s.nii',subj,c,safe_name)));
+                copyfile(tspm_file,fullfile(export_dir,sprintf('%s_spmT_%04d_thr_%s_%s.nii',subj,c,thr_sig,safe_name)));
             end
             xls_files = dir(fullfile(stats_dir,current_task,'*.xls*'));
             if ~isempty(xls_files)
@@ -128,7 +166,7 @@ for s = 1:length(subjects)
                 [~,idx] = max([xls_files.datenum]);
                 latest_xls = fullfile(stats_dir,current_task,xls_files(idx).name);
                 [~,~,ext] = fileparts(latest_xls); % safety measure to detect .xlsx extensions, for example
-                copyfile(latest_xls,fullfile(export_dir,sprintf('%s_con_%04d_thr_%s%s',subj,c,safe_name,ext)));
+                copyfile(latest_xls,fullfile(export_dir,sprintf('%s_con_%04d_thr_%s_%s%s',subj,c,thr_sig,safe_name,ext)));
             end
 
         end
@@ -155,7 +193,7 @@ for s = 1:length(subjects)
                 % Export Excel table
                 matlabbatch{1}.spm.stats.results.export{1}.xls = true;
                 % Export Thresholded SPM map (.nii)
-                matlabbatch{1}.spm.stats.results.export{2}.tspm.basename = ['thr_' safe_conj_name];
+                matlabbatch{1}.spm.stats.results.export{2}.tspm.basename = ['thr_' thr_sig '_' safe_conj_name];
                 
                 try
                 spm_jobman('run', matlabbatch);
@@ -169,9 +207,9 @@ for s = 1:length(subjects)
                 if ~exist(export_dir,'dir'); mkdir(export_dir); end;
     
                 % Copy NIfTI image and Excel file to the '1st_level_exports' folder
-                conj_nii = dir(fullfile(stats_dir,current_task,['*thr_' safe_conj_name '.nii']));
+                conj_nii = dir(fullfile(stats_dir,current_task,['*thr_' thr_sig '_' safe_conj_name '.nii']));
                 if ~isempty(conj_nii)
-                    copyfile(fullfile(stats_dir,current_task,conj_nii(1).name),fullfile(export_dir,sprintf('%s_spmT_CONJ_thr_%s.nii',subj,safe_conj_name)));
+                    copyfile(fullfile(stats_dir,current_task,conj_nii(1).name),fullfile(export_dir,sprintf('%s_spmT_CONJ_thr_%s_%s.nii',subj,thr_sig,safe_conj_name)));
                 end
                 xls_files = dir(fullfile(stats_dir,current_task,'*.xls*'));
                 if ~isempty(xls_files)
@@ -179,7 +217,7 @@ for s = 1:length(subjects)
                     [~,idx] = max([xls_files.datenum]);
                     latest_xls = fullfile(stats_dir,current_task,xls_files(idx).name);
                     [~,~,ext] = fileparts(latest_xls); % safety measure to detect .xlsx extensions, for example
-                    copyfile(latest_xls,fullfile(export_dir,sprintf('%s_con_CONJ_thr_%s%s',subj,safe_conj_name,ext)));
+                    copyfile(latest_xls,fullfile(export_dir,sprintf('%s_con_CONJ_thr_%s_%s%s',subj,thr_sig,safe_conj_name,ext)));
                 end
             end
         end
