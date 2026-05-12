@@ -1,5 +1,5 @@
-# Short Title: Social Reversal Learning
-## Title: Learning and relearning to trust in different social contexts: an fMRI study
+# Short Title: *Social Reversal Learning*
+## Title: *Social Reversal Learning: An fMRI Study of Learning and Relearning to Trust in Different Social Contexts*
 
 **Contributors:** Dulce Travassos
 
