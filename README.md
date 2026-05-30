@@ -55,6 +55,7 @@ For any further information regarding this repository, please contact: Dulce Tra
 * **MatLab**: R2024b (Update 4 - 24.2.0.2833386)
 
 * **SPM12:** Release 7771
+* **MarsBaR SPM toolbox:** v0.45
 
 **WSL (Linux) Environment:**
 
