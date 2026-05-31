@@ -1,7 +1,7 @@
 ### System Specifications
 The code in this folder was developed and tested on a PC with the following specifications:
 
-*  **Software:** MATLAB R2024b (Update 4 - 24.2.0.2833386), SPM12 (7771)
+*  **Software:** MATLAB R2024b (Update 4 - 24.2.0.2833386), SPM12 (7771), MarsBaR toolbox (v0.45)
 *   **OS:** Microsoft Windows 10 (64-bit)
 *   **CPU:** Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz
 *   **RAM:** 16GB
