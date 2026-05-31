@@ -68,3 +68,16 @@ Note: The generated outputs and metrics are highly interdependent and, therefore
 
 This script extracts results from the previously estimated SPM.mat through an interactive prompt that allows users to define custom statistical threshold parameters (p-value, adjustment method, and minimum cluster size). It automatically generates and exports the peak coordinates (.xls) and the thresholded brain maps (.nii) for all evaluated contrasts, including Conjunction Analyses. To facilitate visualization and reporting and prevent accidental overwrites, all outputs receive a dynamic threshold signature in their filename (eg., thr_p0p001_unc_k20) and are centralized into the '\derivatives\spm-statistics\1st-level-exports\\[task-name]' directory.
 
+<br>
+
+#### [`s06_01_roi_definition_marsbar`](s06_01_roi_definition_marsbar.m)
+
+This script documents the procedure for defining subject-specific functional Regions of Interest (ROIs) using the MarsBaR toolbox for SPM12. This approach ensures functional precision by creating spherical ROIs centered on subject-specific peak activation coordinates (e.g., identifying individual pSTS from independent localizer scans), when available.
+
+<br>
+
+#### [`s06_02_roi_analysis`](s06_02_roi_analysis.m)
+
+This script automates the extraction of mean beta values from the individualized MarsBaR ROIs across all subjects. It includes a custom extraction function based on Andrew Jahn's code [https://github.com/andrewjahn/SPM_Scripts/blob/master/Extract_ROI_Data.m], modified to support spatial alignment between the ROI and Contrast spaces.
+
+It uses the functional contrast's affine matrix (Vcon.mat) to mathematically translate ROI coordinates to the exact voxel space of the functional images and automatically detects and removes absolute zeros (for example, caused by out-of-brain voxels) before calculating the mean. The results are compiled into a structured .csv file.
