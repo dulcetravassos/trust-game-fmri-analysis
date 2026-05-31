@@ -43,6 +43,8 @@ For any further information regarding this repository, please contact: Dulce Tra
   - **s03_contrasts.m**: Dynamically defines and computes the 1st-level statistical contrast vectors.
   - **s04_extra_design_quality.m**: Evaluates the statistical efficiency and multicollinearity of the design matrices.
   - **s05_export_results.m**: Extracts automatically 1st-level statistics, exporting peak coordinates tables (.xls) and thresholded brain maps (.nii) for main contrasts and conjunction analyses.
+  - **s06_01_roi_definition_marsbar.m**: Documents the creation of subject-specific functional Regions of Interest (ROIs) based on individual peak coordinates, using MarsBaR.
+  - **s06_02_roi_analysis.m**: Automates the extraction of mean beta values from individualized ROIs, and exports the data to a .csv file.
 
 <br>
 
@@ -55,6 +57,7 @@ For any further information regarding this repository, please contact: Dulce Tra
 * **MatLab**: R2024b (Update 4 - 24.2.0.2833386)
 
 * **SPM12:** Release 7771
+
 * **MarsBaR SPM toolbox:** v0.45
 
 **WSL (Linux) Environment:**
