@@ -15,7 +15,7 @@ Contains all the scripts required to take the raw/defaced BIDS-formated DICOM fi
   
 #### [`02_analysis/`](02_analysis/)
 
-Contains scripts for converting protocols from .prt format (BrainVoyager) to .mat (SPM-readable), design matrices generation, 1st-level (within-subject) and 2nd-level (group) General Linear Model (GLM) specifications, contrast definitions, conjunction alayses, automated results exportation (statistical tables and thresholded NIfTI maps), Region of Interest (ROI) extraction, and design quality checks (e.g., collinearity tests).
+Contains scripts for converting protocols from .prt format (BrainVoyager) to .mat (SPM-readable), design matrices generation, 1st-level (within-subject) and 2nd-level (group) General Linear Model (GLM) specifications, contrast definitions, conjunction alayses, automated results exportation (statistical tables and thresholded NIfTI maps), Region of Interest (ROI) extraction and analysis, and design quality checks (e.g., collinearity tests).
 
 <br>
 
