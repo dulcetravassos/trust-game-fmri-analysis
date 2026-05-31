@@ -2,8 +2,12 @@
 %                                                                        %
 %   ROI Analysis                                                         %
 %                                                                        %
-%   This script uses a custom function to extract the mean beta values   %
-%   from the pre-defined MarsBaR spherical ROIs for each subject.        %
+%   This script extracts mean beta values from subject-specific MarsBaR  %
+%   spherical ROIs. It features a custom function (adapted from Andrew   %
+%   Jahn's code) modified to align the ROI and the contrast spaces,      %
+%   using the functional contrast's affine matrix. It also automatically %
+%   filters out-of-brain artifacts (absolute zeros) before mean          %
+%   calculation.                                                         %
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 30/05/2026                                                  %
