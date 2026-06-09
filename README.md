@@ -5,7 +5,7 @@
 
 **Date created:** January 2026
 
-**Last updated:** May 2026
+**Last updated:** June 2026
 
 **Identifer:** DOI [xxxxx]
 
@@ -22,7 +22,10 @@ For any further information regarding this repository, please contact: Dulce Tra
 <br>
 
 ## Repository Structure (Information about folders and files within):
-- **01_preprocessing**: Contains all the sequential scripts required to take the raw/defaced BIDS-formatted DICOM files to fully processed NIfTI images ready for statistical analysis.
+
+With modularity and reproducibility in mind, this pipeline was designed to be executed sequentially. To facilitate this, both the folders (representing distinct analysis stages) and the scripts within them are numerically prefixed to guide the user through the intended execution order:
+
+- **[`01_preprocessing/`](code/01_preprocessing/)**: Contains all the sequential scripts required to take the raw/defaced BIDS-formatted DICOM files to fully processed NIfTI images ready for statistical analysis.
   - **s00_dicom_to_nifti.m**: Converts raw DICOM MRI data to BIDS-compliant NIfTI files.
   - **s00_tr_injection.m**: Injects the correct Repetition Time (TR) into NIfTI headers for full BIDS-compliance.
   - **s01_slice_timing.m**: Performs Slice Timing Correction (adapted to deal with damaged subjects with reverse slice order and variable volumes).
@@ -36,7 +39,7 @@ For any further information regarding this repository, please contact: Dulce Tra
   - **s08_01_normalization_func.m**: Normalizes the functional images to standard MNI space.
   - **s08_02_normalization_anat.m**: Normalizes the anatomical images and tissue probability maps to MNI space.
   - **s09_smoothing.m**: Applies a spatial Gaussian filter to the normalized functional images to increase the Signal-to-Noise Ratio.
-- **02_analysis**: Contains scripts for setting up, estimating, and evaluating the 1st and 2nd-level General Linear Models (GLMs).
+- **[`02_analysis/`](code/02_analysis/)**: Contains scripts for setting up, estimating, and evaluating the 1st and 2nd-level General Linear Models (GLMs).
   - **s00_convert_prt_to_spm.m**: Converts BrainVoyager .prt logfiles to SPM-readable .mat event files.
   - **s01_get_design_matrix.m**: Generates subject-specific Design Matrices and explicit brain masks.
   - **s02_beta_estimation.m**: Runs the GLM estimation algorithm to generate the regression coefficients (Beta images).
