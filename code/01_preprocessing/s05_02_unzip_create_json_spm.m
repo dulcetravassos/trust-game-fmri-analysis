@@ -10,7 +10,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 22/02/2026                                                  %
-%   Last update: 09/03/2026                                              %
+%   Last update: 10/06/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -159,7 +159,7 @@
 clear all; clc;
 
 % Input and output directories
-base_dir = 'C:\Users\User\Desktop\Tese\data\spm-data';
+base_dir = fullfile(main_dir,'data','spm-data');
 deriv_dir = fullfile(base_dir,'derivatives','spm-preprocessing');
 
 % List of Subjects

@@ -13,7 +13,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 12/02/2026                                                  %
-%   Last update: 28/04/2026                                              %
+%   Last update: 10/06/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -31,9 +31,12 @@ clear all; clc;
 %% Initial Configurations
 % Change according to your preferences
 
-spm_path = 'C:\Users\User\Desktop\Tese\spm12';
+% Main folder
+main_dir = 'C:\Users\User\Desktop\Tese';
 
-base_dir = 'C:\Users\User\Desktop\Tese\data\spm-data';
+spm_path = fullfile(main_dir,'spm12');
+
+base_dir = fullfile(main_dir,'data','spm-data');
 % Input folder - raw anatomical
 raw_dir = fullfile(base_dir,'rawdata');
 % Output folder: /derivatives/spm-preprocessing (BIDS)

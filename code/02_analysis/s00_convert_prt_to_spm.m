@@ -12,7 +12,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 05/01/2026                                                  %
-%   Last update: 04/05/2026                                              %
+%   Last update: 10/06/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -22,16 +22,20 @@ clear all; clc;
 % Change according to your preferences
 % NOTE - some configurations may have to be changed in the read_prt function (for example, the conversion factor, currently for msec -> sec)
 
+% Main folder
+main_dir = 'C:\Users\User\Desktop\Tese';
+
 % Input folder - main task (congruent & incongruent trials)
-folder_prt_congruent = 'C:\Users\User\Desktop\Tese\data\spm-data\sourcedata\protocols\task-main\version2_exclude4NrMatch\prts-runs-task-tg-cong';
-folder_prt_incongruent = 'C:\Users\User\Desktop\Tese\data\spm-data\sourcedata\protocols\task-main\version2_exclude4NrMatch\prts-runs-task-tg-incong';
+protocols_dir = fullfile(main_dir,'data','spm-data','sorucedata','protocols');
+folder_prt_congruent = fullfile(protocols_dir,'task-main','version2_exclude4NrMatch','prts-runs-task-tg-cong');
+folder_prt_incongruent = fullfile(protocols_dir,'task-main','version2_exclude4NrMatch','prts-runs-task-tg-incong');
 
 % Input file - face localizer (universal protocol)
-folder_prt_localizer = 'C:\Users\User\Desktop\Tese\data\spm-data\sourcedata\protocols\task-localizer';
+folder_prt_localizer = fullfile(protocols_dir,'task-localizer');
 localizer_prt_file = dir(fullfile(folder_prt_localizer,'*.prt'));
 
 % Output folder: /derivatives (BIDS)
-folder_out = 'C:\Users\User\Desktop\Tese\data\spm-data\derivatives\spm-events';
+folder_out = fullfile(main_dir,'data','spm-data','derivatives','spm-events');
 
 % What is going to be converted (1 for yes, 0 for no)
 do_congruent = 1;

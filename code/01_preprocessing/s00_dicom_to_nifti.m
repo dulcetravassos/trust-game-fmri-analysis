@@ -9,7 +9,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 19/01/2026                                                  %
-%   Last update: 28/04/2026                                              %
+%   Last update: 10/06/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -18,11 +18,14 @@ clear; clc;
 %% Initial Configurations
 % Change according to your preferences
 
-spm_path = 'C:\Users\User\Desktop\Tese\spm12';
+% Main folder (root where the 'spm12', 'data', and 'github' folders are located)
+main_dir = 'C:\Users\User\Desktop\Tese';
+
+spm_path = fullfile(main_dir,'spm12');
 
 % Input and output directories
-source_dir = 'C:\Users\User\Desktop\Tese\data\spm-data\sourcedata';
-raw_dir = 'C:\Users\User\Desktop\Tese\data\spm-data\rawdata';
+source_dir = fullfile(main_dir,'data','spm-data','sourcedata');
+raw_dir = fullfile(main_dir,'data','spm-data','rawdata');
 
 % What is going to be converted (1 for yes, 0 for no)
 convert_anat_defaced = 1; % Defaced Anatomical

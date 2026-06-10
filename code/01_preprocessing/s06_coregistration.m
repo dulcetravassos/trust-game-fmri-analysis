@@ -12,7 +12,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 25/02/2026                                                  %
-%   Last update: 28/04/2026                                              %
+%   Last update: 10/06/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -22,10 +22,13 @@ clear all; clc;
 % Change according to your preferences
 % Note that some parameters may have to be changed inside the main loop
 
-spm_path = 'C:\Users\User\Desktop\Tese\spm12';
+% Main folder
+main_dir = 'C:\Users\User\Desktop\Tese';
+
+spm_path = fullfile(main_dir,'spm12');
 
 % Input and output directories
-base_dir = 'C:\Users\User\Desktop\Tese\data\spm-data';
+base_dir = fullfile(main_dir,'data','spm-data');
 deriv_dir = fullfile(base_dir,'derivatives','spm-preprocessing');
 
 % List of Subjects
