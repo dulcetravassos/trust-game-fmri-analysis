@@ -1,7 +1,9 @@
 ## Source Code & Analysis Pipeline
 This directory contains all the custom scripts developed to process, analyse, and evaluate the fMRI data for this project. 
 
-The pipeline is highly modular and was designed to be executed sequentially. Therefore, the scripts are numbered in the order they were thought to be ran.
+The pipeline is highly modular and was designed to be executed sequentially. Therefore, the scripts are numbered to guide the user through their intended execution order.
+
+For more detailed information, please check the root [`README file`](../README.md).
 
 <br>
 
