@@ -51,6 +51,31 @@ With modularity and reproducibility in mind, this pipeline was designed to be ex
 
 <br>
 
+**Environment Setup & Directory Organization:**
+
+To ensure seamless execution, these scripts rely on a specific directory structure. All necessary components (data, scripts, and the SPM12 software) must be housed within a single root directory (referred to as "Tese" in the original scripts). This root directory must contain three main subdirectories: 
+- **data/spm-data/** - This directory is the BIDS-compliant dataset. Do not nest another dataset folder inside it; it must directly contain the BIDS subdirectories (i.e., _sourcedata/_, _rawdata/_, and _derivatives/_). The data is available here _**ADD HYPERLINK**_;
+- **spm12/** - Contains the SPM12 installation and toolboxes;
+- **github/** - Contains the cloned components of this repository.
+
+To run this pipeline on your local machine, you should recreate the root folder structure described above (you may name the root folder as you wish). Then, before running the pipeline, open the scripts and update the _main_dir_ variable at the top of the code to match your local path.
+
+For visual clarity:
+```
+📁 Tese/                   # (name it as you wish)
+│
+├── 📁 data/spm-data/      # the BIDS dataset root
+│   ├── 📁 derivatives/       
+│   ├── 📁 rawdata/          
+│   └── 📁 sourcedata/      
+│
+├── 📁 spm12/              # SPM12 software
+└── 📁 github/
+    └── 📁 code/           # The scripts from this pipeline (clone this repository)
+```
+
+<br>
+
 ## Environment 
 
 ### Software:
