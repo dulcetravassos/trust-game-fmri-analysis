@@ -63,7 +63,7 @@ spm_path = fullfile(main_dir,'spm12');
 
 % Input and output directories
 base_dir = fullfile(main_dir,'data','spm-data');
-deriv_dir = fullfile(base_dir,'derivatives','spm-preprocessing');
+deriv_dir = fullfile(base_dir,'derivatives');
 roi_dir = fullfile(deriv_dir,'spm-rois');
 
 % List of Subjects
@@ -90,7 +90,7 @@ average_files = {};
 source_json = '';
 for s = 1:length(subjects)
     subj = subjects{s};
-    anat_dir = fullfile(deriv_dir,subj,'anat');
+    anat_dir = fullfile(deriv_dir,'spm-preprocessing',subj,'anat');
     
     % Get wm* anat image - normalized (w) & bias corrected (m) (and also coregistered, but with "estimate-only", therefore missing the 'r' prefix)
     anat_pattern = sprintf('wm*%s_T1w.nii',subj);
