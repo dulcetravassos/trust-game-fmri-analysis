@@ -74,6 +74,8 @@ This script extracts results from the previously estimated SPM.mat through an in
 
 This script documents the procedure for defining subject-specific functional Regions of Interest (ROIs) using the MarsBaR toolbox for SPM12. This approach ensures functional precision by creating spherical ROIs centered on subject-specific peak activation coordinates (e.g., identifying individual pSTS from independent localizer scans), when available.
 
+Additionally, this script automates the computation of a group average structural T1w image to anatomically guide and validate the chosen ROI radius.
+
 <br>
 
 #### [`s06_02_roi_analysis`](s06_02_roi_analysis.m)
