@@ -40,7 +40,7 @@ With modularity and reproducibility in mind, this pipeline was designed to be ex
   - **s08_02_normalization_anat.m**: Normalizes the anatomical images and tissue probability maps to MNI space.
   - **s09_smoothing.m**: Applies a spatial Gaussian filter to the normalized functional images to increase the Signal-to-Noise Ratio.
 - **[`02_analysis/`](code/02_analysis/)**: Contains scripts for setting up, estimating, and evaluating the 1st and 2nd-level General Linear Models (GLMs).
-  - **s00_convert_prt_to_spm.m**: Converts BrainVoyager .prt logfiles to SPM-readable .mat event files.
+  - **s00_convert_prt.m**: Converts BrainVoyager .prt logfiles to SPM-readable .mat event files and BIDS-compliant .tsv files.
   - **s01_get_design_matrix.m**: Generates subject-specific Design Matrices and explicit brain masks.
   - **s02_beta_estimation.m**: Runs the GLM estimation algorithm to generate the regression coefficients (Beta images).
   - **s03_contrasts.m**: Dynamically defines and computes the 1st-level statistical contrast vectors.
