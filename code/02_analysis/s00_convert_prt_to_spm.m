@@ -1,6 +1,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                        %
-%   PROTOCOL CONVERTER: BRAINVOYAGER (.prt) -> SPM (.mat)                %
+%   PROTOCOL CONVERTER: BRAINVOYAGER (.prt) -> SPM (.mat) & BIDS (.tsv)  %
+%                                                                        %
+%   This script converts BrainVoyager protocol files into SPM-ready .mat %
+%   format and BIDS-compliant .tsv event files. It also generates JSON   %
+%   master dictionaries at the root of the rawdata folder.               %
 %                                                                        %
 %   The function prt_to_spm(), using the function read_prt(), reads      %
 %   multiple .prt files from a selected folder, confirms the resolution  %
@@ -12,7 +16,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 05/01/2026                                                  %
-%   Last update: 10/06/2026                                              %
+%   Last update: 12/06/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -26,7 +30,7 @@ clear all; clc;
 main_dir = 'C:\Users\User\Desktop\Tese';
 
 % Input folder - main task (congruent & incongruent trials)
-protocols_dir = fullfile(main_dir,'data','spm-data','sorucedata','protocols');
+protocols_dir = fullfile(main_dir,'data','spm-data','sourcedata','protocols');
 folder_prt_congruent = fullfile(protocols_dir,'task-main','version2_exclude4NrMatch','prts-runs-task-tg-cong');
 folder_prt_incongruent = fullfile(protocols_dir,'task-main','version2_exclude4NrMatch','prts-runs-task-tg-incong');
 
@@ -34,8 +38,9 @@ folder_prt_incongruent = fullfile(protocols_dir,'task-main','version2_exclude4Nr
 folder_prt_localizer = fullfile(protocols_dir,'task-localizer');
 localizer_prt_file = dir(fullfile(folder_prt_localizer,'*.prt'));
 
-% Output folder: /derivatives (BIDS)
+% Output folders: /rawdata (BIDS - .tsv) & /derivatives (SPM-ready - .m)
 folder_out = fullfile(main_dir,'data','spm-data','derivatives','spm-events');
+raw_dir = fullfile(main_dir,'data','spm-data','rawdata');
 
 % What is going to be converted (1 for yes, 0 for no)
 do_congruent = 1;
@@ -50,20 +55,53 @@ subjects = {
     'sub-022', 'sub-023'
 };
 
-%% Protocol conversion: .prt -> .mat
+%% Protocol conversion: .prt -> .mat & .tsv
 
-% Create output folder if it doesn't exist
+% Create base +derivatives folder if it doesn't exist
 if ~exist(folder_out,'dir'); mkdir(folder_out); end
+
+% For full BIDS compliance, there is a need for a .json sidecar file listing all existing conditions. 
+% However, a single master JSON sidecar at the root directory can describe the task events for all 
+% subjects. If we pool all unique condition names across the entire dataset, we ensure that no rare 
+% or subject-specific conditions are missing from this master dictionary.
+all_main_conditions = {};
+
+% We need to scan all available protocols to guarantee a complete master dictionary, regardless of which 
+% tasks the user chooses to actually convert at the time.
+main_json_path = fullfile(raw_dir,'task-main_run-01_events.json');
+if ~exist(main_json_path,'file')
+    fprintf('Scanning all protocol folders to build master JSON...\n');
+    
+    if exist(folder_prt_congruent,'dir')
+        files_cong = dir(fullfile(folder_prt_congruent,'*.prt'));
+        for i=1:length(files_cong)
+            [names,~,~] = read_prt(fullfile(folder_prt_congruent,files_cong(i).name));
+            all_main_conditions = unique([all_main_conditions,names]);
+        end
+    end
+
+    if exist(folder_prt_incongruent,'dir')
+        files_incong = dir(fullfile(folder_prt_incongruent,'*.prt'));
+        for i=1:length(files_incong)
+            [names,~,~] = read_prt(fullfile(folder_prt_incongruent,files_incong(i).name));
+            all_main_conditions = unique([all_main_conditions,names]);
+        end
+    end
+
+    if ~isempty(all_main_conditions)
+        generate_json(all_main_conditions,main_json_path);
+    end
+end
 
 if do_congruent
     disp('Initiating protocol conversion - CONGRUENT task...');
-    prt_to_spm(folder_prt_congruent,folder_out,subjects,'congruent');
+    prt_to_spm(folder_prt_congruent,folder_out,raw_dir,subjects,'congruent');
     disp('Congruent conversion concluded.');
 end
 
 if do_incongruent
     disp('Initiating protocol conversion - INCONGRUENT task...');
-    prt_to_spm(folder_prt_incongruent,folder_out,subjects,'incongruent');
+    prt_to_spm(folder_prt_incongruent,folder_out,raw_dir,subjects,'incongruent');
     disp('Incongruent conversion concluded.');
 end
 
@@ -77,15 +115,29 @@ if do_localizer
         if isempty(names)
             fprintf('[WARNING] Localizer protocol is empty.\n');
         else
+            loc_path = fullfile(raw_dir,'task-localizer_run-01_events.json');
+            generate_json(names,loc_path); % the face localizer protocol is the exact same across all subjects
+
             for s = 1:length(subjects)
                 subj = subjects{s};
-                subj_folder = fullfile(folder_out,subj,'func');
-                if ~exist(subj_folder,'dir'); mkdir(subj_folder); end;
+
+                % ------------------------------------ .mat ------------------------------------
+                deriv_subj_folder = fullfile(folder_out,subj,'func');
+                if ~exist(deriv_subj_folder,'dir'); mkdir(deriv_subj_folder); end;
 
                 % BIDS name generation: sub-XXX_task-localizer_run-01_events.mat
-                output_filename = fullfile(subj_folder,sprintf('%s_task-localizer_run-01_events.mat',subj));
-                save(output_filename,'names','onsets','durations');
-                fprintf("Saved -> %s/%s_events.mat\n",subj,subj);
+                mat_output_filename = fullfile(deriv_subj_folder,sprintf('%s_task-localizer_run-01_events.mat',subj));
+                save(mat_output_filename,'names','onsets','durations');
+
+
+                % ------------------------------------ .tsv ------------------------------------
+                raw_subj_folder = fullfile(raw_dir,subj,'func');
+                if ~exist(raw_subj_folder,'dir'); mkdir(raw_subj_folder); end;
+
+                % BIDS name generation: sub-XXX_task-localizer_run-01_events.tsv
+                tsv_output_filename = fullfile(raw_subj_folder,sprintf('%s_task-localizer_run-01_events.tsv',subj));
+                export_bids_tsv(names,onsets,durations,tsv_output_filename);
+                fprintf("Saved -> %s (.mat & .tsv)\n",subj);
             end
             disp('Localizer conversion concluded.');
         end
@@ -97,7 +149,7 @@ disp('ALL JOBS FINISHED.');
 %% Helper Functions
 % Useful to maintain the code atomic (no need to repeat lines of code)
 
-function prt_to_spm(folder_prt,folder_out,subjects_list,task_type)
+function prt_to_spm(folder_prt,deriv_dir,raw_dir,subjects_list,task_type)
 
 if ~exist(folder_prt,'dir')
     fprintf('[ERROR] Folder not found: %s\n', folder_prt);
@@ -147,10 +199,7 @@ for i = 1:length(files)
             end  
             
             if ~isempty(bids_sub)
-                % Output Folder: derivatives/spm-events/sub-0xx/func/
-                subj_folder = fullfile(folder_out, bids_sub, 'func');
-                if ~exist(subj_folder, 'dir'); mkdir(subj_folder); end
-               
+
                 % Search for run number in the protocol file name (differs between cong and incong files)
                 run_tokens = regexp(base_name,'run(\d+)','tokens');
 
@@ -162,14 +211,29 @@ for i = 1:length(files)
                     % security fallback
                     new_base_name = sprintf('%s_task-main',bids_sub);
                 end
-                
-                output_filename = fullfile(subj_folder, sprintf('%s_events.mat',new_base_name));
-                save(output_filename,'names','onsets','durations');
-                fprintf("Saved -> %s/%s_events.mat\n", bids_sub, new_base_name);  
+
+                % ------------------------------------ .mat ------------------------------------
+                deriv_subj_folder = fullfile(deriv_dir,bids_sub,'func');
+                if ~exist(deriv_subj_folder,'dir'); mkdir(deriv_subj_folder); end;
+
+                % BIDS name generation: sub-XXX_task-main_run-01_events.mat
+                mat_output_filename = fullfile(deriv_subj_folder,sprintf('%s_events.mat',new_base_name));
+                save(mat_output_filename,'names','onsets','durations');
+
+
+                % ------------------------------------ .tsv ------------------------------------
+                raw_subj_folder = fullfile(raw_dir,bids_sub,'func');
+                if ~exist(raw_subj_folder,'dir'); mkdir(raw_subj_folder); end;
+
+                % BIDS name generation: sub-XXX_task-main_run-01_events.tsv
+                tsv_output_filename = fullfile(raw_subj_folder,sprintf('%s_events.tsv',new_base_name));
+                export_bids_tsv(names,onsets,durations,tsv_output_filename);
+
+                fprintf("Saved -> %s (.mat & .tsv)\n",bids_sub);  
             else
                 % Non-BIDS output
                 fprintf("[WARNING] Filename does not match 'sub-tgXX' pattern. Skipping BIDS renaming.\n");
-                output_filename = fullfile(folder_out, sprintf('%s_events.mat',base_name)); % Saves file in the root
+                output_filename = fullfile(deriv_dir, sprintf('%s_events.mat',base_name)); % Saves file in the root
                 save(output_filename, 'names', 'onsets', 'durations');
             end
             
@@ -181,6 +245,7 @@ end
 fprintf("=================================================\n All files analysed. Finished.\n");
 end
 
+% ------------------------------------------------------------------------------------------------
 
 % (Helper) This function is used in the function above
 function [names, onsets, durations] = read_prt(filepath)
@@ -286,7 +351,7 @@ while ~feof(fid) % While ~ end of file
                     % Convert to seconds (SPM doesn't work with msec)
                     temp_onsets(end+1) = start_time/conversion_factor;
                     % Duration = Final time (2nd number) - Initial time (1st number)
-                    temp_durations(end+1) = (end_time-start_time)/conversion_factor;
+                    temp_durations(end+1) = (end_time-start_time+1)/conversion_factor;
                 
                     actual_trials_read=actual_trials_read+1;
                 else
@@ -317,4 +382,85 @@ while ~feof(fid) % While ~ end of file
 end
 
 fclose(fid);
+end
+
+% ------------------------------------------------------------------------------------------------
+
+function export_bids_tsv(names,onsets,durations,filepath)
+
+% Empty arrays to store the information
+all_onsets = [];
+all_durations = [];
+all_trial_types = {};
+
+% Flatten the data
+for i=1:length(names)
+    cond_name = names{i};
+    cond_onsets = onsets{i};
+    cond_durations = durations{i};
+
+    all_onsets = [all_onsets,cond_onsets];
+    all_durations = [all_durations,cond_durations];
+
+    % Replicate the condition name for each event
+    for j=1:length(cond_onsets)
+        all_trial_types{end+1} = cond_name;
+    end
+end
+
+% Sort events by onset time (required according to BIDS standard)
+[all_onsets,idx] = sort(all_onsets);
+all_durations = all_durations(idx);
+all_trial_types = all_trial_types(idx);
+
+% Export following BIDS standard
+bids_table = table(all_onsets',all_durations',all_trial_types','VariableNames',{'onset','duration','trial_type'});
+writetable(bids_table,filepath,'FileType','text','Delimiter','\t');
+end
+
+% ------------------------------------------------------------------------------------------------
+
+function generate_json(names,filepath)
+
+if exist(filepath,'file'); return; end;
+
+unique_names = unique(names); % do not repeat condition names
+
+% Bypass MATLAB struct by writing directly into the file
+fid = fopen(filepath,'w');
+if fid==-1; warning('Could not save JSON file.'); return; end;
+
+fprintf(fid,'{\n');
+fprintf(fid,'   "onset": {\n');
+fprintf(fid,'       "LongName": "Event onset",\n');
+fprintf(fid,'       "Description": "Onset of the event measured in seconds relative to the start of the run",\n');
+fprintf(fid,'       "Units": "s"\n');
+fprintf(fid,'   },\n');
+fprintf(fid,'   "duration": {\n');
+fprintf(fid,'       "LongName": "Event duration",\n');
+fprintf(fid,'       "Description": "Duration of the event measured in seconds",\n');
+fprintf(fid,'       "Units": "s"\n');
+fprintf(fid,'   },\n');
+fprintf(fid,'   "trial_type": {\n');
+fprintf(fid,'       "LongName": "Event category",\n');
+fprintf(fid,'       "Description": "Name of the experimental condition",\n');
+fprintf(fid,'       "Levels": {\n');
+
+for k=1:length(unique_names)
+    cond = strtrim(unique_names{k});
+    if k<length(unique_names)
+        fprintf(fid,'           "%s": "CHANGE! MANUALLY DESCRIBE THIS CONDITION",\n',cond);
+    else
+        fprintf(fid,'           "%s": "CHANGE! MANUALLY DESCRIBE THIS CONDITION"\n',cond);
+    end
+end
+
+fprintf(fid,'       }\n');
+fprintf(fid,'   }\n');
+fprintf(fid,'}\n');
+
+fclose(fid);
+
+fprintf('-> Master JSON created: %s\n',filepath);
+warning('WARNING! "Level" fields need manual correction!\n');
 end
