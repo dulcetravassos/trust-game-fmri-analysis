@@ -12,7 +12,9 @@ The code in this folder was developed and tested on a PC with the following spec
 ---
 
 
-#### [`s00_convert_prt_to_spm`](s00_convert_prt_to_spm.m)
+#### [`s00_convert_prt`](s00_convert_prt.m)
+
+Translates BrainVoyager protocol files (.prt) into SPM-readable .mat format and BIDS-compliant .tsv event files. It features a mechanism that pools all unique experimental conditions across the dataset to generate a master JSON directory at the root of the rawdata folder, adhering to the BIDS principles.
 
 The function prt_to_spm(), using the function read_prt(), reads multiple .prt files from a selected folder; confirms the resolution of time (converting msec to sec); skips empty conditions (meaning 0 trials); detects start time of an event and calculates its duration; and saves a .mat file with a BIDS compliant name. Additionally, it features subject filtering (processing only a predefined list of subjects) and supports the distribution of a universal protocol (for the face localizer task).
 
