@@ -46,7 +46,7 @@ With modularity and reproducibility in mind, this pipeline was designed to be ex
   - **s03_contrasts.m**: Dynamically defines and computes the 1st-level statistical contrast vectors.
   - **s04_extra_design_quality.m**: Evaluates the statistical efficiency and multicollinearity of the design matrices.
   - **s05_export_results.m**: Extracts automatically 1st-level statistics, exporting peak coordinates tables (.xls) and thresholded brain maps (.nii) for main contrasts and conjunction analyses.
-  - **s06_01_roi_definition_marsbar.m**: Documents the creation of subject-specific functional Regions of Interest (ROIs) based on individual peak coordinates, using MarsBaR.
+  - **s06_01_roi_definition_marsbar.m**: Documents the creation of subject-specific functional Regions of Interest (ROIs) based on individual peak coordinates using MarsBaR and computes group average anatomical image.
   - **s06_02_roi_analysis.m**: Automates the extraction of mean beta values from individualized ROIs, and exports the data to a .csv file.
 
 <br>
