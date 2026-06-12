@@ -43,8 +43,8 @@ folder_out = fullfile(main_dir,'data','spm-data','derivatives','spm-events');
 raw_dir = fullfile(main_dir,'data','spm-data','rawdata');
 
 % What is going to be converted (1 for yes, 0 for no)
-do_congruent = 1;
-do_incongruent = 1;
+do_congruent = 0;
+do_incongruent = 0;
 do_localizer = 1;
 
 % List of Subjects
@@ -115,7 +115,7 @@ if do_localizer
         if isempty(names)
             fprintf('[WARNING] Localizer protocol is empty.\n');
         else
-            loc_path = fullfile(raw_dir,'task-localizer_run-01_events.json');
+            loc_path = fullfile(raw_dir,'task-localizer_events.json');
             generate_json(names,loc_path); % the face localizer protocol is the exact same across all subjects
 
             for s = 1:length(subjects)
@@ -125,8 +125,8 @@ if do_localizer
                 deriv_subj_folder = fullfile(folder_out,subj,'func');
                 if ~exist(deriv_subj_folder,'dir'); mkdir(deriv_subj_folder); end;
 
-                % BIDS name generation: sub-XXX_task-localizer_run-01_events.mat
-                mat_output_filename = fullfile(deriv_subj_folder,sprintf('%s_task-localizer_run-01_events.mat',subj));
+                % BIDS name generation: sub-XXX_task-localizer_events.mat
+                mat_output_filename = fullfile(deriv_subj_folder,sprintf('%s_task-localizer_events.mat',subj));
                 save(mat_output_filename,'names','onsets','durations');
 
 
@@ -134,8 +134,8 @@ if do_localizer
                 raw_subj_folder = fullfile(raw_dir,subj,'func');
                 if ~exist(raw_subj_folder,'dir'); mkdir(raw_subj_folder); end;
 
-                % BIDS name generation: sub-XXX_task-localizer_run-01_events.tsv
-                tsv_output_filename = fullfile(raw_subj_folder,sprintf('%s_task-localizer_run-01_events.tsv',subj));
+                % BIDS name generation: sub-XXX_task-localizer_events.tsv
+                tsv_output_filename = fullfile(raw_subj_folder,sprintf('%s_task-localizer_events.tsv',subj));
                 export_bids_tsv(names,onsets,durations,tsv_output_filename);
                 fprintf("Saved -> %s (.mat & .tsv)\n",subj);
             end
