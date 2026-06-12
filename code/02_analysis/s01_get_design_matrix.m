@@ -13,7 +13,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 09/03/2026                                                  %
-%   Last update: 10/06/2026                                              %
+%   Last update: 12/06/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -150,18 +150,18 @@ for s = 1:length(subjects)
         valid_runs=0;
         for r = 1:length(run_files)
             filename = run_files(r).name;
-
-            tokens = regexp(filename,'run-(\d+)','tokens');
-            if isempty(tokens)
-                fprintf('[WARNING] Cannot extract number of run from %s\n',filename);
-                continue;
-            end
-            actual_run = str2double(tokens{1}{1});
-
-            if strcmp(current_task,'task-main')
-                n_vols_target = volumes_main(s,actual_run);
-            else
+            
+            if strcmp(current_task,'task-localizer')
+                actual_run = 1; % force 1
                 n_vols_target = vol_localizer;
+            else
+                tokens = regexp(filename,'run-(\d+)','tokens');
+                if isempty(tokens)
+                    fprintf('[WARNING] Cannot extract number of run from %s\n',filename);
+                    continue;
+                end
+                actual_run = str2double(tokens{1}{1});
+                n_vols_target = volumes_main(s,actual_run);
             end
 
             % For the current run, find the corresponding swura* volumes
