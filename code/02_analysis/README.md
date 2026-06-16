@@ -20,6 +20,14 @@ The function prt_to_spm(), using the function read_prt(), reads multiple .prt fi
 
 <br>
 
+#### [`s00_reslice_normalize_rois`](s00_reslice_normalize_rois.m)
+
+This script integrates FreeSurfer anatomical Regions of Interest (ROIs) with the SPM12 pipeline. It first reslices the ROIs to match the native T1w spatial dimensions (using _spm_reslice_) and then normalizes them to MNI space, using the subject-specific Forward Deformation Fields (y*) generated during the structural segmentation step of the preprocessing.
+
+This script enforces Nearest Neighbour interpolation to preserve the integrity of binary masks and organizes the final outputs into subject-specific derivative folders.
+
+<br>
+
 #### [`s00_roi_definition_marsbar`](s00_roi_definition_marsbar.m)
 
 This script documents the procedure for defining subject-specific functional Regions of Interest (ROIs) using the MarsBaR toolbox for SPM12. This approach ensures functional precision by creating spherical ROIs centered on subject-specific peak activation coordinates (e.g., identifying individual pSTS from independent localizer scans), when available.
