@@ -41,13 +41,13 @@ With modularity and reproducibility in mind, this pipeline was designed to be ex
   - **s09_smoothing.m**: Applies a spatial Gaussian filter to the normalized functional images to increase the Signal-to-Noise Ratio.
 - **[`02_analysis/`](code/02_analysis/)**: Contains scripts for setting up, estimating, and evaluating the 1st and 2nd-level General Linear Models (GLMs).
   - **s00_convert_prt.m**: Converts BrainVoyager .prt logfiles to SPM-readable .mat event files and BIDS-compliant .tsv files.
+  - **s00_roi_definition_marsbar.m**: Documents the creation of subject-specific functional Regions of Interest (ROIs) based on individual peak coordinates using MarsBaR and computes group average anatomical image.
   - **s01_get_design_matrix.m**: Generates subject-specific Design Matrices and explicit brain masks.
   - **s02_beta_estimation.m**: Runs the GLM estimation algorithm to generate the regression coefficients (Beta images).
   - **s03_contrasts.m**: Dynamically defines and computes the 1st-level statistical contrast vectors.
   - **s04_extra_design_quality.m**: Evaluates the statistical efficiency and multicollinearity of the design matrices.
   - **s05_export_results.m**: Extracts automatically 1st-level statistics, exporting peak coordinates tables (.xls) and thresholded brain maps (.nii) for main contrasts and conjunction analyses.
-  - **s06_01_roi_definition_marsbar.m**: Documents the creation of subject-specific functional Regions of Interest (ROIs) based on individual peak coordinates using MarsBaR and computes group average anatomical image.
-  - **s06_02_roi_analysis.m**: Automates the extraction of mean beta values from individualized ROIs, and exports the data to a .csv file.
+  - **s06_roi_analysis.m**: Automates the extraction of mean beta values from individualized ROIs, and exports the data to a .csv file.
 
 <br>
 
