@@ -3,7 +3,7 @@
 %                                                                        %
 %   Reslice & Normalize ROIs to T1w space and dimensions                 %
 %                                                                        %
-%   Reslice FreeSurfer anatomical ROIS to T1w original space and         %
+%   Reslice FreeSurfer anatomical ROIs to T1w original space and         %
 %   dimensions (using spm_reslice) and then normalize them to MNI space, %
 %   using the Forward Deformation Fields (y*).                           %
 %                                                                        %
