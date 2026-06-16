@@ -15,7 +15,8 @@
 
 clear all; clc;
 
-% Credits to Ricardo Martins, PhD, in guiding the code for the Reslicing stage (https://ricardomar.github.io/).
+% Credits to Ricardo Martins, PhD, for the original reslicing code upon
+% which this script was based and adapted (https://ricardomar.github.io/).
 
 %% Initial Configurations
 % Change according to your preferences
