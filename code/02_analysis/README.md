@@ -20,6 +20,14 @@ The function prt_to_spm(), using the function read_prt(), reads multiple .prt fi
 
 <br>
 
+#### [`s00_roi_definition_marsbar`](s00_roi_definition_marsbar.m)
+
+This script documents the procedure for defining subject-specific functional Regions of Interest (ROIs) using the MarsBaR toolbox for SPM12. This approach ensures functional precision by creating spherical ROIs centered on subject-specific peak activation coordinates (e.g., identifying individual pSTS from independent localizer scans), when available.
+
+Additionally, this script automates the computation of a group average structural T1w image to anatomically guide and validate the chosen ROI radius.
+
+<br>
+
 #### [`s01_get_design_matrix`](s01_get_design_matrix.m)
 
 Creates a subject-specific explicit brain mask using tissue probability maps (GM + WM + CSF) to exclude ghost voxels and out-of-brain artifacts. Additionally, it generates the Design Matrix for each task and session, incorporating the 6 motion regressors. It relies on BIDS-compliant event files converted from .prt to .mat (see s00_convert_prt_to_spm).
@@ -72,15 +80,7 @@ This script extracts results from the previously estimated SPM.mat through an in
 
 <br>
 
-#### [`s06_01_roi_definition_marsbar`](s06_01_roi_definition_marsbar.m)
-
-This script documents the procedure for defining subject-specific functional Regions of Interest (ROIs) using the MarsBaR toolbox for SPM12. This approach ensures functional precision by creating spherical ROIs centered on subject-specific peak activation coordinates (e.g., identifying individual pSTS from independent localizer scans), when available.
-
-Additionally, this script automates the computation of a group average structural T1w image to anatomically guide and validate the chosen ROI radius.
-
-<br>
-
-#### [`s06_02_roi_analysis`](s06_02_roi_analysis.m)
+#### [`s06_roi_analysis`](s06_roi_analysis.m)
 
 This script automates the extraction of mean beta values from the individualized MarsBaR ROIs across all subjects. It includes a custom extraction function based on Andrew Jahn's code [https://github.com/andrewjahn/SPM_Scripts/blob/master/Extract_ROI_Data.m], modified to support spatial alignment between the ROI and Contrast spaces.
 
