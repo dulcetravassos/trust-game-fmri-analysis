@@ -43,8 +43,8 @@ folder_out = fullfile(main_dir,'data','spm-data','derivatives','spm-events');
 raw_dir = fullfile(main_dir,'data','spm-data','rawdata');
 
 % What is going to be converted (1 for yes, 0 for no)
-do_congruent = 0;
-do_incongruent = 0;
+do_congruent = 1;
+do_incongruent = 1;
 do_localizer = 1;
 
 % List of Subjects
