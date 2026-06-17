@@ -4,19 +4,18 @@
 %   Reslice & Normalize ROIs to T1w space and dimensions                 %
 %                                                                        %
 %   Reslice FreeSurfer anatomical ROIs to T1w original space and         %
-%   dimensions (using spm_reslice) and then normalize them to MNI space, %
-%   using the Forward Deformation Fields (y*).                           %
+%   dimensions, and then normalize them to MNI space, using the Forward  %
+%   Deformation Fields (y*).                                             %
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 16/06/2026                                                  %
-%   Last update: 16/06/2026                                              %
+%   Last update: 17/06/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear all; clc;
 
-% Credits to Ricardo Martins, PhD, for the original reslicing code upon
-% which this script was based and adapted (https://ricardomar.github.io/).
+% Credits to Ricardo Martins, PhD, for guiding the development of this script (https://ricardomar.github.io/).
 
 %% Initial Configurations
 % Change according to your preferences
@@ -70,7 +69,7 @@ for s = 1:length(subjects)
         continue;
     end
     ref_img = fullfile(anat_dir,ref_struct(1).name);
-    def_img = fullfile(anat_dir,def_struct(1).name);
+    def_fields = fullfile(anat_dir,def_struct(1).name);
 
     % Find subject's ROIs ('sub-00x_*.nii' format-like)
     roi_pattern = sprintf('%s_*.nii',subj); 
@@ -81,39 +80,44 @@ for s = 1:length(subjects)
     elseif length(roi_files) < 6
         fprintf('[WARNING] Only %d ROIs found for %s!\n',length(roi_files),subj);
     end
-    
-    % ------------------- Reslicing ROIs -------------------
-    resliced_rois = {};
 
-    flags = struct(...
-        'interp', 0, ... % nearest neighbor
-        'mask',   0, ... % don't mask the output
-        'mean',   0, ... % don't write a mean image
-        'which',  1, ... % reslice the mask to match the reference
-        'wrap',   [0 0 0], ... % no wrapping
-        'prefix', 'r' ... % default prefix
-        );          
+    source_rois = {};
+    resliced_rois = {};
 
     for i=1:length(roi_files)
         if startsWith(roi_files(i).name,'r') || startsWith(roi_files(i).name,'w'); continue; end; % skip already resliced or normalized files
     
-        mask_img = fullfile(fs_rois_dir,roi_files(i).name);
-
-        P = char(ref_img,mask_img);
-        spm_reslice(P,flags);
-
-        % Save the path of the newly generated 'r' files
+        % Save the paths of the initial ROIs and the post-reslicing ROIs
+        source_rois{end+1,1} = fullfile(fs_rois_dir,roi_files(i).name);
         resliced_rois{end+1,1} = fullfile(fs_rois_dir,['r',roi_files(i).name]);
     end
 
     if isempty(resliced_rois); continue; end;
 
-    % Normalization
+    % --------------------------- Reslicing ---------------------------
+    
+    % ####################### SPM Batch #######################
+    clear matlabbatch;
+    matlabbatch{1}.spm.spatial.coreg.write.ref = {ref_img};
+    matlabbatch{1}.spm.spatial.coreg.write.source = source_rois;
+    matlabbatch{1}.spm.spatial.coreg.write.roptions.interp = 0; % Nearest Neighbour
+    matlabbatch{1}.spm.spatial.coreg.write.roptions.wrap = [0 0 0]; % no wrapping
+    matlabbatch{1}.spm.spatial.coreg.write.roptions.mask = 0; % don't mask the output
+    matlabbatch{1}.spm.spatial.coreg.write.roptions.prefix = 'r'; % default prefix
+    
+    try
+        spm_jobman('run', matlabbatch);
+    catch ME
+        fprintf('[CRITICAL ERROR] SPM failed for %s: %s\n',subj,ME.message);
+        continue;
+    end      
+
+    % --------------------------- Normalization ---------------------------
     fprintf('>>> Normalizing Resliced ROIs to MNI space...\n');
 
     % ####################### SPM Batch #######################
     clear matlabbatch;
-    matlabbatch{1}.spm.spatial.normalise.write.subj.def = {def_img};
+    matlabbatch{1}.spm.spatial.normalise.write.subj.def = {def_fields};
     matlabbatch{1}.spm.spatial.normalise.write.subj.resample = resliced_rois;
     matlabbatch{1}.spm.spatial.normalise.write.woptions.bb = [-78 -112 -70
                                                               78 76 85];
