@@ -309,6 +309,11 @@ if isfield(hdr, 'ImageType'); json.ImageType = strjoin(string(hdr.ImageType),' '
 json.ConversionSoftware = 'SPM12';
 try json.ConversionSoftwareVersion = spm('Ver'); catch; json.ConversionSoftwareVersion = 'Unknown'; end
 
+
+% --- Manual Metadata Injection ---
+% The SPM's native DICOM to NIfTI importer cannot extract some information hidden in the SIEMENS headers. As parameters such as
+% PhaseEncodingDirection and EchoSpacing are crucial, we manually inject them based on the Magnetom's protocol PDF.
+
 % Functional files
 nslices=0;
 if strcmp(info.type,'func')
@@ -324,6 +329,11 @@ if strcmp(info.type,'func')
     end
 
     if strcmp(info.task,'main')
+
+        % Manual Injection
+        json.PhaseEncodingDirection = 'j-';
+        json.EffectiveEchoSpacing =0.00056;
+        json.TotalReadoutTime =0.00056*(92-1); % echo space*(base resolution-1)
 
         % Since we know that the protocol is Siemens Interleaved with 34 slices, we
         % can calculate the exact timing and save them in the JSON.
@@ -363,6 +373,12 @@ if strcmp(info.type,'func')
         json.SliceTiming = slice_times;
 
     elseif strcmp(info.task,'localizer')
+
+        % Manual Injection
+        json.PhaseEncodingDirection = 'j-';
+        json.EffectiveEchoSpacing =0.00069;
+        json.TotalReadoutTime =0.00069*(84-1); % echo space*(base resolution-1)
+
         % Localizers may not have 29 slices...
         nslices = 29;
         time_per_slice = tr/nslices;
@@ -398,6 +414,13 @@ if strcmp(info.type,'func')
     end
 
     if isfield(hdr,'InstanceNumber'); json.ImageNumber = hdr.InstanceNumber; end
+end
+
+if strcmp(info.type,'anat')
+    % Manual Injection
+    json.RepetitionTime = 2.300;
+    json.EchoTime = 0.00298;
+    json.InversionTime = 0.900;
 end
 
 % Fieldmap files
