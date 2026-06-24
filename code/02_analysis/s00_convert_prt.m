@@ -16,7 +16,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 05/01/2026                                                  %
-%   Last update: 12/06/2026                                              %
+%   Last update: 24/06/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -38,7 +38,7 @@ folder_prt_incongruent = fullfile(protocols_dir,'task-main','version2_exclude4Nr
 folder_prt_localizer = fullfile(protocols_dir,'task-localizer');
 localizer_prt_file = dir(fullfile(folder_prt_localizer,'*.prt'));
 
-% Output folders: /rawdata (BIDS - .tsv) & /derivatives (SPM-ready - .m)
+% Output folders: /rawdata (BIDS - .tsv) & /derivatives (SPM-ready - .mat)
 folder_out = fullfile(main_dir,'data','spm-data','derivatives','spm-events');
 raw_dir = fullfile(main_dir,'data','spm-data','rawdata');
 
@@ -351,7 +351,7 @@ while ~feof(fid) % While ~ end of file
                     % Convert to seconds (SPM doesn't work with msec)
                     temp_onsets(end+1) = start_time/conversion_factor;
                     % Duration = Final time (2nd number) - Initial time (1st number)
-                    temp_durations(end+1) = (end_time-start_time+1)/conversion_factor;
+                    temp_durations(end+1) = (end_time-start_time)/conversion_factor;
                 
                     actual_trials_read=actual_trials_read+1;
                 else
