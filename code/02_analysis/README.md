@@ -93,3 +93,5 @@ This script extracts results from the previously estimated SPM.mat through an in
 This script automates the extraction of mean beta values from the individualized MarsBaR ROIs across all subjects. It includes a custom extraction function based on Andrew Jahn's code [https://github.com/andrewjahn/SPM_Scripts/blob/master/Extract_ROI_Data.m], modified to support spatial alignment between the ROI and Contrast spaces.
 
 It uses the functional contrast's affine matrix (Vcon.mat) to mathematically translate ROI coordinates to the exact voxel space of the functional images and automatically detects and removes absolute zeros (for example, caused by out-of-brain voxels) before calculating the mean. The results are compiled into a structured .csv file.
+
+It supports both unilateral and bilateral images. To process bilateral images, it applies an automated spatial filter based on standard MNI coordinates to isolate the target hemisphere (where x < 0 defines the left hemisphere, and x > 0 the right hemisphere).
