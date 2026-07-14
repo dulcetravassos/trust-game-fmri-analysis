@@ -16,7 +16,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 05/01/2026                                                  %
-%   Last update: 24/06/2026                                              %
+%   Last update: 14/07/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -31,8 +31,8 @@ main_dir = 'C:\Users\User\Desktop\Tese';
 
 % Input folder - main task (congruent & incongruent trials)
 protocols_dir = fullfile(main_dir,'data','spm-data','sourcedata','protocols');
-folder_prt_congruent = fullfile(protocols_dir,'task-main','version2_exclude4NrMatch','prts-runs-task-tg-cong');
-folder_prt_incongruent = fullfile(protocols_dir,'task-main','version2_exclude4NrMatch','prts-runs-task-tg-incong');
+folder_prt_congruent = fullfile(protocols_dir,'task-main','v3_manual_ExclNrMatch_20260630','t1_cong');
+folder_prt_incongruent = fullfile(protocols_dir,'task-main','v3_manual_ExclNrMatch_20260630','t2_incong');
 
 % Input file - face localizer (universal protocol)
 folder_prt_localizer = fullfile(protocols_dir,'task-localizer');
@@ -45,7 +45,7 @@ raw_dir = fullfile(main_dir,'data','spm-data','rawdata');
 % What is going to be converted (1 for yes, 0 for no)
 do_congruent = 1;
 do_incongruent = 1;
-do_localizer = 1;
+do_localizer = 0;
 
 % List of Subjects
 subjects = {
@@ -284,6 +284,7 @@ while ~feof(fid) % While ~ end of file
     % Jump empty or irrelevant lines for SPM protocol
     if isempty(line) || ...
        contains(line, 'FileVersion') || ...
+       contains(line, 'Color:', 'IgnoreCase', true) || ...
        contains(line, 'Experiment') || ...
        contains(line, 'BackgroundColor') || ...
        contains(line, 'TextColor') || ...
@@ -462,5 +463,11 @@ fprintf(fid,'}\n');
 fclose(fid);
 
 fprintf('-> Master JSON created: %s\n',filepath);
+
+% To comply with the BIDS standard, a .json file is generated at the root
+% of the rawdata folder, named "task-main_run-01_events". Inside this file,
+% there is a field named "Levels" that describes every condition that
+% exists on the trust game task. The description should be manually
+% inserted into the file. This warning serves as a reminder to do so.
 warning('WARNING! "Level" fields need manual correction!\n');
 end
