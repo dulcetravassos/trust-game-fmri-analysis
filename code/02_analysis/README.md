@@ -64,13 +64,15 @@ This script includes two sanity check contrasts: one for visual activation (VIDE
 
 #### [`s04_get_2nd_level_design_matrix`](s04_get_2nd_level_design_matrix.m)
 
-aaaaaa
+Automates the specification of second-level one-sample t-test Design Matrices (SPM.mat) for each functional contrast defined in the first-level analysis. It systematically harvests subject-specific contrast maps (con_*.nii) into dedicated directories and includes defensive file-checking to handle missing subject data gracefully.
 
 <br>
 
 #### [`s05_2nd_level_beta_estimation`](s05_2nd_level_beta_estimation.m)
 
-aaaaa
+Reads the Design Matrix (SPM.mat) for each contrast, and runs the estimation algorithm using Restricted Maximum Likelihood. Generates the estimated group regression coefficients (beta_*.nii), the error variance image (ResMS.nii), the analysis mask (mask.nii), and the estimated resels per voxel (RPV.nii).
+
+To save disk space, the residuals are not directly saved, but written in the header.
 
 <br>
 
