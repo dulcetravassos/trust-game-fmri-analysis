@@ -62,7 +62,19 @@ This script includes two sanity check contrasts: one for visual activation (VIDE
 
 <br>
 
-#### [`s04_extra_design_quality`](s04_extra_design_quality.m)
+#### [`s04_get_2nd_level_design_matrix`](s04_get_2nd_level_design_matrix.m)
+
+aaaaaa
+
+<br>
+
+#### [`s05_2nd_level_beta_estimation`](s05_2nd_level_beta_estimation.m)
+
+aaaaa
+
+<br>
+
+#### [`s06_extra_design_quality`](s06_extra_design_quality.m)
 
 This supplementary script evaluates the statistical quality and efficiency of the 1st-Level GLM design matrices. It was specifically developed to assess the impact of a short and fixed Inter-Stimulus Interval (ISI) between the VIDEO and DECISION phases on model collinearity. The primary goal was to validate whether the estimated parameters remain robust and reliable, despite this experimental design limitation.
 
@@ -82,13 +94,13 @@ Note: The generated outputs and metrics are highly interdependent and, therefore
 
 <br>
 
-#### [`s05_export_results`](s05_export_results.m)
+#### [`s07_export_results`](s07_export_results.m)
 
 This script extracts results from the previously estimated SPM.mat through an interactive prompt that allows users to define custom statistical threshold parameters (p-value, adjustment method, and minimum cluster size). It automatically generates and exports the peak coordinates (.xls) and the thresholded brain maps (.nii) for all evaluated contrasts, including Conjunction Analyses. To facilitate visualization and reporting and prevent accidental overwrites, all outputs receive a dynamic threshold signature in their filename (eg., thr_p0p001_unc_k20) and are centralized into the '\derivatives\spm-statistics\1st-level-exports\\[task-name]' directory.
 
 <br>
 
-#### [`s06_roi_analysis`](s06_roi_analysis.m)
+#### [`s08_roi_analysis`](s08_roi_analysis.m)
 
 This script automates the extraction of mean beta values from the individualized MarsBaR ROIs across all subjects. It includes a custom extraction function based on Andrew Jahn's code [https://github.com/andrewjahn/SPM_Scripts/blob/master/Extract_ROI_Data.m], modified to support spatial alignment between the ROI and Contrast spaces.
 
