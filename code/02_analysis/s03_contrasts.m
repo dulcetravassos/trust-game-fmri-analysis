@@ -15,7 +15,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 16/03/2026                                                  %
-%   Last update: 10/06/2026                                              %
+%   Last update: 20/07/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -194,12 +194,11 @@ for s = 1:length(subjects)
             con_6a = zeros(1,num_cols); con_6b = zeros(1,num_cols); con_6c = zeros(1,num_cols); % Contrasts 6a & 6b & 6c
             con_7 = zeros(1,num_cols); % Contrast 7
             con_8a = zeros(1,num_cols); con_8b = zeros(1,num_cols);  % Contrasts 8a & 8b
-            con_9 = zeros(1,num_cols); % Contrast 9
             con_sc_1 = zeros(1,num_cols); con_sc_2 = zeros(1,num_cols); % Sanity Check Contrasts
     
             for i = 1:num_cols
                 name = col_names{i};  
-                if contains(name,'excluded') || contains(name,'NO_RESPONSE')
+                if contains(name,'excluded','IgnoreCase',true) || contains(name,'NO_RESPONSE','IgnoreCase',true)
                     continue;
                 end
     
@@ -211,20 +210,20 @@ for s = 1:length(subjects)
                 curr_run = str2double(tok{1}{1});
                 
                 % ----- Video Phase Contrasts -----
-                if contains(name,'VIDEO')
+                if contains(name,'VIDEO','IgnoreCase',true)
 
                     % Sanity Check 1
-                    if ~contains(name,'NO_RESPONSE')
+                    if ~contains(name,'NO_RESPONSE','IgnoreCase',true)
                         con_sc_1(i) = 1;
                     end
     
                     % Contrast 1
                     % (1a) Trustworthy Partner (TP) > Untrustworthy Partner (UP) 
                     % (1b) UP > TP 
-                    if contains(name,'TTrust')
+                    if contains(name,'TTrust','IgnoreCase',true)
                         con_1a(i) = 1;
                         con_1b(i) = -1;
-                    elseif contains(name,'TUntrust')
+                    elseif contains(name,'TUntrust','IgnoreCase',true)
                         con_1a(i) = -1;
                         con_1b(i) = 1;
                     end  
@@ -233,15 +232,15 @@ for s = 1:length(subjects)
                     % (2a) TP Averted Gaze > TP Directed Gaze (Run 5)
                     % (2b) TP Averted Gaze > TP Directed Gaze (Runs 6-8)
                     if curr_run==run_trans
-                        if contains(name,'TTrust') && contains(name,'averted')
+                        if contains(name,'TTrust','IgnoreCase',true) && contains(name,'averted','IgnoreCase',true)
                             con_2a(i) = 1;
-                        elseif contains(name,'TTrust') && contains(name,'directed')
+                        elseif contains(name,'TTrust','IgnoreCase',true) && contains(name,'directed','IgnoreCase',true)
                             con_2a(i) = -1;
                         end 
                     elseif ismember(curr_run,runs_incong) && curr_run~=run_trans
-                        if contains(name,'TTrust') && contains(name,'averted')
+                        if contains(name,'TTrust','IgnoreCase',true) && contains(name,'averted','IgnoreCase',true)
                             con_2b(i) = 1;
-                        elseif contains(name,'TTrust') && contains(name,'directed')
+                        elseif contains(name,'TTrust','IgnoreCase',true) && contains(name,'directed','IgnoreCase',true)
                             con_2b(i) = -1;
                         end 
                     end
@@ -292,23 +291,23 @@ for s = 1:length(subjects)
                     % (6a) Averted + Directed Gaze (Congruent Phase) > Averted + Directed Gaze (Incongruent Phase) 
                     % (6b) Directed Gaze (Congruent Phase) > Directed Gaze (Incongruent Phase)  
                     % (6c) Averted Gaze (Congruent Phase) > Averted Gaze (Incongruent Phase) 
-                    if contains(name,'directed') && ismember(curr_run,runs_cong)
+                    if contains(name,'directed','IgnoreCase',true) && ismember(curr_run,runs_cong)
                         con_6a(i) = 1;
                         con_6b(i) = 1;
-                    elseif contains(name,'directed') && ismember(curr_run,runs_incong)
+                    elseif contains(name,'directed','IgnoreCase',true) && ismember(curr_run,runs_incong)
                         con_6a(i) = -1;
                         con_6b(i) = -1;
-                    elseif contains(name,'averted') && ismember(curr_run,runs_cong)
+                    elseif contains(name,'averted','IgnoreCase',true) && ismember(curr_run,runs_cong)
                         con_6a(i) = 1;
                         con_6c(i) = 1;
-                    elseif contains(name,'averted') && ismember(curr_run,runs_incong)
+                    elseif contains(name,'averted','IgnoreCase',true) && ismember(curr_run,runs_incong)
                         con_6a(i) = -1;
                         con_6c(i) = -1;
                     end
                 end
     
                 % ----- Feedback/Outcome Phase Contrasts -----
-                if contains(name,'FEEDBACK')
+                if contains(name,'FEEDBACK','IgnoreCase',true)
                     % Contrast 7
                     % Run 5 > Run 4 
                     if curr_run==run_trans
@@ -319,10 +318,10 @@ for s = 1:length(subjects)
                 end
     
                 % ----- Investment Phase Contrasts -----
-                if contains(name,'DECISION') 
+                if contains(name,'DECISION','IgnoreCase',true) 
                     
                     % Sanity Check 2
-                    if ~contains(name,'NO_RESPONSE')
+                    if ~contains(name,'NO_RESPONSE','IgnoreCase',true)
                         con_sc_2(i) = 1;
                     end
                     
@@ -348,9 +347,13 @@ for s = 1:length(subjects)
             % the negative activations should equal -1, so they balance to 0.
             if strcmp(subj,'sub-009')
                 all_cons = {con_sc_1, con_sc_2, con_1a, con_1b};
+                % Define contrast names
+                con_names = {'SC VIDEO','SC INVESTMENT','1a','1b'};
             else
                 all_cons = {con_sc_1, con_sc_2, con_1a, con_1b, con_2a, con_2b, con_3, con_4a, con_4b, con_4c, con_4d, ...
                     con_5a, con_5b, con_5c, con_6a, con_6b, con_6c, con_7, con_8a, con_8b};
+                % Define contrast names
+                con_names = {'SC VIDEO','SC INVESTMENT','1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b'};
             end
             for c = 1:length(all_cons)
                 con = all_cons{c};
@@ -358,19 +361,8 @@ for s = 1:length(subjects)
                 if pos_sum>0; con(con > 0) = con(con > 0)/pos_sum; end;
                 neg_sum = sum(con(con < 0));
                 if neg_sum<0; con(con < 0) = con(con < 0)/abs(neg_sum); end;
-
                 all_cons{c} = con;
-            end
-            if strcmp(subj,'sub-009')
-                [con_sc_1,con_sc_2,con_1a,con_1b] = all_cons{:};
-                % Define contrast names
-                con_names = {'SC VIDEO','SC INVESTMENT','1a','1b'};
-            else
-                [con_sc_1,con_sc_2,con_1a,con_1b,con_2a,con_2b,con_3,con_4a,con_4b,con_4c,con_4d,con_5a,con_5b,con_5c, ...
-                    con_6a,con_6b,con_6c,con_7,con_8a,con_8b] = all_cons{:};
-                % Define contrast names
-                con_names = {'SC VIDEO','SC INVESTMENT','1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b'};
-            end           
+            end         
 
         elseif strcmp(current_task,'task-localizer')
             con_loc_1 = zeros(1,num_cols);
@@ -379,16 +371,16 @@ for s = 1:length(subjects)
             for i = 1:num_cols
                 name = col_names{i};
                 
-                if contains(name,'faces')
+                if contains(name,'faces','IgnoreCase',true)
                     con_loc_1(i) = 1;
                     con_loc_2(i) = 1;
                     con_loc_3(i) = 1;
-                elseif contains(name,'bodies')
+                elseif contains(name,'bodies','IgnoreCase',true)
                     con_loc_1(i) = -1;
-                elseif contains(name,'objects')
+                elseif contains(name,'objects','IgnoreCase',true)
                     con_loc_1(i) = -1;
                     con_loc_2(i) = -1;
-                elseif contains(name,'scrambled')
+                elseif contains(name,'scrambled','IgnoreCase',true)
                     con_loc_1(i) = -1;
                     con_loc_3(i) = -1;
                 end
@@ -396,6 +388,9 @@ for s = 1:length(subjects)
             
             % Normalize contrasts
             all_cons = {con_loc_1, con_loc_2, con_loc_3};
+            % Define contrasts' names
+            con_names = {'Faces > (Bodies + Objects + Scrambled)', 'Faces > Objects', 'Faces > Scrambled'};
+
             for c = 1:length(all_cons)
                 con = all_cons{c};
                 pos_sum = sum(con(con > 0));
@@ -403,11 +398,7 @@ for s = 1:length(subjects)
                 neg_sum = sum(con(con < 0));
                 if neg_sum<0; con(con < 0) = con(con < 0)/abs(neg_sum); end;
                 all_cons{c} = con;
-            end
-            [con_loc_1, con_loc_2, con_loc_3] = all_cons{:};
-
-            % Define contrasts' names
-            con_names = {'Faces > (Bodies + Objects + Scrambled)', 'Faces > Objects', 'Faces > Scrambled'};
+            end     
         end
 
         
