@@ -48,9 +48,10 @@ With modularity and reproducibility in mind, this pipeline was designed to be ex
   - **s03_contrasts.m**: Dynamically defines and computes the 1st-level statistical contrast vectors.
   - **s04_get_2nd_level_design_matrix.m**: Generates 2nd-level one-sample t-test group models across all contrasts previously generated.
   - **s05_2nd_level_beta_estimation.m**: Estimates the regression coefficients (Beta images) for the 2nd-level models.
-  - **s06_extra_design_quality.m**: Evaluates the statistical efficiency and multicollinearity of the design matrices.
-  - **s07_export_results.m**: Extracts automatically 1st-level statistics, exporting peak coordinates tables (.xls) and thresholded brain maps (.nii) for main contrasts and conjunction analyses.
-  - **s08_roi_analysis.m**: Automates the extraction of mean beta values from individualized ROIs, and exports the data to a .csv file.
+  - **s06_get_group_roi.m**: Processes subject-specific bilateral anatomical ROIs into unilateral consensus masks for group-level analyses.
+  - **s07_extra_design_quality.m**: Evaluates the statistical efficiency and multicollinearity of the design matrices.
+  - **s08_export_results.m**: Extracts automatically 1st-level statistics, exporting peak coordinates tables (.xls) and thresholded brain maps (.nii) for main contrasts and conjunction analyses.
+  - **s09_roi_analysis.m**: Automates the extraction of mean beta values from individualized ROIs, and exports the data to a .csv file.
 
 <br>
 
