@@ -41,8 +41,7 @@ subjects = {
 };
 
 % List of bilateral anatomical ROIs
-rois = {'amygdala', 'caudate', 'NAcc'%, 'OFC'
-    };
+rois = {'amygdala', 'caudate', 'NAcc', 'OFC'};
 
 % Threshold: proportion of subjects that must share a voxel
 threshold = 0.5;
