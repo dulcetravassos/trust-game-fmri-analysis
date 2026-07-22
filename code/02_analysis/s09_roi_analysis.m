@@ -2,20 +2,20 @@
 %                                                                        %
 %   ROI Analysis                                                         %
 %                                                                        %
-%   This script extracts mean beta values from subject-specific ROIs. It %
-%   supports both unilateral spherical ROIs (generated via MarsBar) and  %
-%   bilateral anatomical ROIs (from FreeSurfer), automatically splitting %
-%   bilateral regions into specific hemispheres using MNI coordinates.   %
+%   This script extracts mean beta values from subject-specific ROIs.    %
+%   It supports both unilateral ROIs (spherical or anatomical) and       %
+%   bilateral anatomical ROIs (splitting hemispheres via MNI             %
+%   coordinates).                                                        %
 %                                                                        %
 %   It features a custom function (adapted from Andrew Jahn's code)      %
 %   modified to align the ROI and the contrast spaces, using the         %
 %   functional contrast's affine matrix. It also automatically filters   %
-%   out-of-brain artifacts (absolute zeros) prior to computing the mean  %
-%   value.                                                               %
+%   out-of-brain artifacts (absolute zeros) prior to computing mean      %
+%   values.                                                              %
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 30/05/2026                                                  %
-%   Last update: 02/07/2026                                              %
+%   Last update: 22/07/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -47,6 +47,10 @@ subjects = {
     'sub-022', 'sub-023'
 };
 
+
+% Are anatomical ROIs bilateral (.nii with both hemispheres) or unilateral?
+isBilateral = false;
+
 %% ROI Analysis
 
 % Initialize SPM
@@ -57,24 +61,26 @@ spm_jobman('initcfg');
 % User input - selection of ROI and contrast
 valid_regions = {'OFA','FFA','pSTS','amygdala','caudate','NAcc'};
 while true
-    region = input('Enter the region (OFA, pSTS, FFA, amygdala, caudate, or NAcc) [case sensitive]: ','s');
-    if ismember(region,valid_regions); break;
+    raw_region = input('Enter the region (OFA, pSTS, FFA, amygdala, caudate, or NAcc) [case insensitive]: ','s');
+    idx = find(strcmpi(raw_region,valid_regions),1);
+    if ~isempty(idx); region = valid_regions{idx}; break;
     else; fprintf('Invalid region. Try again.\n'); end;
 end
 
 while true
-    lat = input('Enter laterality (r or l) [case sensitive]: ','s');
+    lat = input('Enter laterality (r or l) [case insensitive]: ','s'); 
+    lat = lower(lat);
     if strcmp(lat,'r')||strcmp(lat,'l'); break;
     else; fprintf('Invalid laterality. Try again.\n'); end;
 end
 
 con_names = {'1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b'};
-con_codes = {'con_0001','con_0002','con_0003','con_0004','con_0005','con_0006','con_0007','con_0008', ...
-    'con_0009','con_0010','con_0011','con_0012','con_0013','con_0014','con_0015','con_0016','con_0017','con_0018'};
+con_codes = {'con_0003','con_0004','con_0005','con_0006','con_0007','con_0008','con_0009','con_0010','con_0011', ...
+    'con_0012','con_0013','con_0014','con_0015','con_0016','con_0017','con_0018','con_0019','con_0020'};
 fprintf('Available contrasts: %s\n',strjoin(con_names,', '));
 while true
-    con = input('Enter contrast for ROI analysis (e.g., 1a): ','s');
-    idx = find(strcmp(con_names,con));
+    con = input('Enter contrast for ROI analysis (e.g., 1a) [case insensitive]: ','s');
+    idx = find(strcmpi(con_names,con),1);
     if ~isempty(idx)
         con_file_name = con_codes{idx}; break;
     else
@@ -89,20 +95,23 @@ results_table = table();
 fprintf('\n ----- Starting extraction for %s (Contrast %s) -----\n',base_roi_name,con);
 for s=1:length(subjects)
     subj = subjects{s};
-
-    if ismember(region,{"OFA","pSTS","FFA"})
-        roi_name_search = sprintf('%s-%s',lat,region); % example: r-FFA; l-OFA
-    else
-        roi_name_search = sprintf('%s_%sRL',subj,region); % example: sub-020_amygdalaRL; sub-006_caudateRL
-    end
-
     subj_stats_dir = fullfile(deriv_dir,subj,'stats','task-main');
     subj_roi_dir = fullfile(roi_dir,subj);
+
+    if ismember(region,{'OFA','pSTS','FFA'})
+        roi_name_search = sprintf('%s-%s',lat,region); % example: r-FFA; l-OFA
+    else
+        if isBilateral
+            roi_name_search = sprintf('%s_%sRL',subj,region); % example: sub-020_amygdalaRL; sub-006_caudateRL
+        else
+            roi_name_search = sprintf('%s%s',region,upper(lat)); % example: amygdalaR; caudateL
+        end
+    end
 
     roi_search = dir(fullfile(subj_roi_dir,sprintf('%s*.nii',roi_name_search)));
 
     con_dir = fullfile(deriv_dir,'spm-preprocessing',subj,'stats','task-main');
-    contrast_file = fullfile(subj_stats_dir,sprintf('%s.nii',con_file_name));
+    contrast_file = fullfile(con_dir,sprintf('%s.nii',con_file_name));
 
     mean_value = NaN; % default
 
@@ -112,7 +121,7 @@ for s=1:length(subjects)
         fprintf('[WARNING] Contrast %s not found for %s\n',con_file_name,subj);
     else % success
         roi_file = fullfile(subj_roi_dir,roi_search(1).name);
-        mean_value = Extract_ROI_Data(roi_file,contrast_file,lat);
+        mean_value = Extract_ROI_Data(roi_file,contrast_file,lat,isBilateral);
         fprintf('%s: extracted value = %.4f\n',subj,mean_value);
     end
 
@@ -125,24 +134,26 @@ end
 % Export output
 out_folder = fullfile(stats_dir,'roi-analysis'); 
 if ~exist(out_folder,'dir'); mkdir(out_folder); end;
-output_fn = sprintf('ROI_Extraction_%s_%s.csv',base_roi_name,con);
+output_fn = sprintf('ROI_Extraction_%s_%s.csv',con,base_roi_name);
 writetable(results_table,fullfile(out_folder,output_fn));
 
 %% Helper Functions
 
-function ROI_data = Extract_ROI_Data(ROI, Contrast, lat)
+function ROI_data = Extract_ROI_Data(ROI, Contrast, lat, isBilateral)
 
     [Y,XYZmm] = spm_read_vols(spm_vol(ROI)); % check https://github.com/spm/spm/blob/main/spm_read_vols.m
 
     % Isolate the coordinates where the ROI exists (value > 0)
     roi_mm = XYZmm(:,Y(:)>0);
 
-    % Separate hemispheres (for .nii including both hemispheres!)
-    % if x < 0 = left; if x > 0 = right
-    if strcmp(lat,'l')
-        roi_mm = roi_mm(:,roi_mm(1,:)<0);
-    elseif strcmp(lat,'r')
-        roi_mm = roi_mm(:,roi_mm(1,:)>0);
+    if isBilateral
+        % Separate hemispheres (for .nii including both hemispheres!)
+        % if x < 0 = left; if x > 0 = right
+        if strcmp(lat,'l')
+            roi_mm = roi_mm(:,roi_mm(1,:)<0);
+        elseif strcmp(lat,'r')
+            roi_mm = roi_mm(:,roi_mm(1,:)>0);
+        end
     end
 
     if isempty(roi_mm) 
