@@ -114,7 +114,9 @@ This script extracts results from the previously estimated SPM.mat through an in
 
 This script provides an interactive interface to extract mean beta values for a user-selected ROI, laterality, and functional contrast, across all subjects. It supports both individualized spherical ROIs (generated via MarsBar) and anatomical subcortical ROIs (from FreeSurfer). 
 
-It features a custom extraction function adapted from [`Andrew Jahn's code`](https://github.com/andrewjahn/SPM_Scripts/blob/master/Extract_ROI_Data.m), modified to support spatial alignment between the ROI and Contrast spaces, using the functional contrast's affine matrix (`Vcon.mat`) to mathematically translate ROI coordinates to the exact voxel space of the functional images. The script automatically filters absolute zeros (for example, caused by out-of-brain voxels) before calculating the mean value. The results are compiled into a single structured `.csv` file.
+It features a custom extraction function adapted from [`Andrew Jahn's code`](https://github.com/andrewjahn/SPM_Scripts/blob/master/Extract_ROI_Data.m), modified to support spatial alignment between the ROI and Contrast spaces, using the functional contrast's affine matrix (`Vcon.mat`) to mathematically translate ROI coordinates to the exact voxel space of the functional images. The script automatically filters absolute zeros (for example, caused by out-of-brain voxels) before calculating the mean value. 
+
+The extracted data is compiled into a single structured `.csv` file. Additionally, the script performs a One-Sample T-Test against zero across valid subjects, printing the statistical summary (t-statistic, p-value, 95% CI, mean, and SD) directly to the console and saving it as a .txt report inside the `results/` subfolder.
 
 It supports both unilateral and bilateral images. To process bilateral images, it applies an automated spatial filter based on standard MNI coordinates to isolate the target hemisphere (where x < 0 defines the left hemisphere, and x > 0 the right hemisphere).
 
@@ -122,4 +124,6 @@ It supports both unilateral and bilateral images. To process bilateral images, i
 
 #### [`s09_roi_analysis_batch`](s09_roi_analysis_batch.m)
 
-This script automates the full extraction of mean beta values across all subjects, regions, lateralities, and functional contrasts in a single run, eliminating the need for manual user input. It shares the same core spatial transformation and zero-filtering as [`s09_roi_analysis`](s09_roi_analysis.m), ensuring complete consistency across spatial states. It iterativelly generates dedicated and structured `.csv` files for every individual ROI and contrast combination, saving them directly to the statistical derivatives folder.
+This script automates the full extraction of mean beta values across all subjects, regions, lateralities, and functional contrasts in a single run, eliminating the need for manual user input. It shares the same core spatial transformation and zero-filtering as [`s09_roi_analysis`](s09_roi_analysis.m), ensuring complete consistency across spatial states. 
+
+It iterativelly generates dedicated and structured `.csv` files for every individual ROI and contrast combination. Furthermore, it automatically computes a One-Sample T-Test against zero for each condition and exports a corresponding statistical summary (`.txt`) into the `results/` subfolder.
