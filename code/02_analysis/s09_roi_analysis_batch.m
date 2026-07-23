@@ -173,9 +173,14 @@ for c=1:length(con_names)
             fprintf('Done!\n');
         end
     end
+    % .csv format
     summary_csv_name = sprintf('Summary_Stats_con-%s.csv',con);
     writetable(contrast_summary,fullfile(results_folder,summary_csv_name));
     fprintf('>>> Saved summary: %s\n',summary_csv_name);
+
+    % extra .xlsx format for better readibility
+    summary_xlsx_name = sprintf('Summary_Stats_con-%s.xlsx',con);
+    writetable(contrast_summary,fullfile(results_folder,summary_xlsx_name));
 end
 
 fprintf('Extraction complete! Results saved to: %s\n',out_folder);
