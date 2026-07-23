@@ -14,8 +14,8 @@
 %                                                                        %
 %   Results are exported to individual CSV files for each ROI and        %
 %   contrast combination. Additionally, it performs a One-Sample T-Test  %
-%   against zero for each condition and saves the statistical summary in %
-%   a .txt file.                                                         %
+%   against zero for each condition, saves the statistical summary in a  %
+%   .txt file, and generates a summary .csv table per contrast.          %
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 22/07/2026                                                  %
@@ -76,6 +76,7 @@ for c=1:length(con_names)
   
     con = con_names{c};
     con_file_name = con_codes{c};
+    contrast_summary = table();
     
     for r=1:length(valid_regions)
         
@@ -127,7 +128,7 @@ for c=1:length(con_names)
                 results_table = [results_table; row];
             end
 
-            % Export output
+            % Export individual output
             output_fn = sprintf('ROI_Extraction_%s_%s.csv',con,base_roi_name);
             writetable(results_table,fullfile(out_folder,output_fn));   
 
@@ -137,9 +138,12 @@ for c=1:length(con_names)
             
             if ~isempty(beta)
                 [h,p,ci,stats] = ttest(beta);
+                cohens_d = mean(beta)/std(beta);
                 
                 results_folder = fullfile(out_folder,'results');
                 if ~exist(results_folder,'dir'); mkdir(results_folder); end;
+                
+                % Write .txt report
                 txt_fn = sprintf('Stats_%s_%s.txt',con,base_roi_name);
                 txt_path = fullfile(results_folder,txt_fn);
                 
@@ -155,12 +159,23 @@ for c=1:length(con_names)
                 fprintf(fileID,'t(%d): %.3f\n',stats.df,stats.tstat);
                 fprintf(fileID,'p-value: %.4f\n',p);
                 fprintf(fileID,'95%% CI: [%.4f %.4f]\n',ci(1),ci(2));
-                fprintf(fileID,"Cohen's d = %.3f\n",mean(beta)/std(beta));
+                fprintf(fileID,"Cohen's d = %.3f\n",cohens_d);
                 fclose(fileID);
+
+                sum_row = table({base_roi_name},length(beta),mean(beta),std(beta),stats.df,stats.tstat,p,ci(1),ci(2),cohens_d, ...
+                    'VariableNames',{'ROI','N_valid','Mean_Beta','SD','df','t_stat','p_value','CI_lower','CI_upper','Cohens_d'});
+            else 
+                % fallback
+                sum_row = table({base_roi_name},0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN, ...
+                    'VariableNames',{'ROI','N_valid','Mean_Beta','SD','df','t_stat','p_value','CI_lower','CI_upper','Cohens_d'});            
             end
+            contrast_summary = [contrast_summary; sum_row];
             fprintf('Done!\n');
         end
     end
+    summary_csv_name = sprintf('Summary_Stats_con-%s.csv',con);
+    writetable(contrast_summary,fullfile(results_folder,summary_csv_name));
+    fprintf('>>> Saved summary: %s\n',summary_csv_name);
 end
 
 fprintf('Extraction complete! Results saved to: %s\n',out_folder);
