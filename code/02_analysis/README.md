@@ -126,4 +126,4 @@ It supports both unilateral and bilateral images. To process bilateral images, i
 
 This script automates the full extraction of mean beta values across all subjects, regions, lateralities, and functional contrasts in a single run, eliminating the need for manual user input. It shares the same core spatial transformation and zero-filtering as [`s09_roi_analysis`](s09_roi_analysis.m), ensuring complete consistency across spatial states. 
 
-It iterativelly generates dedicated and structured `.csv` files for every individual ROI and contrast combination. Furthermore, it automatically computes a One-Sample T-Test against zero for each condition and exports a corresponding statistical summary (`.txt`) into the `results/` subfolder.
+It iteratively generates dedicated and structured `.csv` files for every individual ROI and contrast combination. Furthermore, it automatically computes a One-Sample T-Test against zero for each condition, exporting individual statistical summaries (`.txt`) and a consolidated summary table (`.csv`) per contrast into the `results/` subfolder.
