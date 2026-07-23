@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                        %
-%   ROI Analysis                                                         %
+%   ROI Analysis - Interactive Single Extraction & T-Test                %
 %                                                                        %
 %   This script extracts mean beta values from subject-specific ROIs.    %
 %   It supports both unilateral ROIs (spherical or anatomical) and       %
@@ -13,9 +13,12 @@
 %   out-of-brain artifacts (absolute zeros) prior to computing mean      %
 %   values.                                                              %
 %                                                                        %
+%   Exports a structured .csv file and performs a One-Sample T-Test      %
+%   against zero, saving a summary report in a .txt file.                %
+%                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 30/05/2026                                                  %
-%   Last update: 22/07/2026                                              %
+%   Last update: 23/07/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -136,6 +139,37 @@ out_folder = fullfile(stats_dir,'roi-analysis');
 if ~exist(out_folder,'dir'); mkdir(out_folder); end;
 output_fn = sprintf('ROI_Extraction_%s_%s.csv',con,base_roi_name);
 writetable(results_table,fullfile(out_folder,output_fn));
+
+
+% One Sample T-Test
+beta = results_table.Mean_Beta;
+beta = beta(~isnan(beta)); % skips sub-009's NaNs
+
+if ~isempty(beta)
+    [h,p,ci,stats] = ttest(beta);
+    
+    results_folder = fullfile(out_folder,'results');
+    if ~exist(results_folder,'dir'); mkdir(results_folder); end;
+    txt_fn = sprintf('Stats_%s_%s.txt',con,base_roi_name);
+    txt_path = fullfile(results_folder,txt_fn);
+    
+    fileID = fopen(txt_path,'w');
+    for fid=[1,fileID] % when 1, prints on the console; when fileID, writes in the file
+        fprintf(fid,'------------------------------------------\n');
+        fprintf(fid,' Statistical Summary (One-Sample T-Test)\n');
+        fprintf(fid,'------------------------------------------\n');
+        fprintf(fid,'ROI: %s\n',base_roi_name);
+        fprintf(fid,'Contrast: %s (%s)\n',con,con_file_name);
+        fprintf(fid,'N (valid subjects): %d\n',length(beta));
+        fprintf(fid,'Mean beta: %.4f\n',mean(beta));
+        fprintf(fid,'SD: %.4f\n',std(beta));
+        fprintf(fid,'t(%d): %.3f\n',stats.df,stats.tstat);
+        fprintf(fid,'p-value: %.4f\n',p);
+        fprintf(fid,'95%% CI: [%.4f %.4f]\n',ci(1),ci(2));
+    end
+    fclose(fileID);
+    fprintf('Statistical summary saved to: %s\n',txt_path);
+end
 
 %% Helper Functions
 
