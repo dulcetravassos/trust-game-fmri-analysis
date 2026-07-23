@@ -155,6 +155,7 @@ for c=1:length(con_names)
                 fprintf(fileID,'t(%d): %.3f\n',stats.df,stats.tstat);
                 fprintf(fileID,'p-value: %.4f\n',p);
                 fprintf(fileID,'95%% CI: [%.4f %.4f]\n',ci(1),ci(2));
+                fprintf(fileID,"Cohen's d = %.3f\n",mean(beta)/std(beta));
                 fclose(fileID);
             end
             fprintf('Done!\n');

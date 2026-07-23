@@ -166,6 +166,7 @@ if ~isempty(beta)
         fprintf(fid,'t(%d): %.3f\n',stats.df,stats.tstat);
         fprintf(fid,'p-value: %.4f\n',p);
         fprintf(fid,'95%% CI: [%.4f %.4f]\n',ci(1),ci(2));
+        fprintf(fileID,"Cohen's d = %.3f\n",mean(beta)/std(beta));
     end
     fclose(fileID);
     fprintf('Statistical summary saved to: %s\n',txt_path);
