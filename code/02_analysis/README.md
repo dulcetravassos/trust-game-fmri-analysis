@@ -116,7 +116,7 @@ This script provides an interactive interface to extract mean beta values for a 
 
 It features a custom extraction function adapted from [`Andrew Jahn's code`](https://github.com/andrewjahn/SPM_Scripts/blob/master/Extract_ROI_Data.m), modified to support spatial alignment between the ROI and Contrast spaces, using the functional contrast's affine matrix (`Vcon.mat`) to mathematically translate ROI coordinates to the exact voxel space of the functional images. The script automatically filters absolute zeros (for example, caused by out-of-brain voxels) before calculating the mean value. 
 
-The extracted data is compiled into a single structured `.csv` file. Additionally, the script performs a One-Sample T-Test against zero across valid subjects, printing the statistical summary (t-statistic, p-value, 95% CI, mean, and SD) directly to the console and saving it as a .txt report inside the `results/` subfolder.
+The extracted data is compiled into a single structured `.csv` file. Additionally, the script performs a One-Sample T-Test against zero across valid subjects, printing the statistical summary (t-statistic, p-value, 95% CI, mean, SD, and Cohen's d) directly to the console and saving it as a .txt report inside the `results/` subfolder.
 
 It supports both unilateral and bilateral images. To process bilateral images, it applies an automated spatial filter based on standard MNI coordinates to isolate the target hemisphere (where x < 0 defines the left hemisphere, and x > 0 the right hemisphere).
 
