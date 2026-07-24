@@ -5,14 +5,15 @@
 %   This script processes subject-specific bilateral ROI masks (.nii)    %
 %   (e.g., "*_caudateRL.nii") for group-level Small Volume Correction.   %
 %   First, it splits the bilateral masks into Left (x<0) and Right (x>0) %
-%   hemispheric masks for each subject. Then, it computes a group ROI    %
-%   for each hemisphere and region, by summing all masks and             %
-%   thresholding at >= 50% overlap (meaning at least 10 out of 20        % 
-%   subjects must share the voxel).                                      %
+%   hemispheric masks for each subject, skipping predefined corrupted or %
+%   missing data. Then, it computes a group ROI for each hemisphere and  %
+%   region, by summing all valid masks and applying a proportional       %
+%   overlap threshold (>= 50% of the actual valid N subjects must share  %
+%   the voxel for it to be included in the group ROI).                   %
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 20/07/2026                                                  %
-%   Last update: 20/07/2026                                              %
+%   Last update: 24/07/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -41,7 +42,8 @@ subjects = {
 };
 
 % List of bilateral anatomical ROIs
-rois = {'amygdala', 'caudate', 'NAcc', 'OFC'};
+rois = {'amygdala', 'caudate', 'NAcc'%, 'OFC'
+    };
 
 % Threshold: proportion of subjects that must share a voxel
 threshold = 0.5;
@@ -56,8 +58,6 @@ spm_jobman('initcfg');
 group_dir = fullfile(rois_dir,'group');
 if ~exist(group_dir,'dir'); mkdir(group_dir); end;
 
-min_subjects = ceil(length(subjects)*threshold);
-
 for r = 1:length(rois)
     
     current_roi = rois{r};
@@ -69,6 +69,12 @@ for r = 1:length(rois)
     for s = 1:length(subjects)
         subj = subjects{s};
         subj_roi_dir = fullfile(rois_dir,subj);
+
+        % skip corrupted ROIs in specific subjects
+        if strcmp(current_roi,'amygdala') && ismember(subj,{'sub-013','sub-018'})
+            fprintf('[INFO] Skipping %s for %s (corrupted or missing data).\n',current_roi,subj);
+            continue;
+        end
 
         fprintf('>>> Splitting R/L masks for %s...\n',subj);
 
@@ -110,10 +116,15 @@ for r = 1:length(rois)
         end
     end
 
-    if length(left_files) < min_subjects
-        warning('Not enough valid subjects (%d) to create consensus for %s!\n',length(left_files),current_roi);
+    actual_N = length(left_files);
+    if actual_N==0
+        warning('No valid subjects to create consensus for %s!\n',current_roi);
         continue;
     end
+
+    % Dynamic threshold (e.g., 50% of 18 valid subjects = 9)
+    min_subjects = ceil(actual_N*threshold);
+
     fprintf('Calculating group consensus (threshold >= %d subjects)...\n',min_subjects);
     
     % Instead of using the average ('mean(X)'), we dynamically write the ImCalc 
