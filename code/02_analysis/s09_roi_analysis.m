@@ -18,7 +18,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 30/05/2026                                                  %
-%   Last update: 23/07/2026                                              %
+%   Last update: 04/08/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -62,9 +62,9 @@ spm('defaults', 'FMRI');
 spm_jobman('initcfg');
 
 % User input - selection of ROI and contrast
-valid_regions = {'OFA','FFA','pSTS','amygdala','caudate','NAcc'};
+valid_regions = {'OFA','FFA','pSTS','amygdala','caudate','NAcc','medialOFC','lateralOFC'};
 while true
-    raw_region = input('Enter the region (OFA, pSTS, FFA, amygdala, caudate, or NAcc) [case insensitive]: ','s');
+    raw_region = input('Enter the region (OFA, pSTS, FFA, amygdala, caudate, NAcc, medialOFC, or lateralOFC) [case insensitive]: ','s');
     idx = find(strcmpi(raw_region,valid_regions),1);
     if ~isempty(idx); region = valid_regions{idx}; break;
     else; fprintf('Invalid region. Try again.\n'); end;
@@ -183,9 +183,9 @@ function ROI_data = Extract_ROI_Data(ROI, Contrast, lat, isBilateral)
 
     if isBilateral
         % Separate hemispheres (for .nii including both hemispheres!)
-        % if x < 0 = left; if x > 0 = right
+        % if x <= 0 = left; if x > 0 = right
         if strcmp(lat,'l')
-            roi_mm = roi_mm(:,roi_mm(1,:)<0);
+            roi_mm = roi_mm(:,roi_mm(1,:)<=0);
         elseif strcmp(lat,'r')
             roi_mm = roi_mm(:,roi_mm(1,:)>0);
         end
