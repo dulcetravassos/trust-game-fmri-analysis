@@ -4,7 +4,7 @@
 %                                                                        %
 %   This script processes subject-specific bilateral ROI masks (.nii)    %
 %   (e.g., "*_caudateRL.nii") for group-level Small Volume Correction.   %
-%   First, it splits the bilateral masks into Left (x<0) and Right (x>0) %
+%   First, it splits the bilateral masks into Left (x<=0) and Right (x>0)%
 %   hemispheric masks for each subject, skipping predefined corrupted or %
 %   missing data. Then, it computes a group ROI for each hemisphere and  %
 %   region, by summing all valid masks and applying a proportional       %
@@ -106,7 +106,8 @@ for r = 1:length(rois)
 
             % Hemisphere separation
             left = Y; right = Y;
-            left(mniX>=0) = 0; right(mniX<=0) = 0;
+            left(mniX>0) = 0; % saves x<0 AND x=0
+            right(mniX<=0) = 0; % saves x>0
 
             V_left = V; V_right = V;
             V_left.fname = fullfile(subj_roi_dir,left_name);
