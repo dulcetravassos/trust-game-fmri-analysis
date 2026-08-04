@@ -13,7 +13,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 20/07/2026                                                  %
-%   Last update: 24/07/2026                                              %
+%   Last update: 04/08/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -42,8 +42,7 @@ subjects = {
 };
 
 % List of bilateral anatomical ROIs
-rois = {'amygdala', 'caudate', 'NAcc'%, 'OFC'
-    };
+rois = {'amygdala', 'caudate', 'NAcc', 'medialOFC', 'lateralOFC'};
 
 % Threshold: proportion of subjects that must share a voxel
 threshold = 0.5;
@@ -78,11 +77,15 @@ for r = 1:length(rois)
 
         fprintf('>>> Splitting R/L masks for %s...\n',subj);
 
-        bilateral_file = fullfile(subj_roi_dir,sprintf('%s_%sRL.nii',subj,current_roi));
-        if ~exist(bilateral_file,'file')
+        search_bfile = fullfile(subj_roi_dir,sprintf('%s_%s*RL.nii',subj,current_roi));
+        matches = dir(search_bfile);
+
+        if isempty(matches)
             warning('%sRL.nii not found for %s. Skipping...\n',current_roi,subj);
             continue;
         end
+        bilateral_file = fullfile(matches(1).folder,matches(1).name);
+
         
         left_name = sprintf('%sL.nii',current_roi); right_name = sprintf('%sR.nii',current_roi);
 
