@@ -78,7 +78,7 @@ To save disk space, the residuals are not directly saved, but written in the hea
 
 #### [`s06_get_group_roi`](s06_get_group_roi.m)
 
-Processes subject-specific bilateral anatomical ROIs into unilateral consensus masks optimized for group-level analyses in SPM. For hemisphere separation, this script directly loads NIfTI volumes using `spm_vol` and `spm_read_vols`, applies the image's affine transformation matrix (`V.mat`) to map 3D voxel indices into real-world MNI space, and isolates the hemisphere volumes using the rule `x<0` for Left and `x>0` for Right. 
+Processes subject-specific bilateral anatomical ROIs into unilateral consensus masks optimized for group-level analyses in SPM. For hemisphere separation, this script directly loads NIfTI volumes using `spm_vol` and `spm_read_vols`, applies the image's affine transformation matrix (`V.mat`) to map 3D voxel indices into real-world MNI space, and isolates the hemisphere volumes using the rule `x<=0` for Left and `x>0` for Right. 
 
 Additionally, to prevent statistical power degradation in Small Volume Correction (SVC), masks are summed across subjects and dynamically thresholded at 50% spatial overlap. The script is designed to automatically handle and skip missing or corrupted subject data, adjusting the underlying sample size in real-time. A voxel is only retained in the final consensus mask ('*L_avg.nii' or '*R_avg.nii') if it is anatomically shared by at least 50% of the actual valid subjects for that specific region.
 
@@ -118,7 +118,7 @@ It features a custom extraction function adapted from [`Andrew Jahn's code`](htt
 
 The extracted data is compiled into a single structured `.csv` file. Additionally, the script performs a One-Sample T-Test against zero across valid subjects, printing the statistical summary (t-statistic, p-value, 95% CI, mean, SD, and Cohen's d) directly to the console and saving it as a .txt report inside the `results/` subfolder.
 
-It supports both unilateral and bilateral images. To process bilateral images, it applies an automated spatial filter based on standard MNI coordinates to isolate the target hemisphere (where x < 0 defines the left hemisphere, and x > 0 the right hemisphere).
+It supports both unilateral and bilateral images. To process bilateral images, it applies an automated spatial filter based on standard MNI coordinates to isolate the target hemisphere (where x <= 0 defines the left hemisphere, and x > 0 the right hemisphere).
 
 <br>
 
