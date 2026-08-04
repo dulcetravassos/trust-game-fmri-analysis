@@ -80,7 +80,7 @@ To save disk space, the residuals are not directly saved, but written in the hea
 
 Processes subject-specific bilateral anatomical ROIs into unilateral consensus masks optimized for group-level analyses in SPM. For hemisphere separation, this script directly loads NIfTI volumes using `spm_vol` and `spm_read_vols`, applies the image's affine transformation matrix (`V.mat`) to map 3D voxel indices into real-world MNI space, and isolates the hemisphere volumes using the rule `x<0` for Left and `x>0` for Right. 
 
-Additionally, to prevent statistical power degradation in Small Volume Correction (SVC), masks are summed across subjects and dynamically thresholded at 50% spatial overlap. A voxel is only retained in the final consensus mask ('*L_avg.nii' or '*R_avg.nii') if at least 10 out of 20 subjects share anatomical assignment at that MNI coordinate.
+Additionally, to prevent statistical power degradation in Small Volume Correction (SVC), masks are summed across subjects and dynamically thresholded at 50% spatial overlap. The script is designed to automatically handle and skip missing or corrupted subject data, adjusting the underlying sample size in real-time. A voxel is only retained in the final consensus mask ('*L_avg.nii' or '*R_avg.nii') if it is anatomically shared by at least 50% of the actual valid subjects for that specific region.
 
 <br>
 
