@@ -19,7 +19,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 22/07/2026                                                  %
-%   Last update: 23/07/2026                                              %
+%   Last update: 04/08/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -52,7 +52,7 @@ subjects = {
 };
 
 % Parameters
-valid_regions = {'OFA','FFA','pSTS','amygdala','caudate','NAcc'};
+valid_regions = {'OFA','FFA','pSTS','amygdala','caudate','NAcc','medialOFC','lateralOFC'};
 lat_list = {'r','l'};
 con_names = {'1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b'};
 con_codes = {'con_0003','con_0004','con_0005','con_0006','con_0007','con_0008','con_0009','con_0010','con_0011', ...
