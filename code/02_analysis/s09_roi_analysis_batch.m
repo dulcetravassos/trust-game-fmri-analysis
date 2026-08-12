@@ -75,7 +75,7 @@ hypotheses('3') = {{'lOFC', 'right'}, {'amygdala', 'right'}};
 hypotheses('7') = {{'lOFC', 'right'}, {'mOFC', 'right'}, {'caudate', 'right'}, {'NAcc', 'right'}, {'amygdala', 'right'}};
 hypotheses('6b') = {{'NAcc', 'right'}, {'mOFC', 'right'}, {'amygdala', 'both'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
 hypotheses('6c') = {{'amygdala', 'right'}, {'caudate', 'right'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
-hypotheses('6a') = {{'amygdala', 'both'}, {'caudate', 'both'}, {'mOFC', 'both'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
+hypotheses('6a') = {{'amygdala', 'both'}, {'caudate', 'both'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
 hypotheses('8a') = {{'caudate', 'right'}};
 hypotheses('8b') = {{'caudate', 'right'}};
 
