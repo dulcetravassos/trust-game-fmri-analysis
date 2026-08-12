@@ -3,8 +3,10 @@
 %   ROI Analysis - Batch Extraction & T-Test (v2)                        %
 %                                                                        %
 %   This script automatically extracts mean beta values from             %
-%   subject-specific ROIs, across all subjects, regions, lateralities,   %
-%   and functional contrasts.                                            %
+%   subject-specific ROIs based on predefined a priori hypotheses. For   %
+%   each functional contrast, it tests specific target regions           %
+%   (automatically looping through both hemispheres) and applies the     %
+%   appropriate statistical tail (one-sided or two-sided t-test).        %
 %                                                                        %
 %   It features a custom function (adapted from Andrew Jahn's code)      %
 %   modified to align the ROI and the contrast spaces, using the         %
@@ -15,11 +17,11 @@
 %   Results are exported to individual CSV files for each ROI and        %
 %   contrast combination. Additionally, it performs a One-Sample T-Test  %
 %   against zero for each condition, saves the statistical summary in a  %
-%   .txt file, and generates a summary .csv table per contrast.          %
+%   .txt file, and generates a summary .csv/.xlsx table per contrast.    %
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 22/07/2026                                                  %
-%   Last update: 04/08/2026                                              %
+%   Last update: 12/08/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -53,13 +55,36 @@ subjects = {
 
 % Parameters
 valid_regions = {'OFA','FFA','pSTS','amygdala','caudate','NAcc','medialOFC','lateralOFC'};
-lat_list = {'r','l'};
-con_names = {'1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b'};
-con_codes = {'con_0003','con_0004','con_0005','con_0006','con_0007','con_0008','con_0009','con_0010','con_0011', ...
-    'con_0012','con_0013','con_0014','con_0015','con_0016','con_0017','con_0018','con_0019','con_0020'};
+lat_list = {'r','l'}; % this script will always loop through both for every region
+con_names = {'1a','1b','2a','2b','3','6a','6b','6c','7','8a','8b'};
+con_codes = {'con_0003','con_0004','con_0005','con_0006','con_0007', ...
+    'con_0015','con_0016','con_0017','con_0018','con_0019','con_0020'};
 
 % Are anatomical ROIs bilateral (.nii with both hemispheres) or unilateral?
 isBilateral = false;
+
+% Define a priori hypotheses
+% Format: {'region', 'tail'}
+% This script tests automatically both 'r' and 'l' for each region
+hypotheses = containers.Map();
+hypotheses('1a') = {{'NAcc', 'right'}};
+hypotheses('1b') = {{'amygdala', 'right'}, {'caudate', 'right'}, {'pSTS', 'both'}, {'FFA', 'both'}, {'OFA', 'both'}};
+hypotheses('2a') = {{'pSTS', 'right'}, {'amygdala', 'right'}, {'lOFC', 'right'}};
+hypotheses('2b') = {{'pSTS', 'right'}, {'amygdala', 'right'}, {'lOFC', 'right'}};
+hypotheses('3') = {{'lOFC', 'right'}, {'amygdala', 'right'}};
+hypotheses('7') = {{'mOFC', 'right'}, {'caudate', 'right'}, {'NAcc', 'right'}, {'amygdala', 'right'}};
+hypotheses('6b') = {{'NAcc', 'right'}, {'amygdala', 'both'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
+hypotheses('6c') = {{'amygdala', 'right'}, {'caudate', 'right'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
+hypotheses('6a') = {{'amygdala', 'both'}, {'caudate', 'both'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
+hypotheses('8a') = {{'caudate', 'right'}};
+hypotheses('8b') = {{'caudate', 'right'}};
+
+% NOTE: The number of contrasts evaluated here is substantially smaller than the number of contrasts 
+% defined in the previous "s03_contrasts.m" script. This is because we decided to drop or modify 
+% certain hypotheses. No changes need to be made to the earlier scripts, since 1st-level contrast 
+% estimations are computed independently, and, therefore, having extra unused 'con_*.nii' files in 
+% the subjects' directories does not interfere with the statistical validity of the contrasts selected 
+% for this ROI analyis.
 
 %% ROI Analysis
 
@@ -71,16 +96,27 @@ spm_jobman('initcfg');
 out_folder = fullfile(stats_dir,'roi-analysis'); 
 if ~exist(out_folder,'dir'); mkdir(out_folder); end;
 
+results_folder = fullfile(out_folder,'results');
+if ~exist(results_folder,'dir'); mkdir(results_folder); end;
+
 fprintf('----- Starting full batch ROI extraction -----\n');
 for c=1:length(con_names)
   
     con = con_names{c};
     con_file_name = con_codes{c};
     contrast_summary = table();
+
+    if ~isKey(hypotheses,con)
+        fprintf('[INFO] No a priori ROIs defined for contrast %s. Skipping...\n',con);
+        continue;
+    end
+
+    current_targets = hypotheses(con);
     
-    for r=1:length(valid_regions)
+    for t=1:length(current_targets)
         
-        region = valid_regions{r};
+        region = current_targets{t}{1};
+        tail = current_targets{t}{2};
         
         for l=1:length(lat_list)
 
@@ -137,12 +173,9 @@ for c=1:length(con_names)
             beta = beta(~isnan(beta)); % skips sub-009's NaNs
             
             if ~isempty(beta)
-                [h,p,ci,stats] = ttest(beta);
+                [h,p,ci,stats] = ttest(beta,0,'Tail',tail);
                 cohens_d = mean(beta)/std(beta);
-                
-                results_folder = fullfile(out_folder,'results');
-                if ~exist(results_folder,'dir'); mkdir(results_folder); end;
-                
+                                
                 % Write .txt report
                 txt_fn = sprintf('Stats_%s_%s.txt',con,base_roi_name);
                 txt_path = fullfile(results_folder,txt_fn);
@@ -162,12 +195,12 @@ for c=1:length(con_names)
                 fprintf(fileID,"Cohen's d = %.3f\n",cohens_d);
                 fclose(fileID);
 
-                sum_row = table({base_roi_name},length(beta),mean(beta),std(beta),stats.df,stats.tstat,p,ci(1),ci(2),cohens_d, ...
-                    'VariableNames',{'ROI','N_valid','Mean_Beta','SD','df','t_stat','p_value','CI_lower','CI_upper','Cohens_d'});
+                sum_row = table({base_roi_name},{tail},length(beta),mean(beta),std(beta),stats.df,stats.tstat,p,ci(1),ci(2),cohens_d, ...
+                    'VariableNames',{'ROI','Tail','N_valid','Mean_Beta','SD','df','t_stat','p_value','CI_lower','CI_upper','Cohens_d'});
             else 
                 % fallback
-                sum_row = table({base_roi_name},0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN, ...
-                    'VariableNames',{'ROI','N_valid','Mean_Beta','SD','df','t_stat','p_value','CI_lower','CI_upper','Cohens_d'});            
+                sum_row = table({base_roi_name},{tail},0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN, ...
+                    'VariableNames',{'ROI','Tail','N_valid','Mean_Beta','SD','df','t_stat','p_value','CI_lower','CI_upper','Cohens_d'});            
             end
             contrast_summary = [contrast_summary; sum_row];
             fprintf('Done!\n');
@@ -196,9 +229,9 @@ function ROI_data = Extract_ROI_Data(ROI, Contrast, lat, isBilateral)
 
     if isBilateral
         % Separate hemispheres (for .nii including both hemispheres!)
-        % if x < 0 = left; if x > 0 = right
+        % if x <= 0 = left; if x > 0 = right
         if strcmp(lat,'l')
-            roi_mm = roi_mm(:,roi_mm(1,:)<0);
+            roi_mm = roi_mm(:,roi_mm(1,:)<= 0);
         elseif strcmp(lat,'r')
             roi_mm = roi_mm(:,roi_mm(1,:)>0);
         end
