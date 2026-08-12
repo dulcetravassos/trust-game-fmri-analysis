@@ -51,8 +51,8 @@ With modularity and reproducibility in mind, this pipeline was designed to be ex
   - **s06_get_group_roi.m**: Processes subject-specific bilateral anatomical ROIs into unilateral consensus masks for group-level analyses.
   - **s07_extra_design_quality.m**: Evaluates the statistical efficiency and multicollinearity of the design matrices.
   - **s08_export_results.m**: Extracts automatically 1st-level statistics, exporting peak coordinates tables (.xls) and thresholded brain maps (.nii) for main contrasts and conjunction analyses.
-  - **s09_roi_analysis.m**: Allows interactive extraction of mean beta values for a user-selected ROI, laterality, and contrast from individualized ROIs, and performs One-Sample T-Test.
-  - **s09_roi_analysis_batch.m**: Automates the extraction of mean beta values across all ROIs, lateralities, and contrasts in a single run, and performs One-Sample T-Test.
+  - **s09_roi_analysis.m**: Allows interactive extraction of mean beta values for a user-selected ROI, laterality, and contrast from individualized ROIs, and performs two-sided One-Sample T-Test.
+  - **s09_roi_analysis_batch.m**: Automates ROI extraction and One-Sample T-Tests (one- or two-sided) based on _a priori_ hypotheses, using a predefined dictionary.
 
 <br>
 
