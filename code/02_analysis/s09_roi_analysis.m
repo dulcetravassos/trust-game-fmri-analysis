@@ -7,6 +7,15 @@
 %   bilateral anatomical ROIs (splitting hemispheres via MNI             %
 %   coordinates).                                                        %
 %                                                                        %
+%   NOTE: This interactive version defaults to a conservative two-sided  %
+%   t-test and is intended for exploratory data analysis, visualization, %
+%   or troubleshooting. From a rigorous scientific standpoint, it is     %
+%   statistically invalid to formulate hypotheses or test regions after  %
+%   inspecting the data (causing circular analysis or HARKing). For      %
+%   valid statistical inference based exclusively on predefined a priori %
+%   hypotheses, use the hypothesis-driven batch version of this script   %
+%   ("s09_roi_analysis_batch.m").                                        %
+%                                                                        %
 %   It features a custom function (adapted from Andrew Jahn's code)      %
 %   modified to align the ROI and the contrast spaces, using the         %
 %   functional contrast's affine matrix. It also automatically filters   %
@@ -18,7 +27,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 30/05/2026                                                  %
-%   Last update: 04/08/2026                                              %
+%   Last update: 12/08/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -166,7 +175,7 @@ if ~isempty(beta)
         fprintf(fid,'t(%d): %.3f\n',stats.df,stats.tstat);
         fprintf(fid,'p-value: %.4f\n',p);
         fprintf(fid,'95%% CI: [%.4f %.4f]\n',ci(1),ci(2));
-        fprintf(fileID,"Cohen's d = %.3f\n",mean(beta)/std(beta));
+        fprintf(fid,"Cohen's d = %.3f\n",mean(beta)/std(beta));
     end
     fclose(fileID);
     fprintf('Statistical summary saved to: %s\n',txt_path);
