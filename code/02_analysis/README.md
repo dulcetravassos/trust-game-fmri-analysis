@@ -114,6 +114,8 @@ This script extracts results from the previously estimated SPM.mat through an in
 
 This script provides an interactive interface to extract mean beta values for a user-selected ROI, laterality, and functional contrast, across all subjects. It supports both individualized spherical ROIs (generated via MarsBar) and anatomical subcortical ROIs (from FreeSurfer). 
 
+NOTE: This interactive version defaults to a conservative two-sided t-test and is strictly intended for exploratory data analysis, visualization, or troubleshooting. To prevent circular analysis or HARKing, valid statistical inference should be conducted using the hypothesis-driven batch script below [`s09_roi_analysis_batch`](s09_roi_analysis_batch.m).
+
 It features a custom extraction function adapted from [`Andrew Jahn's code`](https://github.com/andrewjahn/SPM_Scripts/blob/master/Extract_ROI_Data.m), modified to support spatial alignment between the ROI and Contrast spaces, using the functional contrast's affine matrix (`Vcon.mat`) to mathematically translate ROI coordinates to the exact voxel space of the functional images. The script automatically filters absolute zeros (for example, caused by out-of-brain voxels) before calculating the mean value. 
 
 The extracted data is compiled into a single structured `.csv` file. Additionally, the script performs a One-Sample T-Test against zero across valid subjects, printing the statistical summary (t-statistic, p-value, 95% CI, mean, SD, and Cohen's d) directly to the console and saving it as a .txt report inside the `results/` subfolder.
@@ -124,6 +126,8 @@ It supports both unilateral and bilateral images. To process bilateral images, i
 
 #### [`s09_roi_analysis_batch`](s09_roi_analysis_batch.m)
 
-This script automates the full extraction of mean beta values across all subjects, regions, lateralities, and functional contrasts in a single run, eliminating the need for manual user input. It shares the same core spatial transformation and zero-filtering as [`s09_roi_analysis`](s09_roi_analysis.m), ensuring complete consistency across spatial states. 
+This script automates the extraction of mean beta values using a strictly hypothesis-driven approach. Instead of performing a blind extraction across all possible conditions, it uses a predefined `containers.Map` dictionary to exclusively test specific target ROIs (automatically looping through both hemispheres) mapped to specific functional contrasts based on _a priori_ hypotheses. It shares the same core spatial transformation and zero-filtering as [`s09_roi_analysis`](s09_roi_analysis.m), ensuring complete consistency across spatial states. 
 
-It iteratively generates dedicated and structured `.csv` files for every individual ROI and contrast combination. Furthermore, it automatically computes a One-Sample T-Test against zero for each condition, exporting individual statistical summaries (`.txt`) and a consolidated summary table (`.csv`) per contrast into the `results/` subfolder.
+Importantly, it implements dynamic statistical tails. When automatically computing the One-Sample T-Test against zero for each condition, it applies either directional one-sided tests (for expected activations/deactivations) or two-sided tests (for exploratory directionality) based on the hypothesis dictionary. This prevents statistical power degradation caused by unnecessary multiple comparisons.
+
+It iteratively generates dedicated and structured `.csv` files for every individual ROI and contrast combination. Furthermore, it automatically computes a One-Sample T-Test against zero for each condition, exporting individual statistical summaries (`.txt`) and a consolidated summary table (`.csv` and `.xlsx`) per contrast into the `results/` subfolder.
