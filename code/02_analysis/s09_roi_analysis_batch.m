@@ -21,7 +21,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 22/07/2026                                                  %
-%   Last update: 12/08/2026                                              %
+%   Last update: 13/08/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -67,17 +67,17 @@ isBilateral = false;
 % Format: {'region', 'tail'}
 % This script tests automatically both 'r' and 'l' for each region
 hypotheses = containers.Map();
-hypotheses('1a') = {{'NAcc', 'right'}};
-hypotheses('1b') = {{'amygdala', 'right'}, {'caudate', 'right'}, {'pSTS', 'both'}, {'FFA', 'both'}, {'OFA', 'both'}};
-hypotheses('2a') = {{'pSTS', 'right'}, {'amygdala', 'right'}, {'lOFC', 'right'}};
-hypotheses('2b') = {{'pSTS', 'right'}, {'amygdala', 'right'}, {'lOFC', 'right'}};
-hypotheses('3') = {{'lOFC', 'right'}, {'amygdala', 'right'}};
-hypotheses('7') = {{'lOFC', 'right'}, {'mOFC', 'right'}, {'caudate', 'right'}, {'NAcc', 'right'}, {'amygdala', 'right'}};
-hypotheses('6b') = {{'NAcc', 'right'}, {'mOFC', 'right'}, {'amygdala', 'both'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
-hypotheses('6c') = {{'amygdala', 'right'}, {'caudate', 'right'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
+hypotheses('1a') = {{'NAcc', 'both'}};
+hypotheses('1b') = {{'amygdala', 'both'}, {'caudate', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}, {'OFA', 'both'}};
+hypotheses('2a') = {{'pSTS', 'both'}, {'amygdala', 'both'}, {'lOFC', 'both'}};
+hypotheses('2b') = {{'pSTS', 'both'}, {'amygdala', 'both'}, {'lOFC', 'both'}};
+hypotheses('3') = {{'lOFC', 'both'}, {'amygdala', 'both'}};
+hypotheses('7') = {{'lOFC', 'both'}, {'mOFC', 'both'}, {'caudate', 'both'}, {'NAcc', 'both'}, {'amygdala', 'both'}};
+hypotheses('6b') = {{'NAcc', 'both'}, {'mOFC', 'both'}, {'amygdala', 'both'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
+hypotheses('6c') = {{'amygdala', 'both'}, {'caudate', 'both'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
 hypotheses('6a') = {{'amygdala', 'both'}, {'caudate', 'both'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
-hypotheses('8a') = {{'caudate', 'right'}};
-hypotheses('8b') = {{'caudate', 'right'}};
+hypotheses('8a') = {{'caudate', 'both'}};
+hypotheses('8b') = {{'caudate', 'both'}};
 
 % NOTE: The number of contrasts evaluated here is substantially smaller than the number of contrasts 
 % defined in the previous "s03_contrasts.m" script. This is because we decided to drop or modify 
