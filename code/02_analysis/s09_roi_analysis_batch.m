@@ -21,7 +21,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 22/07/2026                                                  %
-%   Last update: 13/08/2026                                              %
+%   Last update: 14/08/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -69,13 +69,13 @@ isBilateral = false;
 hypotheses = containers.Map();
 hypotheses('1a') = {{'NAcc', 'both'}};
 hypotheses('1b') = {{'amygdala', 'both'}, {'caudate', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}, {'OFA', 'both'}};
-hypotheses('2a') = {{'pSTS', 'both'}, {'amygdala', 'both'}, {'lOFC', 'both'}};
-hypotheses('2b') = {{'pSTS', 'both'}, {'amygdala', 'both'}, {'lOFC', 'both'}};
-hypotheses('3') = {{'lOFC', 'both'}, {'amygdala', 'both'}};
-hypotheses('7') = {{'lOFC', 'both'}, {'mOFC', 'both'}, {'caudate', 'both'}, {'NAcc', 'both'}, {'amygdala', 'both'}};
-hypotheses('6b') = {{'NAcc', 'both'}, {'mOFC', 'both'}, {'amygdala', 'both'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
-hypotheses('6c') = {{'amygdala', 'both'}, {'caudate', 'both'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
-hypotheses('6a') = {{'amygdala', 'both'}, {'caudate', 'both'}, {'lOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
+hypotheses('2a') = {{'pSTS', 'both'}, {'amygdala', 'both'}, {'lateralOFC', 'both'}};
+hypotheses('2b') = {{'pSTS', 'both'}, {'amygdala', 'both'}, {'lateralOFC', 'both'}};
+hypotheses('3') = {{'lateralOFC', 'both'}, {'amygdala', 'both'}};
+hypotheses('7') = {{'lateralOFC', 'both'}, {'medialOFC', 'both'}, {'caudate', 'both'}, {'NAcc', 'both'}, {'amygdala', 'both'}};
+hypotheses('6b') = {{'NAcc', 'both'}, {'medialOFC', 'both'}, {'amygdala', 'both'}, {'lateralOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
+hypotheses('6c') = {{'amygdala', 'both'}, {'caudate', 'both'}, {'lateralOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
+hypotheses('6a') = {{'amygdala', 'both'}, {'caudate', 'both'}, {'lateralOFC', 'both'}, {'pSTS', 'both'}, {'FFA', 'both'}};
 hypotheses('8a') = {{'caudate', 'both'}};
 hypotheses('8b') = {{'caudate', 'both'}};
 
