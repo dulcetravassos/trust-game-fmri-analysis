@@ -60,6 +60,8 @@ The generated outputs (`con_*.nii` and `spmT_*.nii` files) are saved and ready t
 
 This script includes two sanity check contrasts: one for visual activation (VIDEO > baseline) and one for motor activation (INVESTMENT > baseline).
 
+_NOTE: In the final version of the work, some hypotheses were discarded and, therefore, some of the available contrasts were not used in the 2nd-level. They are kept here because 1st-level SPM contrast estimation calculates each vector independently. Removing them would require modifying and re-running the pipeline. The contrasts used are: 1a, 1b, 2a, 2b, 3, 6a, 6b, 6c, 7, 8a, 8b, 9a, 9b, 9c, and 9d._
+
 <br>
 
 #### [`s04_get_2nd_level_design_matrix`](s04_get_2nd_level_design_matrix.m)
