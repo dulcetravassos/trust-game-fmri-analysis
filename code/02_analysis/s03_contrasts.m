@@ -15,9 +15,17 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 16/03/2026                                                  %
-%   Last update: 20/07/2026                                              %
+%   Last update: 18/08/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% NOTE: In the final version of the work, some hypotheses were discarded 
+% and, therefore, some of these contrasts were not used in the 2nd-level. 
+% They are kept here because 1st-level SPM contrast estimation calculates 
+% each vector independently. Removing them would require modifying and 
+% re-running the pipeline.
+% The contrasts used are: 1a, 1b, 2a, 2b, 3, 6a, 6b, 6c, 7, 8a, 8b, 9a, 9b,
+% 9c, and 9d.
 
 clear all; clc;
 
@@ -104,6 +112,13 @@ tasks = {'task-main','task-localizer'};
 % (6a) Averted + Directed Gaze (Congruent Phase) > Averted + Directed Gaze (Incongruent Phase) 
 % (6b) Directed Gaze (Congruent Phase) > Directed Gaze (Incongruent Phase)  
 % (6c) Averted Gaze (Congruent Phase) > Averted Gaze (Incongruent Phase) 
+
+% Contrast 9: Social Context Modulation - identify regions that are modulated by the social 
+% context (trustworthy vs untrustworthy) when processing the exact same cue:
+% (9a) TP Directed Gaze > UP Directed Gaze (Congruent Phase) 
+% (9b) TP Directed Gaze > UP Directed Gaze (Incongruent Phase)  
+% (9c) TP Averted Gaze > UP Averted Gaze (Congruent Phase) 
+% (9d) TP Averted Gaze > UP Averted Gaze (Incongruent Phase)
 
 %% Feedback/Outcome Phase Contrasts 
 
@@ -194,6 +209,7 @@ for s = 1:length(subjects)
             con_6a = zeros(1,num_cols); con_6b = zeros(1,num_cols); con_6c = zeros(1,num_cols); % Contrasts 6a & 6b & 6c
             con_7 = zeros(1,num_cols); % Contrast 7
             con_8a = zeros(1,num_cols); con_8b = zeros(1,num_cols);  % Contrasts 8a & 8b
+            con_9a = zeros(1,num_cols); con_9b = zeros(1,num_cols); con_9c = zeros(1,num_cols); con_9d = zeros(1,num_cols); % Contrasts 9a & 9b & 9c & 9d
             con_sc_1 = zeros(1,num_cols); con_sc_2 = zeros(1,num_cols); % Sanity Check Contrasts
     
             for i = 1:num_cols
@@ -304,6 +320,41 @@ for s = 1:length(subjects)
                         con_6a(i) = -1;
                         con_6c(i) = -1;
                     end
+
+                    % Contrast 9 
+                    % (9a) TP Directed Gaze > UP Directed Gaze (Congruent Phase) 
+                    % (9b) TP Directed Gaze > UP Directed Gaze (Incongruent Phase)  
+                    % (9c) TP Averted Gaze > UP Averted Gaze (Congruent Phase) 
+                    % (9d) TP Averted Gaze > UP Averted Gaze (Incongruent Phase)
+                    if ismember(curr_run,runs_cong)
+                        if contains(name,'directed','IgnoreCase',true) 
+                            if contains(name,'TTrust','IgnoreCase',true)
+                                con_9a(i) = 1;
+                            elseif contains(name,'TUntrust','IgnoreCase',true)
+                                con_9a(i) = -1;
+                            end
+                        elseif contains(name,'averted','IgnoreCase',true)
+                            if contains(name,'TTrust','IgnoreCase',true)
+                                con_9c(i) = 1;
+                            elseif contains(name,'TUntrust','IgnoreCase',true)
+                                con_9c(i) = -1;
+                            end
+                        end
+                    elseif ismember(curr_run,runs_incong)
+                        if contains(name,'directed','IgnoreCase',true) 
+                            if contains(name,'TTrust','IgnoreCase',true)
+                                con_9b(i) = 1;
+                            elseif contains(name,'TUntrust','IgnoreCase',true)
+                                con_9b(i) = -1;
+                            end
+                        elseif contains(name,'averted','IgnoreCase',true)
+                            if contains(name,'TTrust','IgnoreCase',true)
+                                con_9d(i) = 1;
+                            elseif contains(name,'TUntrust','IgnoreCase',true)
+                                con_9d(i) = -1;
+                            end
+                        end
+                    end
                 end
     
                 % ----- Feedback/Outcome Phase Contrasts -----
@@ -351,9 +402,9 @@ for s = 1:length(subjects)
                 con_names = {'SC VIDEO','SC INVESTMENT','1a','1b'};
             else
                 all_cons = {con_sc_1, con_sc_2, con_1a, con_1b, con_2a, con_2b, con_3, con_4a, con_4b, con_4c, con_4d, ...
-                    con_5a, con_5b, con_5c, con_6a, con_6b, con_6c, con_7, con_8a, con_8b};
+                    con_5a, con_5b, con_5c, con_6a, con_6b, con_6c, con_7, con_8a, con_8b, con_9a, con_9b, con_9c, con_9d};
                 % Define contrast names
-                con_names = {'SC VIDEO','SC INVESTMENT','1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b'};
+                con_names = {'SC VIDEO','SC INVESTMENT','1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b','9a','9b','9c','9d'};
             end
             for c = 1:length(all_cons)
                 con = all_cons{c};

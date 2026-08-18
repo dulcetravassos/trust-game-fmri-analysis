@@ -15,7 +15,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 15/07/2026                                                  %
-%   Last update: 15/07/2026                                              %
+%   Last update: 18/08/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -42,7 +42,8 @@ spm('defaults', 'FMRI');
 spm_jobman('initcfg');
 
 all_cons = {'sc_1', 'sc_2', '1a', '1b', '2a', '2b', '3', '4a', '4b', ...
-    '4c', '4d', '5a', '5b', '5c', '6a', '6b', '6c', '7', '8a', '8b'};
+    '4c', '4d', '5a', '5b', '5c', '6a', '6b', '6c', '7', '8a', '8b', ...
+    '9a', '9b', '9c', '9d'};
 
 for c = 1:length(all_cons)
     con = all_cons{c};

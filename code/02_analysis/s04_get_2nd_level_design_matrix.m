@@ -12,7 +12,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 15/07/2026                                                  %
-%   Last update: 15/07/2026                                              %
+%   Last update: 18/08/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -46,11 +46,12 @@ if isempty(which('spm')); addpath(spm_path); end
 spm('defaults', 'FMRI');
 spm_jobman('initcfg');
 
-all_cons = {'con_0001', 'con_0002', 'con_0003', 'con_0004', 'con_0005', 'con_0006', 'con_0007', 'con_0008', 'con_0009', ...
-    'con_0010', 'con_0011', 'con_0012', 'con_0013', 'con_0014', 'con_0015', 'con_0016', 'con_0017', 'con_0018', 'con_0019', 'con_0020'};
+all_cons = {'con_0001', 'con_0002', 'con_0003', 'con_0004', 'con_0005', 'con_0006', 'con_0007', 'con_0008', ...
+    'con_0009', 'con_0010', 'con_0011', 'con_0012', 'con_0013', 'con_0014', 'con_0015', 'con_0016', 'con_0017', ...
+    'con_0018', 'con_0019', 'con_0020', 'con_0021', 'con_0022', 'con_0023', 'con_0024'};
 
-all_cons_names = {'sc_1', 'sc_2', '1a', '1b', '2a', '2b', '3', '4a', '4b', ...
-    '4c', '4d', '5a', '5b', '5c', '6a', '6b', '6c', '7', '8a', '8b'};
+all_cons_names = {'sc_1', 'sc_2', '1a', '1b', '2a', '2b', '3', '4a', '4b', '4c', '4d', ...
+    '5a', '5b', '5c', '6a', '6b', '6c', '7', '8a', '8b', '9a', '9b', '9c', '9d'};
 
 % Create main output folder
 second_level_dir = fullfile(deriv_dir,'spm-statistics','2nd-level');
