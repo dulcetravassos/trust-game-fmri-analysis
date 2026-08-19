@@ -15,7 +15,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 16/03/2026                                                  %
-%   Last update: 18/08/2026                                              %
+%   Last update: 19/08/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -25,7 +25,8 @@
 % each vector independently. Removing them would require modifying and 
 % re-running the pipeline.
 % The contrasts used are: 1a, 1b, 2a, 2b, 3, 6a, 6b, 6c, 7, 8a, 8b, 9a, 9b,
-% 9c, and 9d.
+% 9c, and 9d. Additional contrasts (10a, 10b, and 10c) are kept for control
+% purposes.
 
 clear all; clc;
 
@@ -120,6 +121,12 @@ tasks = {'task-main','task-localizer'};
 % (9c) TP Averted Gaze > UP Averted Gaze (Congruent Phase) 
 % (9d) TP Averted Gaze > UP Averted Gaze (Incongruent Phase)
 
+% Contrast 10: Task Validation / Control - verify the expected neural differentiation between the 
+% main experimental conditions:
+% (10a) Directed Gaze > Averted Gaze
+% (10b) Averted Gaze > Directed Gaze
+% (10c) TP + UP > PC
+
 %% Feedback/Outcome Phase Contrasts 
 
 % Contrast 7: Immediate Relearning (Prediction Error) – which regions respond to the sudden rule 
@@ -210,6 +217,7 @@ for s = 1:length(subjects)
             con_7 = zeros(1,num_cols); % Contrast 7
             con_8a = zeros(1,num_cols); con_8b = zeros(1,num_cols);  % Contrasts 8a & 8b
             con_9a = zeros(1,num_cols); con_9b = zeros(1,num_cols); con_9c = zeros(1,num_cols); con_9d = zeros(1,num_cols); % Contrasts 9a & 9b & 9c & 9d
+            con_10a = zeros(1,num_cols); con_10b = zeros(1,num_cols); con_10c = zeros(1,num_cols); % Contrasts 10a & 10b & 10c
             con_sc_1 = zeros(1,num_cols); con_sc_2 = zeros(1,num_cols); % Sanity Check Contrasts
     
             for i = 1:num_cols
@@ -355,6 +363,25 @@ for s = 1:length(subjects)
                             end
                         end
                     end
+
+                    % Contrast 10: Task Validation / Control - verify the expected neural differentiation between the 
+                    % main experimental conditions:
+                    % (10a) Directed Gaze > Averted Gaze
+                    % (10b) Averted Gaze > Directed Gaze
+                    % (10c) TP + UP > PC
+                    if contains(name,'PC','IgnoreCase',true)
+                        con_10c(i) = -1;
+                    else
+                        if contains(name,'averted','IgnoreCase',true)
+                            con_10a(i) = -1;
+                            con_10b(i) = 1;
+                            con_10c(i) = 1;
+                        elseif contains(name,'directed','IgnoreCase',true)
+                            con_10a(i) = 1;
+                            con_10b(i) = -1;
+                            con_10c(i) = 1;
+                        end
+                    end
                 end
     
                 % ----- Feedback/Outcome Phase Contrasts -----
@@ -401,10 +428,10 @@ for s = 1:length(subjects)
                 % Define contrast names
                 con_names = {'SC VIDEO','SC INVESTMENT','1a','1b'};
             else
-                all_cons = {con_sc_1, con_sc_2, con_1a, con_1b, con_2a, con_2b, con_3, con_4a, con_4b, con_4c, con_4d, ...
-                    con_5a, con_5b, con_5c, con_6a, con_6b, con_6c, con_7, con_8a, con_8b, con_9a, con_9b, con_9c, con_9d};
+                all_cons = {con_sc_1, con_sc_2, con_1a, con_1b, con_2a, con_2b, con_3, con_4a, con_4b, con_4c, con_4d, con_5a, con_5b, ...
+                    con_5c, con_6a, con_6b, con_6c, con_7, con_8a, con_8b, con_9a, con_9b, con_9c, con_9d, con_10a, con_10b, con_10c};
                 % Define contrast names
-                con_names = {'SC VIDEO','SC INVESTMENT','1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b','9a','9b','9c','9d'};
+                con_names = {'SC VIDEO','SC INVESTMENT','1a','1b','2a','2b','3','4a','4b','4c','4d','5a','5b','5c','6a','6b','6c','7','8a','8b','9a','9b','9c','9d','10a','10b','10c'};
             end
             for c = 1:length(all_cons)
                 con = all_cons{c};
