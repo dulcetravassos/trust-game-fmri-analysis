@@ -19,9 +19,13 @@
 %   against zero for each condition, saves the statistical summary in a  %
 %   .txt file, and generates a summary .csv/.xlsx table per contrast.    %
 %                                                                        %
+%   It includes both uncorrected and Family-Wise Error (FWE) corrected   %
+%   p-values (via Bonferroni method) based on the number of ROIs tested  %
+%   per contrast.                                                        %
+%                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 22/07/2026                                                  %
-%   Last update: 14/08/2026                                              %
+%   Last update: 22/08/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -112,6 +116,9 @@ for c=1:length(con_names)
     end
 
     current_targets = hypotheses(con);
+
+    % calculate number of independent tests for FWE correction
+    num_tests = length(current_targets) * length(lat_list);
     
     for t=1:length(current_targets)
         
@@ -175,6 +182,10 @@ for c=1:length(con_names)
             if ~isempty(beta)
                 [h,p,ci,stats] = ttest(beta,0,'Tail',tail);
                 cohens_d = mean(beta)/std(beta);
+
+                % FWE Bonferroni Correction
+                p_fwe = p*num_tests;
+                if p_fwe > 1; p_fwe = 1; end;
                                 
                 % Write .txt report
                 txt_fn = sprintf('Stats_%s_%s.txt',con,base_roi_name);
@@ -190,17 +201,18 @@ for c=1:length(con_names)
                 fprintf(fileID,'Mean beta: %.4f\n',mean(beta));
                 fprintf(fileID,'SD: %.4f\n',std(beta));
                 fprintf(fileID,'t(%d): %.3f\n',stats.df,stats.tstat);
-                fprintf(fileID,'p-value: %.4f\n',p);
+                fprintf(fileID,'p-value (unc.): %.4f\n',p);
+                fprintf(fileID,'p-value (FWE): %.4f\n',p_fwe);
                 fprintf(fileID,'95%% CI: [%.4f %.4f]\n',ci(1),ci(2));
                 fprintf(fileID,"Cohen's d = %.3f\n",cohens_d);
                 fclose(fileID);
 
-                sum_row = table({base_roi_name},{tail},length(beta),mean(beta),std(beta),stats.df,stats.tstat,p,ci(1),ci(2),cohens_d, ...
-                    'VariableNames',{'ROI','Tail','N_valid','Mean_Beta','SD','df','t_stat','p_value','CI_lower','CI_upper','Cohens_d'});
+                sum_row = table({base_roi_name},{tail},length(beta),mean(beta),std(beta),stats.df,stats.tstat,p,p_fwe,ci(1),ci(2),cohens_d, ...
+                    'VariableNames',{'ROI','Tail','N_valid','Mean_Beta','SD','df','t_stat','p_unc','p_fwe','CI_lower','CI_upper','Cohens_d'});
             else 
                 % fallback
-                sum_row = table({base_roi_name},{tail},0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN, ...
-                    'VariableNames',{'ROI','Tail','N_valid','Mean_Beta','SD','df','t_stat','p_value','CI_lower','CI_upper','Cohens_d'});            
+                sum_row = table({base_roi_name},{tail},0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN, ...
+                    'VariableNames',{'ROI','Tail','N_valid','Mean_Beta','SD','df','t_stat','p_unc','p_fwe','CI_lower','CI_upper','Cohens_d'});            
             end
             contrast_summary = [contrast_summary; sum_row];
             fprintf('Done!\n');
