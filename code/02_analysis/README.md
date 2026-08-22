@@ -132,4 +132,6 @@ This script automates the extraction of mean beta values using a strictly hypoth
 
 Importantly, it implements dynamic statistical tails. When automatically computing the One-Sample T-Test against zero for each condition, it applies either directional one-sided tests (for expected activations/deactivations) or two-sided tests (for exploratory directionality) based on the hypothesis dictionary. This prevents statistical power degradation caused by unnecessary multiple comparisons.
 
+To rigorously control for multiple comparisons, the script computes Family-Wise Error (FWE) corrected p-values using the Bonferroni method. The correction factor is dynamically adjusted based on the total number of independent target ROIs tested within a given contrast (number of predefined expected regions x 2 hemispheres).
+
 It iteratively generates dedicated and structured `.csv` files for every individual ROI and contrast combination. Furthermore, it automatically computes a One-Sample T-Test against zero for each condition, exporting individual statistical summaries (`.txt`) and a consolidated summary table (`.csv` and `.xlsx`) per contrast into the `results/` subfolder.
