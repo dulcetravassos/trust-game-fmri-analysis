@@ -47,6 +47,7 @@ With modularity and reproducibility in mind, this pipeline was designed to be ex
   - **s02_beta_estimation.m**: Runs the GLM estimation algorithm to generate the regression coefficients (Beta images).
   - **s03_contrasts.m**: Dynamically defines and computes the 1st-level statistical contrast vectors.
   - **s04_01_get_2nd_level_onesample.m**: Generates 2nd-level one-sample t-test group models across all contrasts previously generated.
+  - **s04_02_get_2nd_level_twosample.m**: Generates 2nd-level two-sample t-test models for some predefined contrasts.
   - **s05_2nd_level_beta_estimation.m**: Estimates the regression coefficients (Beta images) for the 2nd-level models.
   - **s06_get_group_roi.m**: Processes subject-specific bilateral anatomical ROIs into unilateral consensus masks for group-level analyses.
   - **s07_extra_design_quality.m**: Evaluates the statistical efficiency and multicollinearity of the design matrices.
