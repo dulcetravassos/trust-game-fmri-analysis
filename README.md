@@ -46,7 +46,7 @@ With modularity and reproducibility in mind, this pipeline was designed to be ex
   - **s01_get_design_matrix.m**: Generates subject-specific Design Matrices and explicit brain masks.
   - **s02_beta_estimation.m**: Runs the GLM estimation algorithm to generate the regression coefficients (Beta images).
   - **s03_contrasts.m**: Dynamically defines and computes the 1st-level statistical contrast vectors.
-  - **s04_get_2nd_level_design_matrix.m**: Generates 2nd-level one-sample t-test group models across all contrasts previously generated.
+  - **s04_01_get_2nd_level_onesample.m**: Generates 2nd-level one-sample t-test group models across all contrasts previously generated.
   - **s05_2nd_level_beta_estimation.m**: Estimates the regression coefficients (Beta images) for the 2nd-level models.
   - **s06_get_group_roi.m**: Processes subject-specific bilateral anatomical ROIs into unilateral consensus masks for group-level analyses.
   - **s07_extra_design_quality.m**: Evaluates the statistical efficiency and multicollinearity of the design matrices.
