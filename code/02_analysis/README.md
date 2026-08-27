@@ -64,7 +64,7 @@ _NOTE: In the final version of the work, some hypotheses were discarded and, the
 
 <br>
 
-#### [`s04_get_2nd_level_design_matrix`](s04_get_2nd_level_design_matrix.m)
+#### [`s04_01_get_2nd_level_onesample`](s04_01_get_2nd_level_onesample.m)
 
 Automates the specification of second-level one-sample t-test Design Matrices (SPM.mat) for each functional contrast defined in the first-level analysis. It systematically harvests subject-specific contrast maps (`con_*.nii`) into dedicated directories and includes defensive file-checking to handle missing subject data gracefully.
 
