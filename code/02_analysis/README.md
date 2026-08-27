@@ -70,6 +70,12 @@ Automates the specification of second-level one-sample t-test Design Matrices (S
 
 <br>
 
+#### [`s04_02_get_2nd_level_twosample`](s04_02_get_2nd_level_twosample.m)
+
+Automates the specification of second-level two-sample t-test Design Matrices (SPM.mat) for predefined exploratory _post-hoc_ contrasts. Specifically, it stratifies the cohort into 'Learners' and 'Non-Learners' to investigate independent group differences. It automatically configures the SPM model for independent samples with unequal variance and shares the same defensive file checking architecture as the one-sample script.
+
+<br>
+
 #### [`s05_2nd_level_beta_estimation`](s05_2nd_level_beta_estimation.m)
 
 Reads the Design Matrix (`SPM.mat`) for each contrast, and runs the estimation algorithm using Restricted Maximum Likelihood. Generates the estimated group regression coefficients (`beta_*.nii`), the error variance image (`ResMS.nii`), the analysis mask (`mask.nii`), and the estimated resels per voxel (`RPV.nii`).
