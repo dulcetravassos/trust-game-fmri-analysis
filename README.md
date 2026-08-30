@@ -13,10 +13,10 @@
 
 **Code License:** MIT
 
-**Description:** This repository contains the complete pipeline for fMRI data preprocessing and analysis in SPM for the [xxxx] study.
+**Description:** This repository contains the complete pipeline for fMRI data preprocessing and analysis in SPM for the "_Social Reversal Learning: An fMRI Study of Learning and Relearning to Trust in Different Social Contexts_" study.
 
-This repository consists of a SPM project executed primarily in MATLAB, with (xxx) custom scripts required to replicate the results from the [xxx] study. Output files and directory structures follow the Brain Imaging Data Structure (BIDS) naming convention. For a detailed description of all folders and files, please refer to the Repository Structure section below. 
-To execute this pipeline, please ensure that MATLAB, SPM12, and FSL (versions specified below) are installed. The scripts are numbered sequentially in the order that they should be run. The data either needed to run these scripts or created by these scripts is available at [xxx]. 
+This repository consists of a SPM project executed primarily in MATLAB, with 27 custom scripts required to replicate the results from the "_Social Reversal Learning_" study. Output files and directory structures follow the Brain Imaging Data Structure (BIDS) naming convention. For a detailed description of all folders and files, please refer to the Repository Structure section below. 
+To execute this pipeline, please ensure that MATLAB, SPM12, and FSL (versions specified below) are installed. The scripts are numbered sequentially in the order that they should be run. The data either needed to run these scripts or created by these scripts is available at [_waiting for publication_]. 
 For any further information regarding this repository, please contact: Dulce Travassos, email: uc2021216844 [at] student [dot] uc [dot] pt.
 
 <br>
@@ -60,7 +60,7 @@ With modularity and reproducibility in mind, this pipeline was designed to be ex
 **Environment Setup & Directory Organization:**
 
 To ensure seamless execution, these scripts rely on a specific directory structure. All necessary components (data, scripts, and the SPM12 software) must be housed within a single root directory (referred to as "Tese" in the original scripts). This root directory must contain three main subdirectories: 
-- **data/spm-data/** - This directory is the BIDS-compliant dataset. Do not nest another dataset folder inside it; it must directly contain the BIDS subdirectories (i.e., _sourcedata/_, _rawdata/_, and _derivatives/_). The data is available here _**ADD HYPERLINK**_;
+- **data/spm-data/** - This directory is the BIDS-compliant dataset. Do not nest another dataset folder inside it; it must directly contain the BIDS subdirectories (i.e., _sourcedata/_, _rawdata/_, and _derivatives/_). The data is available here [_waiting for publication_];
 - **spm12/** - Contains the SPM12 installation and toolboxes;
 - **github/** - Contains the cloned components of this repository.
 
