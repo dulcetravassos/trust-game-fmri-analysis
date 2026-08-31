@@ -9,7 +9,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 19/01/2026                                                  %
-%   Last update: 17/06/2026                                              %
+%   Last update: 01/09/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -42,26 +42,26 @@ runs_fmap = [1:8]; % Fieldmaps
 % may vary between the input and output. This correspondence table follows
 % the format {raw, BIDS}.
 subject_map = {
-    'sub-tg02',  'sub-002';
-    'sub-tg03',  'sub-003';
-    'sub-tg04',  'sub-004';
-    'sub-tg06',  'sub-006';
-    'sub-tg07',  'sub-007';
-    'sub-tg08',  'sub-008';
-    'sub-tg09',  'sub-009';
-    'sub-tg11',  'sub-011';
-    'sub-tg12',  'sub-012';
-    'sub-tg13',  'sub-013';
-    'sub-tg14',  'sub-014';
-    'sub-tg15',  'sub-015';
-    'sub-tg16',  'sub-016';
-    'sub-tg17',  'sub-017';
-    'sub-tg18',  'sub-018';
-    'sub-tg19',  'sub-019';
-    'sub-tg20',  'sub-020';
-    'sub-tg21',  'sub-021';
-    'sub-tg22',  'sub-022';
-    'sub-tg23',  'sub-023';
+    'sub-tg819',  'sub-819';
+    'sub-tg908',  'sub-908';
+    'sub-tg147',  'sub-147';
+    'sub-tg915',  'sub-915';
+    'sub-tg641',  'sub-641';
+    'sub-tg119',  'sub-119';
+    'sub-tg295',  'sub-295';
+    'sub-tg557',  'sub-557';
+    'sub-tg958',  'sub-958';
+    'sub-tg965',  'sub-965';
+    'sub-tg177',  'sub-177';
+    'sub-tg971',  'sub-971';
+    'sub-tg664',  'sub-664';
+    'sub-tg497',  'sub-497';
+    'sub-tg805',  'sub-805';
+    'sub-tg162',  'sub-162';
+    'sub-tg435',  'sub-435';
+    'sub-tg917',  'sub-917';
+    'sub-tg797',  'sub-797';
+    'sub-tg960',  'sub-960';
 };
 
 %% Conversion Logic
@@ -322,10 +322,10 @@ if strcmp(info.type,'func')
     json.RepetitionTime = tr;
     json.EchoTime = te;
 
-    % Sub-017 acquired with inverse slice order!
-    is_inverted = contains(info.bids_subj,'sub-017');
+    % Sub-497 acquired with inverse slice order!
+    is_inverted = contains(info.bids_subj,'sub-497');
     if is_inverted
-        fprintf('[INFO] Applying DESCENDING slice timing for sub-017!\n')
+        fprintf('[INFO] Applying DESCENDING slice timing for sub-497!\n')
     end
 
     if strcmp(info.task,'main')

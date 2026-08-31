@@ -10,7 +10,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 22/02/2026                                                  %
-%   Last update: 10/06/2026                                              %
+%   Last update: 01/09/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -96,13 +96,13 @@
 
 % Example
 % ----------- s05_01 -----------
-% bet ../../../rawdata/sub-006/fmap/sub-006_run-01_magnitude.nii fmap/sub-006_run-01_magnitude_brain.nii.gz -f 0.5 -m
-% fslmaths ../../../rawdata/sub-006/fmap/sub-006_run-01_phasediff.nii -div 2 fmap/sub-006_run-01_phasediff_half.nii.gz
-% fsl_prepare_fieldmap SIEMENS fmap/sub-006_run-01_phasediff_half.nii.gz fmap/sub-006_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-006_run-01.nii.gz 2.46 --nocheck
-% fslmaths fmap/fmap_rads_sub-006_run-01.nii.gz -nan fmap/fmap_rads_sub-006_run-01.nii.gz
-% flirt -in fmap/sub-006_run-01_magnitude_brain.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-% flirt -in fmap/fmap_rads_sub-006_run-01.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-006_run-01.nii.gz
-% fugue -i func/rasub-006_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-006_run-01.nii.gz --unwarpdir=y- -u func/urasub-006_task-main_run-01_bold.nii.gz -v
+% bet ../../../rawdata/sub-915/fmap/sub-915_run-01_magnitude.nii fmap/sub-915_run-01_magnitude_brain.nii.gz -f 0.5 -m
+% fslmaths ../../../rawdata/sub-915/fmap/sub-915_run-01_phasediff.nii -div 2 fmap/sub-915_run-01_phasediff_half.nii.gz
+% fsl_prepare_fieldmap SIEMENS fmap/sub-915_run-01_phasediff_half.nii.gz fmap/sub-915_run-01_magnitude_brain.nii.gz fmap/fmap_rads_sub-915_run-01.nii.gz 2.46 --nocheck
+% fslmaths fmap/fmap_rads_sub-915_run-01.nii.gz -nan fmap/fmap_rads_sub-915_run-01.nii.gz
+% flirt -in fmap/sub-915_run-01_magnitude_brain.nii.gz -ref func/rasub-915_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
+% flirt -in fmap/fmap_rads_sub-915_run-01.nii.gz -ref func/rasub-915_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-915_run-01.nii.gz
+% fugue -i func/rasub-915_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-915_run-01.nii.gz --unwarpdir=y- -u func/urasub-915_task-main_run-01_bold.nii.gz -v
 % ----------- s05_02 -----------
 % Unzip rfmap* and ura* files and create JSONs (BIDS-compliant)
 
@@ -114,12 +114,12 @@
 
 % Example
 % ----------- s05_01 -----------
-% fslmaths ../../../rawdata/sub-002/fmap/sub-002_run-01_phasediff.nii -div 2 fmap/sub-002_run-01_phasediff_half.nii.gz
-% fsl_prepare_fieldmap SIEMENS fmap/sub-002_run-01_phasediff_half.nii.gz fmap/sub-002_run-01_magnitude.nii fmap/fmap_rads_sub-002_run-01.nii.gz 2.46 --nocheck
-% fslmaths fmap/fmap_rads_sub-002_run-01.nii.gz -nan fmap/fmap_rads_sub-002_run-01.nii.gz
-% flirt -in fmap/sub-002_run-01_magnitude.nii -ref func/rasub-002_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-% flirt -in fmap/fmap_rads_sub-002_run-01.nii.gz -ref func/rasub-002_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-002_run-01.nii.gz
-% fugue -i func/rasub-002_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-002_run-01.nii.gz --unwarpdir=y- -u func/urasub-002_task-main_run-01_bold.nii.gz -v
+% fslmaths ../../../rawdata/sub-819/fmap/sub-819_run-01_phasediff.nii -div 2 fmap/sub-819_run-01_phasediff_half.nii.gz
+% fsl_prepare_fieldmap SIEMENS fmap/sub-819_run-01_phasediff_half.nii.gz fmap/sub-819_run-01_magnitude.nii fmap/fmap_rads_sub-819_run-01.nii.gz 2.46 --nocheck
+% fslmaths fmap/fmap_rads_sub-819_run-01.nii.gz -nan fmap/fmap_rads_sub-819_run-01.nii.gz
+% flirt -in fmap/sub-819_run-01_magnitude.nii -ref func/rasub-819_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
+% flirt -in fmap/fmap_rads_sub-819_run-01.nii.gz -ref func/rasub-819_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat -out fmap/rfmap_rads_sub-819_run-01.nii.gz
+% fugue -i func/rasub-819_task-main_run-01_bold.nii --dwell=0.00056 --loadfmap=fmap/rfmap_rads_sub-819_run-01.nii.gz --unwarpdir=y- -u func/urasub-819_task-main_run-01_bold.nii.gz -v
 % ----------- s05_02 -----------
 % Unzip rfmap* and ura* files and create JSONs (BIDS-compliant)
 
@@ -128,28 +128,28 @@
 %% Final notices
 
 % You can use the full paths to each file or, before running these scripts, change the terminal's directory using the 'cd' command
-% (for example, cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-006/)
+% (for example, cd /mnt/c/Users/User/Desktop/Tese/data/spm-data/derivatives/spm-preprocessing/sub-915/)
 
 % In cases where there are magnitude1 and magnitude2, we manually chose the best option:
 % MAGNITUDE 1:
-% Sub-006: Runs – 2, 3, 6, 7  
-% Sub-009: Runs – 1, 2, 3, 4 
-% Sub-015: Runs – 2, 4, 5, 8
-% Sub-019: Runs – 3, 4, 5, 7, 8 
+% sub-915: Runs – 2, 3, 6, 7  
+% sub-295: Runs – 1, 2, 3, 4 
+% sub-971: Runs – 2, 4, 5, 8
+% sub-162: Runs – 3, 4, 5, 7, 8 
 % MAGNITUDE 2:
-% Sub-009: Runs – 6, 8
+% sub-295: Runs – 6, 8
 %
 % Additionally, while developing this script, I noticed that thosemagnitude1 and magnitude2 files had +1 voxel than the phasediff, 
 % blocking the fsl_prepare_fieldmap. Those runs have an additional line (flirt), to cut the magnitude to the exact size of phasediff.
 %
-% flirt -in fmap/sub-006_run-01_magnitude_brain.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
-% flirt -in fmap/fmap_rads_sub-006_run-01.nii.gz -ref func/rasub-006_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat  -out fmap/rfmap_rads_sub-006_run-01.nii.gz
+% flirt -in fmap/sub-915_run-01_magnitude_brain.nii.gz -ref func/rasub-915_task-main_run-01_bold.nii -dof 6 -omat fmap/fieldmap2epi_run-01.mat
+% flirt -in fmap/fmap_rads_sub-915_run-01.nii.gz -ref func/rasub-915_task-main_run-01_bold.nii -applyxfm -init fmap/fieldmap2epi_run-01.mat  -out fmap/rfmap_rads_sub-915_run-01.nii.gz
 % flirt: used for registration, the main options are an input (-in), a reference (-ref) volume, the calculated affine transformation that registers 
 % the input to the reference which is saved as a 4x4 affine matrix (-omat), and output volume (-out) where the transform  is applied to the input 
 % volume to align it with the reference volume. To apply a saved transformation to a volume: -applyxfm, -init and -out. For these usage the reference 
 % volume must still be specified as this sets the voxel and image dimensions of the resulting volume.
 
-% fslmaths fmap/fmap_rads_sub-008_run-01.nii -nan fmap/fmap_rads_sub-008_run-01.nii
+% fslmaths fmap/fmap_rads_sub-119_run-01.nii -nan fmap/fmap_rads_sub-119_run-01.nii
 % replaces NaNs with 0
 
 %% Initial Configurations
@@ -164,10 +164,10 @@ deriv_dir = fullfile(base_dir,'derivatives','spm-preprocessing');
 
 % List of Subjects
 subjects = {
-    'sub-002', 'sub-003', 'sub-004', 'sub-006', 'sub-007', 'sub-008', ...
-    'sub-009', 'sub-011', 'sub-012', 'sub-013', 'sub-014', 'sub-015', ...
-    'sub-016', 'sub-017', 'sub-018', 'sub-019', 'sub-020', 'sub-021', ...
-    'sub-022', 'sub-023'
+    'sub-819', 'sub-908', 'sub-147', 'sub-915', 'sub-641', 'sub-119', ...
+    'sub-295', 'sub-557', 'sub-958', 'sub-965', 'sub-177', 'sub-971', ...
+    'sub-664', 'sub-497', 'sub-805', 'sub-162', 'sub-435', 'sub-917', ...
+    'sub-797', 'sub-960'
 };
 
 %% Unzip and Generate JSONs
@@ -252,7 +252,7 @@ json_data.Description = 'Coregistered Phase/Magnitude Fieldmap calculated in rad
 json_data.Units = 'rad/s';
 json_data.Software = 'FSL (fsl_prepare_fieldmap & flirt)';
 
-fake_mag_subjects = {'sub-002', 'sub-003', 'sub-004'};
+fake_mag_subjects = {'sub-819', 'sub-908', 'sub-147'};
 if ismember(subj,fake_mag_subjects)
     json_data.Sources = {
         sprintf('rawdata/%s/fmap/ (phasediff)',subj), ...
@@ -296,7 +296,7 @@ json_data.DistortionCorrection = true;
 json_data.DistortionCorrectionSoftware = 'FSL FUGUE';
 json_data.DistortionCorrectionParameters = struct('dwell_time',dwell_time,'unwarpdir','y-');
 
-%fake_mag_subjects = {'sub-002', 'sub-003', 'sub-004'};
+%fake_mag_subjects = {'sub-819', 'sub-908', 'sub-147'};
 %if ismember(subj,fake_mag_subjects)
 %    json_data.DistortionCorrectionParameters.FieldmapSmoothing = 'Gaussian (sigma=2mm)';
 %end

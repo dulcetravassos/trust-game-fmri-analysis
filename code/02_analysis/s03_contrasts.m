@@ -15,7 +15,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 16/03/2026                                                  %
-%   Last update: 19/08/2026                                              %
+%   Last update: 01/09/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -45,10 +45,10 @@ deriv_dir = fullfile(base_dir,'derivatives','spm-preprocessing');
 
 % List of Subjects
 subjects = {
-    'sub-002', 'sub-003', 'sub-004', 'sub-006', 'sub-007', 'sub-008', ...
-    'sub-009', 'sub-011', 'sub-012', 'sub-013', 'sub-014', 'sub-015', ...
-    'sub-016', 'sub-017', 'sub-018', 'sub-019', 'sub-020', 'sub-021', ...
-    'sub-022', 'sub-023'
+    'sub-819', 'sub-908', 'sub-147', 'sub-915', 'sub-641', 'sub-119', ...
+    'sub-295', 'sub-557', 'sub-958', 'sub-965', 'sub-177', 'sub-971', ...
+    'sub-664', 'sub-497', 'sub-805', 'sub-162', 'sub-435', 'sub-917', ...
+    'sub-797', 'sub-960'
 };
 
 % Tasks
@@ -60,13 +60,13 @@ tasks = {'task-main','task-localizer'};
 % Transition/Expectation Violation run.
 
 % However, there are some exceptions that have to be considered when constructing the contrast vectors:
-% sub-009: runs 1-4 congruent (runs 5-8 discarded)
+% sub-295: runs 1-4 congruent (runs 5-8 discarded)
 %          (this subject performed 7 congruent runs and 1 incongruent run. Run 8 (relearning 
 %          phase) was discarded because the 3 extra learning runs far exceeded the acceptable 
 %          threshold of 1 extra run, thus maintaining experimental validity and comparable 
 %          learning baselines)
-% sub-013: runs 2-4 congruent, 5-8 incongruent (missing early congruent run)
-% sub-017: runs 1-3 congruent, 4-8 incongruent (transition happens at run 4)
+% sub-965: runs 2-4 congruent, 5-8 incongruent (missing early congruent run)
+% sub-497: runs 1-3 congruent, 4-8 incongruent (transition happens at run 4)
 %          (this means this subject had one less run to learn the pattern compared to other 
 %          subjects and had one extra incongruent run...)
 
@@ -188,19 +188,19 @@ for s = 1:length(subjects)
             runs_incong = [5, 6, 7, 8];
     
             % Exceptions
-            if strcmp(subj,'sub-009')
+            if strcmp(subj,'sub-295')
                 % Missing runs 5-8
                 run_trans = NaN;
                 runs_cong = [1, 2, 3, 4];
                 runs_incong = [];
                 % Note that this means that he can only participate in Contrast 1, since the others 
                 % require relearning runs or incongruent runs that this subject does not have!
-            elseif strcmp(subj,'sub-013')
+            elseif strcmp(subj,'sub-965')
                 % Missing run 1
                 run_trans = 4;
                 runs_cong = [1, 2, 3];
                 runs_incong = [4, 5, 6, 7];
-            elseif strcmp(subj,'sub-017')
+            elseif strcmp(subj,'sub-497')
                 % Transition happened at run 4
                 run_trans = 4;
                 runs_cong = [1, 2, 3];
@@ -423,7 +423,7 @@ for s = 1:length(subjects)
             % Normalize contrasts
             % The sum of the positive activations should equal 1 and the sum of
             % the negative activations should equal -1, so they balance to 0.
-            if strcmp(subj,'sub-009')
+            if strcmp(subj,'sub-295')
                 all_cons = {con_sc_1, con_sc_2, con_1a, con_1b};
                 % Define contrast names
                 con_names = {'SC VIDEO','SC INVESTMENT','1a','1b'};

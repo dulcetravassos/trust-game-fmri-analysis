@@ -17,7 +17,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 18/02/2026                                                  %
-%   Last update: 10/06/2026                                              %
+%   Last update: 01/09/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -39,7 +39,7 @@ deriv_dir = fullfile(base_dir,'derivatives','spm-preprocessing');
 
 % List of Subjects WITHOUT magnitude files
 subjects = {
-    'sub-002', 'sub-003', 'sub-004'
+    'sub-819', 'sub-908', 'sub-147'
 };
 
 %% Get Magnitude Substitute

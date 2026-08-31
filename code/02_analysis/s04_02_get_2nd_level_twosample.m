@@ -7,7 +7,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 27/08/2026                                                  %
-%   Last update: 27/08/2026                                              %
+%   Last update: 01/09/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -28,11 +28,11 @@ deriv_dir = fullfile(base_dir,'derivatives');
 
 % List of subjects divided by groups
 learners = {
-    'sub-002', 'sub-004', 'sub-006', 'sub-007', 'sub-008', 'sub-012', 'sub-013', 'sub-015', 'sub-016', 'sub-019', 'sub-023'
+    'sub-819', 'sub-147', 'sub-915', 'sub-641', 'sub-119', 'sub-958', 'sub-965', 'sub-971', 'sub-664', 'sub-162', 'sub-960'
     };
 
 non_learners = {
-    'sub-003', 'sub-011', 'sub-014', 'sub-017', 'sub-018', 'sub-020', 'sub-021', 'sub-022'
+    'sub-908', 'sub-557', 'sub-177', 'sub-497', 'sub-805', 'sub-435', 'sub-917', 'sub-797'
     };
 
 %% Specify 2nd-Level

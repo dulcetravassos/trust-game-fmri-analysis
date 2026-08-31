@@ -13,7 +13,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 12/02/2026                                                  %
-%   Last update: 10/06/2026                                              %
+%   Last update: 01/09/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -44,10 +44,10 @@ deriv_dir = fullfile(base_dir,'derivatives','spm-preprocessing');
 
 % List of Subjects
 subjects = {
-    'sub-002', 'sub-003', 'sub-004', 'sub-006', 'sub-007', 'sub-008', ...
-    'sub-009', 'sub-011', 'sub-012', 'sub-013', 'sub-014', 'sub-015', ...
-    'sub-016', 'sub-017', 'sub-018', 'sub-019', 'sub-020', 'sub-021', ...
-    'sub-022', 'sub-023'
+    'sub-819', 'sub-908', 'sub-147', 'sub-915', 'sub-641', 'sub-119', ...
+    'sub-295', 'sub-557', 'sub-958', 'sub-965', 'sub-177', 'sub-971', ...
+    'sub-664', 'sub-497', 'sub-805', 'sub-162', 'sub-435', 'sub-917', ...
+    'sub-797', 'sub-960'
 };
 
 %% Processing
