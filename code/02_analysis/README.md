@@ -96,6 +96,8 @@ Additionally, to prevent statistical power degradation in Small Volume Correctio
 
 This supplementary script evaluates the statistical quality and efficiency of the 1st-Level GLM design matrices. It was specifically developed to assess the impact of a short and fixed Inter-Stimulus Interval (ISI) between the VIDEO and DECISION phases on model collinearity. The primary goal was to validate whether the estimated parameters remain robust and reliable, despite this experimental design limitation.
 
+It automatically generates and exports a summary table ("Design_Quality_Metrics.xlsx"). This file aggregates the subject-level metrics, focusing specifically on the critical VIDEO-DECISION collinearity, ready for direct inclusion in the Supplementary Materials.
+
 Metrics used: 
 
 - Correlation Matrices: *to identify specific pairwise collinearity between regressors;*
