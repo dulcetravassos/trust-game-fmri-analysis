@@ -13,7 +13,7 @@
 %                                                                        %
 %   Author: Dulce Travassos                                              %
 %   Created: 24/03/2026                                                  %
-%   Last update: 10/06/2026                                              %
+%   Last update: 31/08/2026                                              %
 %                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -51,6 +51,8 @@ if isempty(which('spm')); addpath(spm_path); end
 spm('defaults', 'FMRI');
 spm_jobman('initcfg');
 
+results_table = table();
+
 for s = 1:length(subjects)
     subj = subjects{s};
 
@@ -77,7 +79,14 @@ for s = 1:length(subjects)
         X_var = X(:,var(X)>0); % if var = 0, then the values in the column are constant
         names_var = names(var(X)>0);
         R = corr(X_var);
-    
+
+        % Identify regressor types based on names_var
+        is_motion = ~cellfun(@isempty,regexp(names_var,'R\d+','once'));
+        is_task = ~is_motion;
+        is_video = contains(names_var,'VIDEO','IgnoreCase',true) & ~contains(names_var,'excluded','IgnoreCase',true) & ~contains(names_var,'NO_RESPONSE','IgnoreCase',true);
+        is_decision = contains(names_var,'DECISION','IgnoreCase',true) & ~contains(names_var,'excluded','IgnoreCase',true) & ~contains(names_var,'NO_RESPONSE','IgnoreCase',true);
+        is_other_task = is_task & ~is_video & ~is_decision;
+
         %% Correlation Between Conditions
         % Highly correlated conditions are problematic, because the SPM GLM model struggles to separate 
         % the shared variance, making it difficult to attribute the BOLD signal to a specific condition.
@@ -108,8 +117,25 @@ for s = 1:length(subjects)
         title(sprintf('Design Matrix Correlation (R) - %s',subj));
         xlabel('Regressors (Columns)'); ylabel('Regressors (Columns)');
 
-        fprintf('\n##############################################\n');
+        % VIDEO-DECISION correlations (for the table)
+        video_idx = find(is_video); decision_idx = find(is_decision);
+        video_decision_corrs = [];
+        for v = video_idx
+            for d = decision_idx
+                video_decision_corrs(end+1) = R(v,d);
+            end
+        end
+
+        if isempty(video_decision_corrs)
+            max_r_vd = NaN;
+            n_r_vd_above_05 = NaN;
+        else
+            max_r_vd = max(abs(video_decision_corrs));
+            n_r_vd_above_05 = sum(abs(video_decision_corrs)>0.5);
+        end
         
+        fprintf('\n##############################################\n');
+
         %% VIF (Variance Inflation Factor)
         % VIF quantifies how much the variance of an estimated regression coefficient is inflated due to 
         % multicollinearity. VIF = 1 signifies no redundancy among variables (perfect orthogonality), 
@@ -128,6 +154,10 @@ for s = 1:length(subjects)
             end
         end
 
+        % Extract max VIF for task regressors only
+        if any(is_task); max_vif_task = max(VIF(is_task));
+        else; max_vif_task = NaN; end;
+
         fprintf('\n##############################################\n');
 
         %% Eigenvalues & Condition Number of a Matrix
@@ -145,8 +175,7 @@ for s = 1:length(subjects)
         cond_num = cond(X_var);
         fprintf('Condition Number (Kappa) = %.2f\n',cond_num);
         
-        is_motion = ~cellfun(@isempty,regexp(names_var,'R\d+','once'));
-        X_task = X_var(:,~is_motion);
+        X_task = X_var(:,is_task);
         cond_task = cond(X_task);
         fprintf('Condition Number (task only - excl. movement regressors): %.2f\n',cond_task);
 
@@ -161,6 +190,12 @@ for s = 1:length(subjects)
         erdf = SPM.xX.erdf; % effective residual degrees of freedom
         fprintf('eDF = %.2f\n',erdf);
         fprintf('\n##############################################\n');
+
+        %% Save Sumamry Table (.xlsx)
+
+        sum_row = table({subj},{task},max_r_vd,n_r_vd_above_05,max_vif_task,cond_task,erdf, ...
+            'VariableNames',{'Subject','Task','Max_r_Video_Decision','N_Corrs_V_D_above_05','Max_VIF_task','Condition_Number_Task','eDF'});
+        results_table = [results_table; sum_row];
 
         %% Overlap plots
         % Visual demonstration of the temporal overlap (shared variance) between the predicted BOLD 
@@ -196,3 +231,9 @@ for s = 1:length(subjects)
         end
     end
 end
+
+%% Export .xlsx Table
+
+output_xlsx = fullfile(deriv_dir,'Design_Quality_Metrics.xlsx');
+writetable(results_table,output_xlsx);
+fprintf('\n>>>>> Design Quality Metrics saved to %s\n',output_xlsx);
