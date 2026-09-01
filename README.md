@@ -5,7 +5,7 @@
 
 **Date created:** January 2026
 
-**Last updated:** August 2026
+**Last updated:** September 2026
 
 **Identifer:** DOI [xxxxx]
 
@@ -18,6 +18,8 @@
 This repository consists of a SPM project executed primarily in MATLAB, with 27 custom scripts required to replicate the results from the "_Social Reversal Learning_" study. Output files and directory structures follow the Brain Imaging Data Structure (BIDS) naming convention. For a detailed description of all folders and files, please refer to the Repository Structure section below. 
 To execute this pipeline, please ensure that MATLAB, SPM12, and FSL (versions specified below) are installed. The scripts are numbered sequentially in the order that they should be run. The data either needed to run these scripts or created by these scripts is available at [_waiting for publication_]. 
 For any further information regarding this repository, please contact: Dulce Travassos, email: uc2021216844 [at] student [dot] uc [dot] pt.
+
+_**Note:** The pipeline assumes that the anatomical ROIs used are already provided. Their original generation using FreeSurfer is not included in the repository. Functional ROIs, in contrast, are generated within the pipeline using the Face Localizer data._
 
 <br>
 
@@ -41,7 +43,7 @@ With modularity and reproducibility in mind, this pipeline was designed to be ex
   - **s09_smoothing.m**: Applies a spatial Gaussian filter to the normalized functional images to increase the Signal-to-Noise Ratio.
 - **[`02_analysis/`](code/02_analysis/)**: Contains scripts for setting up, estimating, and evaluating the 1st and 2nd-level General Linear Models (GLMs).
   - **s00_convert_prt.m**: Converts BrainVoyager .prt logfiles to SPM-readable .mat event files and BIDS-compliant .tsv files.
-  - **s00_reslice_normalize_rois.m**: Reslices FreeSurfer anatomical ROIs into the T1w space dimensions and normalizes them to MNI.
+  - **s00_reslice_normalize_rois.m**: Reslices pre-existing FreeSurfer anatomical ROIs into the T1w space dimensions and normalizes them to MNI.
   - **s00_roi_definition_marsbar.m**: Documents the creation of subject-specific functional Regions of Interest (ROIs) based on individual peak coordinates using MarsBaR and computes group average anatomical image.
   - **s01_get_design_matrix.m**: Generates subject-specific Design Matrices and explicit brain masks.
   - **s02_beta_estimation.m**: Runs the GLM estimation algorithm to generate the regression coefficients (Beta images).
