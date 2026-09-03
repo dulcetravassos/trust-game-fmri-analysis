@@ -1,7 +1,14 @@
 # Short Title: *Social Reversal Learning*
 ## Title: *Social Reversal Learning: An fMRI Study of Learning and Relearning to Trust in Different Social Contexts*
 
-**Contributors:** Dulce Travassos
+**CRediT Author Statement:** 
+
+_**Software:** Dulce Travassos. [Data Preprocessing and Analysis Support] Ricardo Martins, Bruno Direito._
+
+_**Methodology:** Dulce Travassos. [Preprocessing Pipeline] Ana Cortês. [Functional ROI definition] Ricardo Martins, Catarina Duarte._
+
+_**Supervision:** [TREASURE - Open Code & Software] Alfredo Sanchéz-Tójar, Thomas Feliciani._
+
 
 **Date created:** January 2026
 
